@@ -1,0 +1,80 @@
+/***
+ * @copyright Copyright (c) 2020, Magnus Walbeck <mw@mwalbeck.org>
+ *
+ * @license GNU AGPL version 3 or any later version, see COPYING file for more.
+ */
+
+/* Analytics ---------------------------------------------------------------- */
+
+.app-analytics #app-navigation {
+    &:not(.vue) > ul > li > a.active + div.app-navigation-entry-utils {
+        background-color: var(--color-primary-element);
+    }
+
+    #data-settings li.data-settings-item {
+        opacity: 1;
+    }
+}
+
+.app-analytics #app-content .dataTables_wrapper {
+    .dataTables_length,
+    .dataTables_filter,
+    .dataTables_info,
+    .dataTables_processing,
+    .dataTables_paginate {
+        color: var(--color-main-text);
+    }
+
+    .dataTable {
+        thead th {
+            border-bottom-color: var(--color-border);
+        }
+
+        &.no-footer {
+            border-bottom-color: var(--color-border);
+        }
+    }
+
+    .dataTables_paginate .paginate_button {
+        border-color: var(--color-border);
+        color: var(--color-main-text) !important;
+
+        &:hover {
+            background: var(--color-main-background);
+            border-color: var(--color-primary-element);
+        }
+
+        &.current {
+            background: var(--color-primary-element);
+            border-color: var(--color-primary-element);
+            color: var(--color-main-text) !important;
+        }
+
+        &.disabled {
+            background-color: var(--color-background-alternate);
+            color: var(--color-text-maxcontrast) !important;
+
+            &:hover {
+                border-color: var(--color-border);
+            }
+        }
+    }
+}
+
+.app-analytics #app-sidebar .tabHeaders .tabHeader {
+    &.selected,
+    &:hover,
+    &:focus,
+    &:active {
+        border-bottom-color: var(--color-primary-element);
+    }
+}
+
+.app-analytics .analyticsWidgetItem {
+    background-color: var(--color-background-darker) !important;
+
+    &:hover,
+    &:focus {
+        background-color: var(--color-background-hover) !important;
+    }
+}

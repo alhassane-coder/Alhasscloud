@@ -1,0 +1,56 @@
+<?xml version="1.0"?>
+<info xmlns:xsi= "http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="https://apps.nextcloud.com/schema/apps/info.xsd">
+	<id>mail</id>
+	<name>Mail</name>
+	<summary>💌 A mail app for Nextcloud</summary>
+	<description><![CDATA[**💌 A mail app for Nextcloud**
+
+- **🚀 Integration with other Nextcloud apps!** Currently Contacts, Calendar & Files – more to come.
+- **📥 Multiple mail accounts!** Personal and company account? No problem, and a nice unified inbox. Connect any IMAP account.
+- **🔒 Send & receive encrypted mails!** Using the great [Mailvelope](https://mailvelope.com) browser extension.
+- **🙈 We’re not reinventing the wheel!** Based on the great [Horde](http://horde.org) libraries.
+- **📬 Want to host your own mail server?** We don’t have to reimplement this as you could set up [Mail-in-a-Box](https://mailinabox.email)!
+	]]></description>
+	<version>1.4.1</version>
+	<licence>agpl</licence>
+	<author>Christoph Wurst</author>
+	<author>Roeland Jago Douma</author>
+	<author>Greta Doçi</author>
+	<author>Cyrille Bollu</author>
+	<author>Jan-Christoph Borchardt</author>
+	<namespace>Mail</namespace>
+	<documentation>
+		<admin>https://github.com/nextcloud/mail#readme</admin>
+	</documentation>
+	<category>social</category>
+	<category>office</category>
+	<website>https://github.com/nextcloud/mail#readme</website>
+	<bugs>https://github.com/nextcloud/mail/issues</bugs>
+	<repository type="git">https://github.com/nextcloud/mail.git</repository>
+	<screenshot>https://user-images.githubusercontent.com/1374172/79554966-278e1600-809f-11ea-82ea-7a0d72a2704f.png</screenshot>
+	<dependencies>
+		<php min-version="7.2" max-version="7.4" />
+		<nextcloud min-version="18" max-version="20" />
+	</dependencies>
+	<repair-steps>
+		<post-migration>
+			<step>OCA\Mail\Migration\FixCollectedAddresses</step>
+			<step>OCA\Mail\Migration\FixBackgroundJobs</step>
+			<step>OCA\Mail\Migration\MakeItineraryExtractorExecutable</step>
+			<step>OCA\Mail\Migration\MigrateProvisioningConfig</step>
+			<step>OCA\Mail\Migration\ProvisionAccounts</step>
+		</post-migration>
+	</repair-steps>
+	<commands>
+		<command>OCA\Mail\Command\CleanUp</command>
+		<command>OCA\Mail\Command\CreateAccount</command>
+		<command>OCA\Mail\Command\DiagnoseAccount</command>
+		<command>OCA\Mail\Command\ExportAccount</command>
+		<command>OCA\Mail\Command\SyncAccount</command>
+		<command>OCA\Mail\Command\TrainAccount</command>
+	</commands>
+	<settings>
+		<admin>OCA\Mail\Settings\AdminSettings</admin>
+	</settings>
+</info>

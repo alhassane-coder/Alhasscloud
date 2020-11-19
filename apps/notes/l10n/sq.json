@@ -1,0 +1,25 @@
+{ "translations": {
+    "Error" : "Error",
+    "New note" : "Shënim i ri",
+    "Notes" : "Shënime",
+    "Settings" : "Rregullimet",
+    "All notes" : "Të gjitha shënimet",
+    "Categories" : "Kategoritë",
+    "Today" : "Sot",
+    "Yesterday" : "Dje",
+    "This week" : "Këtë javë",
+    "This month" : "Këtë muaj",
+    "Rename" : "Rename",
+    "Delete note" : "Fshije shënimin",
+    "Remove from favorites" : "Remove from favorites",
+    "Add to favorites" : "Shtoje tek të parapëlqyerat",
+    "Details" : "Detajet",
+    "Edit" : "Përpuno",
+    "Preview" : "Parapamje ",
+    "Category" : "Kategori",
+    "Uncategorized" : "Të pakategorizuara",
+    "_%n word_::_%n words_" : ["%n fjalë","%n fjalë"],
+    "Android app" : "Aplikacion Android",
+    "iOS app" : "Aplikacion iOS"
+},"pluralForm" :"nplurals=2; plural=(n != 1);"
+}

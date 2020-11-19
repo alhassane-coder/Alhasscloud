@@ -1,0 +1,72 @@
+#user_sql .main {
+    overflow: auto;
+}
+
+#user_sql .main > div {
+    float: left;
+    width: 380px;
+}
+
+#user_sql .main div > label > span {
+    display: inline-block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: middle;
+    white-space: nowrap;
+    width: 120px;
+}
+
+#user_sql .main div > label > input,
+#user_sql .main div > label > select {
+    width: 257px;
+}
+
+#user_sql .main div > input[type="checkbox"] {
+    min-height: auto;
+}
+
+#user_sql .main .button-right {
+    overflow: auto;
+}
+
+#user_sql .main .button-right > input[type="submit"] {
+    float: right;
+}
+
+#user_sql .main .inner-fieldset {
+    border-bottom: 1px solid var(--color-border);
+    border-top: 1px solid var(--color-border);
+    margin: 8px 0;
+    padding: 8px 0 8px 16px;
+}
+
+#user_sql .msg {
+    left: 0;
+    padding: 3px;
+    position: fixed;
+    text-align: center;
+    width: 100%;
+    z-index: 100;
+}
+
+#user_sql .msg.error {
+    background-color: var(--color-error);
+    color: var(--color-primary-text);
+}
+
+#user_sql .msg.success {
+    background-color: var(--color-success);
+    color: var(--color-primary-text);
+}
+
+#user_sql .msg.waiting {
+    background-color: var(--color-warning);
+    color: var(--color-primary-text);
+}
+
+#user_sql .loading {
+    display: inline-block;
+    height: 32px;
+    margin: 5px 0;
+    width: 32px;
+}

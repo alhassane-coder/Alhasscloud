@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<info>
+    <id>user_sql</id>
+    <name>User and Group SQL Backends</name>
+    <summary>Control users and groups by SQL queries</summary>
+    <description>
+        Use external database as a source for Nextcloud users and groups.
+        Retrieve the users and groups info. Allow the users to change their passwords.
+        Sync the users' email addresses with the addresses stored by Nextcloud.
+    </description>
+    <version>4.5.0</version>
+    <licence>agpl</licence>
+    <author>Marcin Łojewski</author>
+    <author>Andreas Böhler</author>
+    <namespace>UserSQL</namespace>
+    <bugs>https://github.com/nextcloud/user_sql/issues</bugs>
+    <repository>https://github.com/nextcloud/user_sql</repository>
+    <screenshot>https://raw.githubusercontent.com/nextcloud/user_sql/master/img/screenshot.png</screenshot>
+    <types>
+        <authentication/>
+    </types>
+    <category>auth</category>
+    <dependencies>
+        <php min-version="7.1"/>
+        <nextcloud min-version="14" max-version="19"/>
+    </dependencies>
+    <settings>
+        <admin>\OCA\UserSQL\Settings\Admin</admin>
+        <admin-section>OCA\UserSQL\Settings\Section</admin-section>
+    </settings>
+</info>

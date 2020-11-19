@@ -1,0 +1,30 @@
+/***
+ * @copyright Copyright (c) 2017, Magnus Walbeck <mw@mwalbeck.org>
+ *
+ * @license GNU AGPL version 3 or any later version, see COPYING file for more.
+ */
+
+/* Announcement Center ------------------------------------------------------ */
+
+.app-announcementcenter {
+    #announcement_submit_msg.success {
+        background-color: var(--color-success) !important;
+    }
+
+    .section > span {
+        color: var(--color-text-maxcontrast);
+    }
+}
+
+/* Icons -------------------------------------------------------------------- */
+
+.app-announcementcenter {
+    .icon-announcementcenter,
+    .icon-announcementcenter-dark {
+        background-image: var(--icon-announcementcenter-announcementcenter-f2f2f2) !important;
+    }
+
+    .icon-notifications-off {
+        background-image: var(--icon-announcementcenter-notifications-off-f2f2f2) !important;
+    }
+}

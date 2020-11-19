@@ -1,0 +1,28 @@
+{ "translations": {
+    "Personal" : "Personol",
+    "Done" : "Done",
+    "The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form" : "Mae'r ffeil lwythwyd i fyny'n fwy na chyfarwyddeb MAX_FILE_SIZE bennwyd yn y ffurflen HTML",
+    "No file was uploaded" : "Ni lwythwyd ffeil i fyny",
+    "Missing a temporary folder" : "Plygell dros dro yn eisiau",
+    "Cancel" : "Diddymu",
+    "Details" : "Manylion",
+    "Tags" : "Tagiau",
+    "Undo" : "Dadwneud",
+    "Can edit" : "Can edit",
+    "Can share" : "Can share",
+    "Delete" : "Dileu",
+    "Edit" : "Golygu",
+    "Title" : "Teitl",
+    "Upload attachment" : "Llwytho atodiad",
+    "Modified" : "Addaswyd",
+    "Select Date" : "Dewis Dyddiad",
+    "Save" : "Cadw",
+    "Update" : "Diweddaru",
+    "Description" : "Disgrifiad",
+    "seconds ago" : "eiliad yn ôl",
+    "Shared with you" : "Shared with you",
+    "An error occurred" : "Digwyddodd gwall",
+    "Today" : "Heddiw",
+    "This week" : "Wythnos yma"
+},"pluralForm" :"nplurals=4; plural=(n==1) ? 0 : (n==2) ? 1 : (n != 8 && n != 11) ? 2 : 3;"
+}

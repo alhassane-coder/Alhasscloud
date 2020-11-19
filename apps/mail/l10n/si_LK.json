@@ -1,0 +1,25 @@
+{ "translations": {
+    "Mail" : "තැපැල්",
+    "Name" : "නම",
+    "Password" : "මුර පදය",
+    "None" : "කිසිවක් නැත",
+    "Save" : "සුරකින්න",
+    "Connect" : "සම්බන්ධ වන්න",
+    "Select" : "Select",
+    "Delete" : "ඉවත් කරන්න",
+    "Important" : "වැදගත්",
+    "Favorites" : "Favorites",
+    "Other" : "වෙනත්",
+    "Settings" : "සැකසුම්",
+    "Quota" : "සලාකය",
+    "Add folder" : "Add folder",
+    "Cancel" : "අවලංගු කරන්න",
+    "General" : "සාමාන්‍යයෙන්",
+    "User" : "User",
+    "Host" : "සත්කාරකය",
+    "Port" : "තොට",
+    "Search" : "Search",
+    "Refresh" : "නැවුම් කරන්න",
+    "All" : "සියල්ල"
+},"pluralForm" :"nplurals=2; plural=(n != 1);"
+}

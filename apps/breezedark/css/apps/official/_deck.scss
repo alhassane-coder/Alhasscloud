@@ -1,0 +1,93 @@
+/***
+ * @copyright Copyright (c) 2018, Magnus Walbeck <mw@mwalbeck.org>
+ *
+ * @license GNU AGPL version 3 or any later version, see COPYING file for more.
+ */
+
+/* Deck --------------------------------------------------------------------- */
+
+.card {
+    background-color: var(--color-background-darker) !important;
+    border: 1px solid var(--color-border);
+
+    &:hover,
+    &.current-card {
+        border-color: var(--color-primary-element);
+    }
+
+    .due,
+    .due.overdue {
+        opacity: 1 !important;
+    }
+
+    .due.next {
+        background-color: var(--color-neutral) !important;
+        opacity: 1 !important;
+
+        span {
+            color: var(--color-text-dark);
+        }
+    }
+
+    .due.now {
+        opacity: 1 !important;
+
+        span {
+            color: var(--color-text-dark);
+        }
+    }
+}
+
+.modal-wrapper .modal-container {
+    box-shadow: unset !important;
+}
+
+/* Icons -------------------------------------------------------------------- */
+
+.icon-deck {
+    background-image: var(--icon-deck-deck-f2f2f2) !important;
+}
+
+.icon-archive {
+    background-image: var(--icon-deck-archive-f2f2f2) !important;
+}
+
+.icon-toggle-compact-expanded {
+    background-image: var(--icon-deck-toggle-view-collapse-f2f2f2) !important;
+}
+
+.icon-toggle-compact-collapsed {
+    background-image: var(--icon-deck-toggle-view-expand-f2f2f2) !important;
+}
+
+.icon-clone {
+    background-image: var(--icon-deck-clone-f2f2f2) !important;
+}
+
+.icon-filter {
+    background-image: var(--icon-deck-filter-f2f2f2) !important;
+}
+
+.icon-attach {
+    background-image: var(--icon-deck-attach-f2f2f2) !important;
+}
+
+.icon-calendar-dark.now,
+.icon-calendar-dark.next {
+    background-image: var(--icon-calendar-000) !important;
+}
+
+.icon-filter_set {
+    background-image: var(--icon-deck-filter_set-f2f2f2) !important;
+}
+
+.resource-type-deck {
+    img[src$="deck-dark.svg"] {
+        filter: invert(95%);
+        opacity: 0.7 !important;
+    }
+
+    &:hover img[src$="deck-dark.svg"] {
+        opacity: 1 !important;
+    }
+}

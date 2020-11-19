@@ -1,0 +1,25 @@
+/***
+ * @copyright Copyright (c) 2017, Magnus Walbeck <mw@mwalbeck.org>
+ *
+ * @license GNU AGPL version 3 or any later version, see COPYING file for more.
+ */
+
+/* User account deletion ---------------------------------------------------- */
+
+#delete-account-settings .warnings {
+    color: var(--color-error);
+}
+
+button#deleteaccount {
+    border-color: var(--color-error);
+
+    &:hover:not(:disabled):not(.primary):not(#quota) {
+        background-color: var(--color-error);
+        border-color: var(--color-error);
+    }
+
+    &:disabled {
+        background-color: var(--color-background-alternate);
+        border-color: var(--color-border);
+    }
+}

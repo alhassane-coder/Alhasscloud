@@ -1,0 +1,55 @@
+/***
+ * @copyright Copyright (c) 2018, Magnus Walbeck <mw@mwalbeck.org>
+ *
+ * @license GNU AGPL version 3 or any later version, see COPYING file for more.
+ */
+
+/* Weather ------------------------------------------------------------------ */
+
+.app-weather #city-list-left {
+    background-color: var(--color-main-background);
+    border-left: none;
+    border-right-color: var(--color-border);
+
+    .city-list {
+        li {
+            a {
+                color: var(--color-main-text);
+            }
+
+            &:hover,
+            &:hover > a {
+                background-color: var(--color-background-hover);
+                box-shadow: inset 4px 0 var(--color-primary);
+            }
+
+            &.selected,
+            &.selected a {
+                background-color: var(--color-primary-element);
+                box-shadow: inset 4px 0 var(--color-primary);
+                color: var(--color-main-text);
+                font-weight: 600;
+            }
+        }
+
+        #create-city {
+            background-color: var(--color-main-background);
+            border-bottom-color: var(--color-primary-element);
+            border-left: none;
+            border-right: none;
+            border-top-color: var(--color-primary-element);
+
+            h1 {
+                color: var(--color-main-text);
+            }
+
+            hr {
+                background: var(--color-border);
+            }
+        }
+    }
+}
+
+.app-weather #city-right table tr {
+    background-color: unset;
+}

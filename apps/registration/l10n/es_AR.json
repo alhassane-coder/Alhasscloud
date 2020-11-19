@@ -1,0 +1,11 @@
+{ "translations": {
+    "Saved" : "Guardado",
+    "Register" : "Registrar",
+    "None" : "Ninguno",
+    "Username" : "Nombre de usuario",
+    "Password" : "Contraseña",
+    "Create account" : "Crear cuenta",
+    "Email" : "Correo electrónico",
+    "Back to login" : "Volver para iniciar sesión"
+},"pluralForm" :"nplurals=2; plural=(n != 1);"
+}

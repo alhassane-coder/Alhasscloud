@@ -1,0 +1,18 @@
+OC.L10N.register(
+    "quota_warning",
+    {
+    "Saving…" : "Tallennetaan…",
+    "Saved!" : "Tallennettu!",
+    "Nearing your storage quota" : "Tallennustilan kiintiö on tulossa täyteen",
+    "You are using more than %d%% of your storage quota. Try to free up some space by deleting old files you don't need anymore." : "Käytössäsi on %d%% enemmän kuin kiintiöksesi on määritetty. Vapauta tilaa poistamalla tarpeettomia tiedostoja.",
+    "Quota warning" : "Kiintiövaroitus",
+    "You are using more than %d%% of your storage quota" : "Käytössäsi on enemmän kuin %d%% tallennustilan kiintiöstäsi",
+    "First notification" : "Ensimmäinen ilmoitus",
+    "Send an email" : "Lähetä sähköposti",
+    "Second notification" : "Toinen ilmoitus",
+    "Final notification" : "Viimeinen ilmoitus",
+    "Link to quota management" : "Linkki kiintiöhallintaan",
+    "Resend notifications after … days" : "Lähetä ilmoitukset uudelleen … päivän jälkeen",
+    "Set to 0 if the user should only receive one notification." : "Aseta arvoon 0 jos käyttäjän tulee vastaanottaa vain yksi ilmoitus."
+},
+"nplurals=2; plural=(n != 1);");

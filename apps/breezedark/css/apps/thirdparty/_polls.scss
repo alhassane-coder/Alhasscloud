@@ -1,0 +1,98 @@
+/***
+ * @copyright Copyright (c) 2018, Magnus Walbeck <mw@mwalbeck.org>
+ *
+ * @license GNU AGPL version 3 or any later version, see COPYING file for more.
+ */
+
+/* Polls -------------------------------------------------------------------- */
+
+.app-polls #app-content {
+    .table-row.table-header {
+        opacity: 1;
+    }
+
+    .table .pollListItem a {
+        color: var(--color-main-text);
+    }
+
+    .toggle-cell {
+        &.yes,
+        &.maybe,
+        &.no {
+            background-color: var(--color-main-background);
+        }
+    }
+
+    .poll-cell {
+        &.yes {
+            color: var(--color-success);
+        }
+
+        &.maybe {
+            color: var(--color-warning);
+        }
+
+        &.no {
+            color: var(--color-error);
+        }
+    }
+
+    input.success,
+    input.icon-confirn.success {
+        background-color: var(--color-main-background) !important;
+        border-color: var(--color-success) !important;
+    }
+
+    input.error {
+        background-color: var(--color-main-background) !important;
+        border-color: var(--color-error) !important;
+    }
+
+    .vote-row .counter {
+        .yes {
+            background-color: var(--color-success);
+        }
+
+        .no {
+            background-color: var(--color-error);
+        }
+    }
+}
+
+.app-polls #app-sidebar {
+    &.detailsView .pollInformation .cloud .open {
+        background-color: var(--color-success);
+    }
+
+    &.detailsView .pollInformation .cloud .information {
+        background-color: var(--color-warning);
+    }
+
+    .pollActions li a {
+        opacity: 0.7;
+
+        &:hover {
+            opacity: 1;
+        }
+    }
+}
+
+.app-polls .tabHeaders .tabHeader {
+    &.selected,
+    &:hover,
+    &:focus {
+        border-bottom-color: var(--color-border);
+    }
+}
+
+/* Datepicker */
+.app-polls .mx-datepicker .mx-datepicker-popup {
+    background-color: var(--color-main-background) !important;
+    border-color: var(--color-border) !important;
+}
+
+// Shift dates
+.app-polls .modal-dialog {
+    border: 1px solid var(--color-border) !important;
+    box-shadow: none !important;
+}

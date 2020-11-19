@@ -1,0 +1,356 @@
+/***
+ * @copyright Copyright (c) 2017, Magnus Walbeck <mw@mwalbeck.org>
+ *
+ * @license GNU AGPL version 3 or any later version, see COPYING file for more.
+ */
+
+/* Passman ------------------------------------------------------------------ */
+
+.app-passman .vault_wrapper {
+    background: var(--color-background-darker);
+    border: 1px solid var(--color-border);
+    box-shadow: none;
+
+    .vaultlist li {
+        border-bottom-color: var(--color-border);
+
+        &:hover {
+            background-color: var(--color-background-hover);
+        }
+
+        &.ng-scope:last-child {
+            border-bottom: none;
+        }
+    }
+
+    .login_form {
+        .button-geen {
+            background-color: var(--color-success);
+            border-color: var(--color-success);
+            color: var(--color-main-text);
+
+            &:hover {
+                border-color: var(--color-success) !important;
+            }
+
+            &:active,
+            &:focus {
+                border-color: var(--color-primary-element) !important;
+            }
+        }
+
+        .button-red {
+            background-color: var(--color-error);
+            border-color: var(--color-error);
+            color: var(--color-main-text);
+
+            &:hover {
+                border-color: var(--color-warning) !important;
+            }
+
+            &:active,
+            &:focus {
+                background-color: var(--color-warning) !important;
+                border-color: var(--color-warning) !important;
+            }
+        }
+    }
+}
+
+.app-passman #app-navigation {
+    li {
+        .bullet-color-red {
+            background-color: var(--color-error);
+        }
+
+        .bullet-color-yellow {
+            background-color: var(--color-warning);
+        }
+
+        .bullet-color-green {
+            background-color: var(--color-success);
+        }
+    }
+
+    .nav-trashbin a {
+        background-color: var(--color-main-background) !important;
+
+        &:hover {
+            background-color: var(--color-background-hover) !important;
+        }
+
+        &.active {
+            background-color: var(--color-primary-element) !important;
+        }
+    }
+}
+
+.app-passman #app-content {
+    #app-content-wrapper {
+        .credential-table tr {
+            &:hover {
+                background-color: var(--color-background-hover);
+            }
+
+            &.selected {
+                background-color: var(--color-primary-element);
+            }
+
+            td {
+                border-bottom-color: var(--color-border);
+            }
+        }
+
+        .viewModes .view-mode {
+            background-color: var(--color-main-background);
+            border-color: var(--color-border) !important;
+
+            &.active {
+                background-color: var(--color-primary-element);
+            }
+        }
+
+        .grid-view .credential {
+            border-color: var(--color-border) !important;
+
+            .credential_content .tags .tag {
+                color: var(--color-main-text) !important;
+            }
+        }
+
+        .tags .tag,
+        .app_sidebar .credential-data .tags .tag {
+            background-color: var(--color-background-darker);
+            border: 1px solid var(--color-border);
+        }
+
+        #passman-controls {
+            background-color: inherit;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .edit_credential .compromised-button {
+            background-color: var(--color-error);
+            border-color: var(--color-error);
+            color: var(--color-main-text);
+
+            &:hover,
+            &:active,
+            &:focus {
+                border-color: var(--color-warning);
+            }
+        }
+    }
+
+    // Settings
+
+    .tab_header li {
+        &.active {
+            box-shadow: inset 0 -4px var(--color-primary);
+
+            .indicator {
+                display: none;
+            }
+        }
+
+        &.tab {
+            background-color: var(--color-main-background) !important;
+            border-right-color: var(--color-border);
+            color: var(--color-main-text) !important;
+
+            &:hover {
+                background-color: var(--color-background-hover) !important;
+            }
+        }
+    }
+
+    .tab_container {
+        border: none;
+    }
+
+    .pass-meter .details,
+    .pass-meter .pass-meter-message {
+        color: var(--color-text-maxcontrast);
+    }
+
+    .pass-meter-col .indicator {
+        background-color: var(--color-background-darker);
+    }
+
+    .pass-meter-col.poor .indicator {
+        background-color: var(--color-error);
+    }
+
+    .pass-meter-col.weak .indicator {
+        background-color: var(--color-warning);
+    }
+
+    .pass-meter-col.good .indicator,
+    .pass-meter-col.strong .indicator {
+        background-color: var(--color-success);
+    }
+
+    .icon-label input,
+    .pw-gen input {
+        background-color: var(--color-main-background);
+        border-color: var(--color-border);
+        color: var(--color-main-text);
+    }
+
+    .pw-gen .generate_pw .cell {
+        background-color: var(--color-main-background);
+        border-color: var(--color-border);
+    }
+
+    .inputfile + label {
+        background-color: var(--color-background-darker);
+        border: 1px solid var(--color-border);
+
+        &:hover {
+            border-color: var(--color-primary-element);
+        }
+    }
+
+    .icon-label .icon-picker .cell {
+        background-color: var(--color-main-background);
+        border-color: var(--color-border);
+
+        &:hover {
+            border-color: var(--color-primary-element);
+        }
+    }
+
+    .btn-danger {
+        background-color: var(--color-error);
+        background-image: none;
+        border-color: var(--color-error);
+        box-shadow: none;
+        color: var(--color-main-text);
+        text-shadow: none;
+
+        &:hover {
+            background-color: var(--color-error);
+            border-color: var(--color-warning) !important;
+        }
+
+        &:focus,
+        &:active {
+            background-color: var(--color-warning) !important;
+            border-color: var(--color-warning) !important;
+        }
+    }
+}
+
+tags-input {
+    .tags {
+        background-color: var(--color-main-background) !important;
+        border: 1px solid var(--color-border) !important;
+        box-shadow: none !important;
+
+        &.focused {
+            border-color: var(--color-primary-element) !important;
+            -webkit-box-shadow: none !important;
+            -moz-box-shadow: none !important;
+            box-shadow: none !important;
+        }
+
+        .tag-item {
+            border-color: var(--color-border) !important;
+            color: var(--color-main-text) !important;
+        }
+    }
+
+    &.ng-invalid .tags {
+        border-color: var(--color-error) !important;
+        -webkit-box-shadow: none !important;
+        -moz-box-shadow: none !important;
+        box-shadow: none !important;
+    }
+
+    .autocomplete {
+        background-color: var(--color-background-darker) !important;
+        border: 1px solid var(--color-border) !important;
+        -webkit-box-shadow: none !important;
+        -moz-box-shadow: none !important;
+        box-shadow: none !important;
+
+        .suggestion-item.selected {
+            background-color: var(--color-background-hover) !important;
+            color: var(--color-main-text) !important;
+        }
+    }
+}
+
+.angularjs-datetime-picker {
+    background: var(--color-main-background) !important;
+    border-color: var(--color-border) !important;
+    color: var(--color-main-text) !important;
+
+    .adp-month {
+        background: var(--color-main-background) !important;
+        border-bottom-color: var(--color-border) !important;
+
+        > button {
+            color: var(--color-main-text) !important;
+
+            &:hover {
+                color: var(--color-primary-element) !important;
+            }
+
+            &:active,
+            &:focus {
+                background-color: transparent !important;
+                color: var(--color-primary-element) !important;
+            }
+        }
+    }
+
+    .adp-days {
+        > .adp-day.selected {
+            background: var(--color-background-hover) !important;
+            border-color: var(--color-primary-element) !important;
+        }
+
+        > .adp-day.selectable:hover {
+            background: var(--color-background-hover) !important;
+        }
+    }
+}
+
+.sequence code {
+    border: none !important;
+}
+
+.iconpicker-dialog,
+.shareincoming-dialog,
+.custom-search-dialog {
+    &,
+    .ui-dialog {
+        box-shadow: none !important;
+    }
+}
+
+.iconpicker-dialog .ui-button.ui-button-icon-only {
+    background-color: var(--color-main-background) !important;
+}
+
+#passman-settings {
+    #mover {
+        table tr:hover {
+            background-color: unset;
+        }
+    }
+}
+
+/* Icons -------------------------------------------------------------------- */
+
+.app-passman {
+    //source https://material.io/tools/icons/?icon=restore&style=baseline
+    .icon-expired {
+        background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPScyNCcgaGVpZ2h0PScyNCcgdmlld0JveD0nMCAwIDI0IDI0Jz48cGF0aCBkPSdNMCAwaDI0djI0SDB6JyBmaWxsPSdub25lJy8+PHBhdGggZD0nTTEzIDNjLTQuOTcgMC05IDQuMDMtOSA5SDFsMy44OSAzLjg5LjA3LjE0TDkgMTJINmMwLTMuODcgMy4xMy03IDctN3M3IDMuMTMgNyA3LTMuMTMgNy03IDdjLTEuOTMgMC0zLjY4LS43OS00Ljk0LTIuMDZsLTEuNDIgMS40MkM4LjI3IDE5Ljk5IDEwLjUxIDIxIDEzIDIxYzQuOTcgMCA5LTQuMDMgOS05cy00LjAzLTktOS05em0tMSA1djVsNC4yOCAyLjU0LjcyLTEuMjEtMy41LTIuMDhWOEgxMnonIGZpbGw9JyNmMmYyZjInLz48L3N2Zz4=") !important;
+    }
+
+    .icon-label .icon-image {
+        background-image: unset !important;
+    }
+}

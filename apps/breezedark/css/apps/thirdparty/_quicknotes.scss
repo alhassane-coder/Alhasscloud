@@ -1,0 +1,47 @@
+/***
+ * @copyright Copyright (c) 2018, Magnus Walbeck <mw@mwalbeck.org>
+ *
+ * @license GNU AGPL version 3 or any later version, see COPYING file for more.
+ */
+
+/* Quick Notes -------------------------------------------------------------- */
+
+.app-quicknotes #app-navigation {
+    #new-note-fixed {
+        background-color: var(--color-main-background);
+    }
+
+    #colors-folder {
+        .circle-toolbar.any-color {
+            background-color: var(--color-background-alternate);
+        }
+    }
+}
+
+.app-quicknotes .quicknote {
+    box-shadow: none;
+    color: #000;
+
+    &:hover {
+        box-shadow: none;
+    }
+}
+
+/* Icons -------------------------------------------------------------------- */
+
+// Change icons to black as the contrast with white is really bad
+.app-quicknotes {
+    .icon-checkmark {
+        background-image: var(--icon-checkmark-000) !important;
+    }
+
+    .quicknote .icon-delete {
+        background-image: var(--icon-delete-000) !important;
+
+        &:hover,
+        &:focus {
+            background-image: var(--icon-delete-da4453) !important;
+            opacity: 1 !important;
+        }
+    }
+}

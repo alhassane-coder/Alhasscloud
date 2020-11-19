@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<info xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	  xsi:noNamespaceSchemaLocation="https://apps.nextcloud.com/schema/apps/info.xsd">
+	<id>twofactor_admin</id>
+	<name>Two-Factor Admin Support</name>
+	<summary>Nextcloud Two-Factor Authentication Admin Support Provider</summary>
+	<description>This two-factor auth (2FA) provider for Nextcloud allows admins to generate a one-time
+		code for users to log into a 2FA protected account. This is helpful in situations where
+		users have lost access to their other 2FA methods or mandatory 2FA without any previously
+		enabled 2FA provider.
+	</description>
+	<version>3.0.0</version>
+	<licence>agpl</licence>
+	<author>Christoph Wurst</author>
+	<namespace>TwoFactorAdmin</namespace>
+	<documentation>
+		<user>https://nextcloud-twofactor-admin.readthedocs.io/en/latest/User%20Documentation/</user>
+		<admin>https://nextcloud-twofactor-admin.readthedocs.io/en/latest/Admin%20Documentation/</admin>
+	</documentation>
+	<category>security</category>
+	<bugs>https://github.com/ChristophWurst/twofactor_admin/issues</bugs>
+	<dependencies>
+		<php min-version="7.2" max-version="7.4"/>
+		<database>sqlite</database>
+		<database>mysql</database>
+		<nextcloud min-version="17" max-version="20"/>
+	</dependencies>
+
+	<two-factor-providers>
+		<provider>OCA\TwoFactorAdmin\Provider\AdminProvider</provider>
+	</two-factor-providers>
+
+	<commands>
+		<command>OCA\TwoFactorAdmin\Command\Generate</command>
+	</commands>
+
+	<settings>
+		<admin>OCA\TwoFactorAdmin\Settings\AdminSettings</admin>
+	</settings>
+</info>

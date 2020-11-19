@@ -1,0 +1,95 @@
+
+@include icon-black-white('sprt-bw', 'tasks', 1, false);
+
+.sprt-add {
+	background-position: 25% 0;
+}
+
+.sprt-all {
+	background-position: 75% 50%;
+}
+
+.sprt-alphabetically {
+	background-position: 0 25%;
+}
+
+.sprt-calendar {
+	background-position: 25% 25%;
+}
+
+.sprt-checkmark {
+	background-position: 50% 0;
+}
+
+.sprt-clock {
+	background-position: 50% 25%;
+}
+
+.sprt-close {
+	background-position: 0 50%;
+}
+
+.sprt-current {
+	background-position: 25% 50%;
+}
+
+.sprt-duedate {
+	background-position: 50% 50%;
+}
+
+.sprt-hide {
+	background-position: 75% 0;
+}
+
+.sprt-list {
+	background-position: 75% 25%;
+}
+
+.sprt-manual {
+	background-position: 0 0;
+}
+
+.sprt-note {
+	background-position: 0 75%;
+}
+
+.sprt-percent {
+	background-position: 25% 75%;
+}
+
+.sprt-pinned {
+	background-position: 50% 75%;
+}
+
+.sprt-pinned-off {
+	background-position: 75% 75%;
+}
+
+.sprt-startdate {
+	background-position: 100% 0;
+}
+
+.sprt-subtasks-hidden {
+	background-position: 100% 25%;
+}
+
+.sprt-subtasks-visible {
+	background-position: 100% 50%;
+}
+
+.sprt-tag {
+	background-position: 100% 75%;
+}
+
+.sprt-task-star {
+	background-position: 0 100%;
+}
+
+.sprt-toggle {
+	background-position: 25% 100%;
+}
+
+.sprt-trash {
+	background-position: 50% 100%;
+}
+

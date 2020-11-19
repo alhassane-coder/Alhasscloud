@@ -1,0 +1,26 @@
+{ "translations": {
+    "Name" : "ئاتى",
+    "Password" : "ئىم",
+    "None" : "يوق",
+    "Save" : "ساقلا",
+    "Connect" : "باغلان",
+    "Send" : "يوللا",
+    "Favorite" : "يىغقۇچ",
+    "Select" : "Select",
+    "Delete" : "ئۆچۈر",
+    "Important" : "مۇھىم",
+    "Favorites" : "يىغقۇچ",
+    "Other" : "باشقا",
+    "Reply" : "جاۋاب قايتۇر",
+    "Settings" : "تەڭشەكلەر",
+    "Add folder" : "Add folder",
+    "Cancel" : "ۋاز كەچ",
+    "General" : "ئادەتتىكى",
+    "User" : "User",
+    "Host" : "باش ئاپپارات",
+    "Port" : "ئېغىز",
+    "Search" : "Search",
+    "Refresh" : "يېڭىلا",
+    "All" : "ھەممىسى"
+},"pluralForm" :"nplurals=2; plural=(n != 1);"
+}

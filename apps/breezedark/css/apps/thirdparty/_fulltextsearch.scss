@@ -1,0 +1,82 @@
+/***
+ * @copyright Copyright (c) 2018, Magnus Walbeck <mw@mwalbeck.org>
+ *
+ * @license GNU AGPL version 3 or any later version, see COPYING file for more.
+ */
+
+/* FullTextSearch ----------------------------------------------------------- */
+
+// Search popup
+#fts-popup {
+    .div-table-col-left {
+        color: var(--color-main-text);
+    }
+
+    .fts_options_input {
+        opacity: 1;
+    }
+}
+
+// Generic Search
+.provider_header {
+    .provider_navigation {
+        border-bottom-color: var(--color-border);
+        color: var(--color-text-maxcontrast);
+    }
+
+    .provider_result .result_entry {
+        border-bottom-color: var(--color-border);
+
+        .result_title {
+            color: var(--color-main-text);
+        }
+
+        .result_extract {
+            color: var(--color-text-maxcontrast);
+        }
+    }
+}
+
+// Files specific Search
+.provider_header {
+    .files_header {
+        border-bottom-color: var(--color-border);
+
+        .files_header_div {
+            color: var(--color-text-maxcontrast);
+        }
+    }
+
+    .files_result {
+        border-bottom-color: var(--color-border);
+
+        .files_div_name .files_result_file {
+            .files_result_title {
+                color: var(--color-main-text);
+            }
+
+            .files_result_extract {
+                color: var(--color-text-maxcontrast);
+            }
+        }
+
+        .files_result_item {
+            background: var(--color-main-background);
+            color: var(--color-text-maxcontrast);
+        }
+    }
+}
+
+// Settings
+.app-settings #app-content {
+    #fns,
+    #elastic_search,
+    #files {
+        .div-table .div-table-row .div-table-col {
+            select,
+            input {
+                background-color: var(--color-background-darker) !important;
+            }
+        }
+    }
+}

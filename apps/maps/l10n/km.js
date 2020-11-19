@@ -1,0 +1,26 @@
+OC.L10N.register(
+    "maps",
+    {
+    "Maps" : "ផែនទី",
+    "Personal" : "ផ្ទាល់​ខ្លួន",
+    "Not grouped" : "គ្មាន​ក្រុម",
+    "Work" : "ធ្វើការ",
+    "Rename" : "ប្ដូរ​ឈ្មោះ",
+    "Export" : "នាំចេញ",
+    "Delete" : "លុប",
+    "Date" : "Date",
+    "Name" : "ឈ្មោះ",
+    "Comment" : "មតិ",
+    "Move" : "Move",
+    "right" : "ខាង​ស្ដាំ",
+    "left" : "ខាង​ឆ្វេង",
+    "Destination" : "Destination",
+    "Add to favorites" : "Add to favorites",
+    "File" : "File",
+    "Link" : "Link",
+    "Description" : "ការ​អធិប្បាយ",
+    "Sort by name" : "Order by name",
+    "Sort by date" : "Order by date",
+    "Settings" : "ការកំណត់"
+},
+"nplurals=1; plural=0;");

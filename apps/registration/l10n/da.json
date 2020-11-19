@@ -1,0 +1,11 @@
+{ "translations": {
+    "Saved" : "Gemt",
+    "Register" : "Registér",
+    "None" : "Ingen",
+    "Username" : "Brugernavn",
+    "Password" : "Adgangskode",
+    "Create account" : "Opret konto",
+    "Email" : "Email",
+    "Back to login" : "Tilbage til log in"
+},"pluralForm" :"nplurals=2; plural=(n != 1);"
+}

@@ -1,0 +1,11 @@
+{ "translations": {
+    "Saved" : "Disimpan",
+    "Register" : "Daftar",
+    "None" : "Tidak ada",
+    "Username" : "Nama pengguna",
+    "Password" : "Kata kunci",
+    "Create account" : "Buat akun",
+    "Email" : "Surel",
+    "Back to login" : "Kembali ke log masuk"
+},"pluralForm" :"nplurals=1; plural=0;"
+}

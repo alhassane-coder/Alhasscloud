@@ -1,0 +1,109 @@
+/***
+ * @copyright Copyright (c) 2018, Magnus Walbeck <mw@mwalbeck.org>
+ *
+ * @license GNU AGPL version 3 or any later version, see COPYING file for more.
+ */
+
+/* Mail --------------------------------------------------------------------- */
+
+.app-mail #account-form .tabs-component-tab {
+    a {
+        color: var(--color-main-text);
+    }
+
+    &.is-active {
+        border-bottom-color: var(--color-primary-element);
+    }
+}
+
+.app-mail #app-content {
+    .app-content-list {
+        .app-content-list-item,
+        .app-content-list-item-menu a {
+            color: var(--color-main-text);
+        }
+
+        .app-content-list-item-line-two,
+        .app-content-list-item .app-content-list-item-details {
+            color: var(--color-text-maxcontrast);
+            opacity: 1;
+        }
+    }
+
+    .app-content-details {
+        #mail-message-header {
+            background: var(--color-main-background);
+        }
+
+        #mail-content iframe {
+            background-color: #eee;
+            border-radius: 3px;
+        }
+
+        .transparency {
+            opacity: 1;
+        }
+    }
+}
+
+.mail-message-attachments .attachments .attachment {
+    .attachment-name:hover {
+        background-color: unset;
+    }
+
+    .attachment-size {
+        opacity: 0.7;
+
+        &:hover {
+            background-color: unset;
+        }
+    }
+
+    button:hover {
+        opacity: 1;
+    }
+
+    .mail-attached-image:hover {
+        opacity: 1;
+    }
+}
+
+/* Icons -------------------------------------------------------------------- */
+
+.app-mail {
+    .icon-inbox {
+        background-image: var(--icon-mail-inbox-f2f2f2) !important;
+    }
+
+    .icon-flagged {
+        background-image: var(--icon-mail-star-f2f2f2) !important;
+    }
+
+    .icon-drafts {
+        background-image: var(--icon-mail-drafts-f2f2f2) !important;
+    }
+
+    .icon-sent {
+        background-image: var(--icon-mail-sent-f2f2f2) !important;
+    }
+
+    .icon-archive {
+        background-image: var(--icon-mail-archive-f2f2f2) !important;
+    }
+
+    .icon-junk {
+        background-image: var(--icon-mail-junk-f2f2f2) !important;
+    }
+
+    .icon-trash {
+        background-image: var(--icon-mail-trash-f2f2f2) !important;
+    }
+
+    .icon-forward {
+        background-image: var(--icon-mail-forward-f2f2f2) !important;
+    }
+
+    .icon-starred[data-starred="false"]:not(:hover) {
+        background-image: var(--icon-star-dark-f2f2f2) !important;
+    }
+}

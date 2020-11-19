@@ -1,0 +1,22 @@
+/***
+ * @copyright Copyright (c) 2020, Magnus Walbeck (mw@mwalbeck.org)
+ *
+ * @license GNU AGPL version 3 or any later version, see COPYING file for more.
+ */
+
+/* Terms of service --------------------------------------------------------- */
+
+#terms_of_service_confirm .v--modal-overlay .v--modal-background-click {
+    background-color: rgba(0, 0, 0, 0.5);
+
+    .v--modal.v--modal-box {
+        background-color: var(--color-main-background);
+        border: 1px solid var(--color-border);
+        box-shadow: none;
+        padding: 1em;
+
+        #tos-overlay button.primary {
+            margin: 1em auto;
+        }
+    }
+}

@@ -1,0 +1,130 @@
+/***
+ * @copyright Copyright (c) 2020, Magnus Walbeck <mw@mwalbeck.org>
+ *
+ * @license GNU AGPL version 3 or any later version, see COPYING file for more.
+ */
+
+/* Maps --------------------------------------------------------------------- */
+
+.app-maps #app-navigation {
+    #navigation-favorites:not(.active),
+    #navigation-routing:not(.active),
+    #navigation-photos:not(.active),
+    #navigation-contacts:not(.active),
+    #navigation-tracks:not(.active),
+    #navigation-devices:not(.active) {
+        > a,
+        > .app-navigation-entry-utils {
+            opacity: 0.57 !important;
+        }
+
+        > .app-navigation-entry-menu {
+            opacity: 1 !important;
+
+            > * {
+                opacity: 0.57 !important;
+            }
+        }
+    }
+}
+
+.app-maps #app-content {
+    #search-form #search-submit {
+        background-color: transparent !important;
+        border: none !important;
+    }
+
+    .leaflet-container {
+        background-color: var(--color-main-background);
+    }
+
+    .leaflet-control-container .leaflet-routing-container {
+        background-color: var(--color-main-background);
+        border: 1px solid var(--color-border);
+
+        .leaflet-routing-geocoders {
+            border-bottom: none;
+
+            input {
+                border-color: var(--color-border);
+            }
+
+            button {
+                background-color: var(--color-main-background);
+                border-color: var(--color-border);
+            }
+
+            .exportCurrentRoute {
+                border-bottom: 1px solid var(--color-border);
+            }
+        }
+
+        &.leaflet-bar button {
+            background-color: var(--color-main-background) !important;
+            color: var(--color-main-text) !important;
+
+            &:hover {
+                background-color: var(--color-background-hover) !important;
+            }
+        }
+    }
+
+    .leaflet-contextmenu {
+        background-color: var(--color-main-background);
+        border: 1px solid var(--color-border);
+        box-shadow: none;
+
+        .leaflet-contextmenu-item.over {
+            background-color: var(--color-background-hover);
+            border-color: var(--color-background-hover);
+        }
+
+        .leaflet-contextmenu-separator {
+            border-bottom-color: var(--color-border);
+        }
+    }
+
+    .leaflet-routing-alt {
+        tr:hover {
+            background-color: var(--color-background-hover);
+        }
+
+        tr:nth-child(2n + 1) {
+            background-color: var(--color-background-darker);
+        }
+    }
+
+    .leaflet-routing-alt,
+    .leaflet-routing-error {
+        border-bottom-color: var(--color-border);
+    }
+}
+
+.leaflet-routing-geocoder-result table {
+    background-color: var(--color-main-background) !important;
+    border-color: var(--color-border) !important;
+
+    tr:hover,
+    .leaflet-routing-geocoder-selected {
+        background-color: var(--color-background-hover);
+    }
+}
+
+/* Icons -------------------------------------------------------------------- */
+
+// Filtered images
+
+.app-maps #app-content {
+    img[src$="star-dark?color=000000"],
+    img[src$="picture?color=000000"],
+    img[src$="user?color=000000"],
+    img[src$="share?color=000000"],
+    img[src$="recent.svg"],
+    img[src$="triangle-s.svg"],
+    img[src$="triangle-e.svg"],
+    img[src$="poi_place_town.p.20.png"],
+    img[src$="poi_place_village.p.20.png"],
+    .leaflet-routing-icon {
+        filter: invert(95%);
+    }
+}

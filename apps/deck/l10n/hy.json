@@ -1,0 +1,21 @@
+{ "translations": {
+    "Personal" : "Անձնական",
+    "Done" : "Done",
+    "Cancel" : "ընդհատել",
+    "Details" : "Մանրամասներ",
+    "Can edit" : "Can edit",
+    "Can share" : "Can share",
+    "Delete" : "հեռացնել",
+    "Edit" : "մշակել",
+    "Title" : "Վերնագիր",
+    "Comments" : "Կարծիքներ",
+    "Modified" : "Փոփոխված",
+    "Save" : "Պահպանել",
+    "Update" : "Թարմացնել",
+    "Description" : "Նկարագրություն",
+    "seconds ago" : "վրկ. առաջ",
+    "Shared with you" : "Shared with you",
+    "Today" : "այսօր",
+    "This week" : "այս շաբաթ"
+},"pluralForm" :"nplurals=2; plural=(n != 1);"
+}

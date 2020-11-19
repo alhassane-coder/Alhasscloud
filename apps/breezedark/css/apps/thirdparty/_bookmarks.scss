@@ -1,0 +1,33 @@
+/***
+ * @copyright Copyright (c) 2017, Magnus Walbeck <mw@mwalbeck.org>
+ *
+ * @license GNU AGPL version 3 or any later version, see COPYING file for more.
+ */
+
+/* Bookmarks ---------------------------------------------------------------- */
+
+.app-bookmarks #app-content {
+    .folder--gridview,
+    .bookmark--gridview,
+    .bookmarkslist--gridview > .create-folder,
+    .bookmarkslist--gridview > .create-bookmark {
+        background: var(--color-main-background);
+        box-shadow: none;
+    }
+
+    .bookmark--gridview .bookmark__checkbox {
+        background-color: var(--color-main-background);
+
+        input.checkbox + label::before {
+            margin: 0 3px 3px;
+        }
+    }
+
+    .bookmarkslist > :first-child:not(.bookmarkslist__loading):not(.bookmarkslist__empty).active {
+        border-top-color: var(--color-primary-element);
+    }
+
+    .breadcrumbs .breadcrumbs__path a {
+        color: var(--color-main-text);
+    }
+}

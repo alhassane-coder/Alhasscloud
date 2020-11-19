@@ -1,0 +1,11 @@
+{ "translations": {
+    "Error" : "ایرر",
+    "Notes" : "Notes",
+    "Settings" : "سیٹینگز",
+    "Today" : "آج",
+    "Rename" : "Rename",
+    "Remove from favorites" : "Remove from favorites",
+    "Add to favorites" : "Add to favorites",
+    "Edit" : "تدوین کریں"
+},"pluralForm" :"nplurals=2; plural=(n != 1);"
+}
