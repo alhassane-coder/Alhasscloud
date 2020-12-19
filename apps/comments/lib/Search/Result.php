@@ -2,6 +2,7 @@
 /**
  * @copyright Copyright (c) 2018 Joas Schilling <coding@schilljs.com>
  *
+ * @author Christoph Wurst <christoph@winzerhof-wurst.at>
  * @author Joas Schilling <coding@schilljs.com>
  * @author Michał Węgrzynek <michal.wegrzynek@malloc.com.pl>
  *
@@ -28,12 +29,33 @@ use OCP\Comments\IComment;
 use OCP\Files\NotFoundException;
 use OCP\Search\Result as BaseResult;
 
+/**
+ * @deprecated 20.0.0
+ */
 class Result extends BaseResult {
+	/**
+	 * @deprecated 20.0.0
+	 */
 	public $type = 'comment';
+	/**
+	 * @deprecated 20.0.0
+	 */
 	public $comment;
+	/**
+	 * @deprecated 20.0.0
+	 */
 	public $authorId;
+	/**
+	 * @deprecated 20.0.0
+	 */
 	public $authorName;
+	/**
+	 * @deprecated 20.0.0
+	 */
 	public $path;
+	/**
+	 * @deprecated 20.0.0
+	 */
 	public $fileName;
 
 	/**
@@ -42,6 +64,7 @@ class Result extends BaseResult {
 	 * @param string $authorName
 	 * @param string $path
 	 * @throws NotFoundException
+	 * @deprecated 20.0.0
 	 */
 	public function __construct(string $search,
 								IComment $comment,

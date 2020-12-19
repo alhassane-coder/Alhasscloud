@@ -21,79 +21,66 @@
 
 namespace OCA\WorkflowEngine\AppInfo;
 
+use Closure;
 use OCA\WorkflowEngine\Controller\RequestTime;
 use OCA\WorkflowEngine\Helper\LogContext;
+use OCA\WorkflowEngine\Listener\LoadAdditionalSettingsScriptsListener;
 use OCA\WorkflowEngine\Manager;
 use OCA\WorkflowEngine\Service\Logger;
+use OCP\AppFramework\App;
+use OCP\AppFramework\Bootstrap\IBootContext;
+use OCP\AppFramework\Bootstrap\IBootstrap;
+use OCP\AppFramework\Bootstrap\IRegistrationContext;
 use OCP\AppFramework\QueryException;
 use OCP\EventDispatcher\Event;
-use OCP\Template;
+use OCP\EventDispatcher\IEventDispatcher;
+use OCP\ILogger;
+use OCP\IServerContainer;
+use OCP\WorkflowEngine\Events\LoadSettingsScriptsEvent;
 use OCP\WorkflowEngine\IEntity;
 use OCP\WorkflowEngine\IEntityCompat;
 use OCP\WorkflowEngine\IOperation;
 use OCP\WorkflowEngine\IOperationCompat;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class Application extends \OCP\AppFramework\App {
+class Application extends App implements IBootstrap {
 	public const APP_ID = 'workflowengine';
-
-	/** @var EventDispatcherInterface */
-	protected $dispatcher;
-	/** @var Manager */
-	protected $manager;
 
 	public function __construct() {
 		parent::__construct(self::APP_ID);
-
-		$this->getContainer()->registerAlias('RequestTimeController', RequestTime::class);
-
-		$this->dispatcher = $this->getContainer()->getServer()->getEventDispatcher();
-		$this->manager = $this->getContainer()->query(Manager::class);
 	}
 
-	/**
-	 * Register all hooks and listeners
-	 */
-	public function registerHooksAndListeners() {
-		$this->dispatcher->addListener(
-			'OCP\WorkflowEngine::loadAdditionalSettingScripts',
-			function () {
-				if (!function_exists('style')) {
-					// This is hacky, but we need to load the template class
-					class_exists(Template::class, true);
-				}
-
-				script('core', [
-					'files/fileinfo',
-					'files/client',
-					'systemtags/systemtags',
-					'systemtags/systemtagmodel',
-					'systemtags/systemtagscollection',
-				]);
-
-				script(self::APP_ID, [
-					'workflowengine',
-				]);
-			},
+	public function register(IRegistrationContext $context): void {
+		$context->registerServiceAlias('RequestTimeController', RequestTime::class);
+		$context->registerEventListener(
+			LoadSettingsScriptsEvent::class,
+			LoadAdditionalSettingsScriptsListener::class,
 			-100
 		);
 	}
 
-	public function registerRuleListeners() {
-		$configuredEvents = $this->manager->getAllConfiguredEvents();
+	public function boot(IBootContext $context): void {
+		$context->injectFn(Closure::fromCallable([$this, 'registerRuleListeners']));
+	}
+
+	private function registerRuleListeners(IEventDispatcher $dispatcher,
+										   IServerContainer $container,
+										   ILogger $logger): void {
+		/** @var Manager $manager */
+		$manager = $container->query(Manager::class);
+		$configuredEvents = $manager->getAllConfiguredEvents();
 
 		foreach ($configuredEvents as $operationClass => $events) {
 			foreach ($events as $entityClass => $eventNames) {
-				array_map(function (string $eventName) use ($operationClass, $entityClass) {
-					$this->dispatcher->addListener(
+				array_map(function (string $eventName) use ($manager, $container, $dispatcher, $logger, $operationClass, $entityClass) {
+					$dispatcher->addListener(
 						$eventName,
-						function ($event) use ($eventName, $operationClass, $entityClass) {
-							$ruleMatcher = $this->manager->getRuleMatcher();
+						function ($event) use ($manager, $container, $eventName, $logger, $operationClass, $entityClass) {
+							$ruleMatcher = $manager->getRuleMatcher();
 							try {
 								/** @var IEntity $entity */
-								$entity = $this->getContainer()->query($entityClass);
+								$entity = $container->query($entityClass);
 								/** @var IOperation $operation */
-								$operation = $this->getContainer()->query($operationClass);
+								$operation = $container->query($operationClass);
 
 								$ruleMatcher->setEventName($eventName);
 								$ruleMatcher->setEntity($entity);
@@ -106,7 +93,7 @@ class Application extends \OCP\AppFramework\App {
 									->setEventName($eventName);
 
 								/** @var Logger $flowLogger */
-								$flowLogger = $this->getContainer()->query(Logger::class);
+								$flowLogger = $container->query(Logger::class);
 								$flowLogger->logEventInit($ctx);
 
 								if ($event instanceof Event) {
@@ -117,7 +104,6 @@ class Application extends \OCP\AppFramework\App {
 									$entity->prepareRuleMatcherCompat($ruleMatcher, $eventName, $event);
 									$operation->onEventCompat($eventName, $event, $ruleMatcher);
 								} else {
-									$logger = $this->getContainer()->getServer()->getLogger();
 									$logger->debug(
 										'Cannot handle event {name} of {event} against entity {entity} and operation {operation}',
 										[

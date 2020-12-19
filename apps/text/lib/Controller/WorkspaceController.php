@@ -108,7 +108,8 @@ class WorkspaceController extends OCSController {
 	 */
 	public function folder(string $path = '/'): DataResponse {
 		try {
-			$folder = $this->rootFolder->getUserFolder($this->userId)->get($path);
+			$userFolder = $this->rootFolder->getUserFolder($this->userId);
+			$folder = $userFolder->get($path);
 			if ($folder instanceof Folder) {
 				$file = $this->workspaceService->getFile($folder);
 				if ($file === null) {
@@ -124,7 +125,8 @@ class WorkspaceController extends OCSController {
 					'file' => [
 						'id' => $file->getId(),
 						'mimetype' => $file->getMimetype(),
-						'name' => $file->getName()
+						'name' => $file->getName(),
+						'path' => $userFolder->getRelativePath($file->getPath())
 					],
 					'folder' => [
 						'permissions' => $folder->getPermissions()

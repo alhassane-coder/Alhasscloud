@@ -5,6 +5,7 @@
  * @author Bjoern Schiessle <bjoern@schiessle.org>
  * @author Björn Schießle <bjoern@schiessle.org>
  * @author Christoph Wurst <christoph@winzerhof-wurst.at>
+ * @author Daniel Kesselberg <mail@danielkesselberg.de>
  * @author Joas Schilling <coding@schilljs.com>
  * @author Lukas Reschke <lukas@statuscode.ch>
  * @author Morris Jobke <hey@morrisjobke.de>
@@ -363,7 +364,7 @@ class Storage extends DAV implements ISharedStorage, IDisableEncryptionStorage {
 			$permissions = $response['{http://open-collaboration-services.org/ns}share-permissions'];
 		} elseif (isset($response['{http://open-cloud-mesh.org/ns}share-permissions'])) {
 			// permissions provided by the OCM API
-			$permissions = $this->ocmPermissions2ncPermissions($response['{http://open-collaboration-services.org/ns}share-permissions']);
+			$permissions = $this->ocmPermissions2ncPermissions($response['{http://open-collaboration-services.org/ns}share-permissions'], $path);
 		} else {
 			// use default permission if remote server doesn't provide the share permissions
 			$permissions = $this->getDefaultPermissions($path);

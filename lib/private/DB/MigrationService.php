@@ -4,10 +4,10 @@
  * @copyright Copyright (c) 2017, ownCloud GmbH
  *
  * @author Christoph Wurst <christoph@winzerhof-wurst.at>
+ * @author Daniel Kesselberg <mail@danielkesselberg.de>
  * @author Joas Schilling <coding@schilljs.com>
  * @author Morris Jobke <hey@morrisjobke.de>
  * @author Robin Appelman <robin@icewind.nl>
- * @author Roeland Jago Douma <roeland@famdouma.nl>
  *
  * @license AGPL-3.0
  *
@@ -34,7 +34,7 @@ use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\SchemaException;
 use Doctrine\DBAL\Schema\Sequence;
 use Doctrine\DBAL\Schema\Table;
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use OC\App\InfoParser;
 use OC\IntegrityCheck\Helpers\AppLocator;
 use OC\Migration\SimpleOutput;
@@ -124,6 +124,11 @@ class MigrationService {
 			return false;
 		}
 
+		if ($this->connection->tableExists('migrations') && \OC::$server->getConfig()->getAppValue('core', 'vendor', '') !== 'owncloud') {
+			$this->migrationTableCreated = true;
+			return false;
+		}
+
 		$schema = new SchemaWrapper($this->connection);
 
 		/**
@@ -165,8 +170,8 @@ class MigrationService {
 		}
 
 		$table = $schema->createTable('migrations');
-		$table->addColumn('app', Type::STRING, ['length' => 255]);
-		$table->addColumn('version', Type::STRING, ['length' => 255]);
+		$table->addColumn('app', Types::STRING, ['length' => 255]);
+		$table->addColumn('version', Types::STRING, ['length' => 255]);
 		$table->setPrimaryKey(['app', 'version']);
 
 		$this->connection->migrateToSchema($schema->getWrappedSchema());

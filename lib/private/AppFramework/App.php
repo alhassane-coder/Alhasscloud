@@ -10,6 +10,7 @@ declare(strict_types=1);
  * @author Joas Schilling <coding@schilljs.com>
  * @author Lukas Reschke <lukas@statuscode.ch>
  * @author Morris Jobke <hey@morrisjobke.de>
+ * @author Robin Appelman <robin@icewind.nl>
  * @author Roeland Jago Douma <roeland@famdouma.nl>
  * @author Thomas Müller <thomas.mueller@tmit.eu>
  *
@@ -85,6 +86,20 @@ class App {
 		}
 
 		return $topNamespace . self::$nameSpaceCache[$appId];
+	}
+
+	public static function getAppIdForClass(string $className, string $topNamespace='OCA\\'): ?string {
+		if (strpos($className, $topNamespace) !== 0) {
+			return null;
+		}
+
+		foreach (self::$nameSpaceCache as $appId => $namespace) {
+			if (strpos($className, $topNamespace . $namespace . '\\') === 0) {
+				return $appId;
+			}
+		}
+
+		return null;
 	}
 
 

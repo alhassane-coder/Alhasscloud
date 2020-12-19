@@ -11,6 +11,7 @@
  * @author Roeland Jago Douma <roeland@famdouma.nl>
  * @author Stefan Weil <sw@weilnetz.de>
  * @author Thomas Müller <thomas.mueller@tmit.eu>
+ * @author Valdnet <47037905+Valdnet@users.noreply.github.com>
  *
  * @license AGPL-3.0
  *
@@ -63,6 +64,7 @@ class DependencyAnalyzer {
 		}
 
 		return array_merge(
+			$this->analyzeArchitecture($dependencies),
 			$this->analyzePhpVersion($dependencies),
 			$this->analyzeDatabases($dependencies),
 			$this->analyzeCommands($dependencies),
@@ -173,6 +175,29 @@ class DependencyAnalyzer {
 		return $missing;
 	}
 
+	private function analyzeArchitecture(array $dependencies) {
+		$missing = [];
+		if (!isset($dependencies['architecture'])) {
+			return $missing;
+		}
+
+		$supportedArchitectures = $dependencies['architecture'];
+		if (empty($supportedArchitectures)) {
+			return $missing;
+		}
+		if (!is_array($supportedArchitectures)) {
+			$supportedArchitectures = [$supportedArchitectures];
+		}
+		$supportedArchitectures = array_map(function ($architecture) {
+			return $this->getValue($architecture);
+		}, $supportedArchitectures);
+		$currentArchitecture = $this->platform->getArchitecture();
+		if (!in_array($currentArchitecture, $supportedArchitectures, true)) {
+			$missing[] = (string)$this->l->t('The following architectures are supported: %s', [implode(', ', $supportedArchitectures)]);
+		}
+		return $missing;
+	}
+
 	/**
 	 * @param array $dependencies
 	 * @return array
@@ -195,7 +220,7 @@ class DependencyAnalyzer {
 		}, $supportedDatabases);
 		$currentDatabase = $this->platform->getDatabase();
 		if (!in_array($currentDatabase, $supportedDatabases)) {
-			$missing[] = (string)$this->l->t('Following databases are supported: %s', [implode(', ', $supportedDatabases)]);
+			$missing[] = (string)$this->l->t('The following databases are supported: %s', [implode(', ', $supportedDatabases)]);
 		}
 		return $missing;
 	}
@@ -298,7 +323,7 @@ class DependencyAnalyzer {
 		}
 		$currentOS = $this->platform->getOS();
 		if (!in_array($currentOS, $oss)) {
-			$missing[] = (string)$this->l->t('Following platforms are supported: %s', [implode(', ', $oss)]);
+			$missing[] = (string)$this->l->t('The following platforms are supported: %s', [implode(', ', $oss)]);
 		}
 		return $missing;
 	}

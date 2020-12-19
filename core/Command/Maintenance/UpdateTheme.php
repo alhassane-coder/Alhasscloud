@@ -2,6 +2,7 @@
 /**
  * @copyright Copyright (c) 2017 Julius Härtl <jus@bitgrid.net>
  *
+ * @author Joas Schilling <coding@schilljs.com>
  * @author Julius Härtl <jus@bitgrid.net>
  * @author Morris Jobke <hey@morrisjobke.de>
  * @author Roeland Jago Douma <roeland@famdouma.nl>
@@ -54,7 +55,7 @@ class UpdateTheme extends UpdateJS {
 			->setDescription('Apply custom theme changes');
 	}
 
-	protected function execute(InputInterface $input, OutputInterface $output) {
+	protected function execute(InputInterface $input, OutputInterface $output): int {
 		// run mimetypelist.js update since themes might change mimetype icons
 		parent::execute($input, $output);
 
@@ -62,5 +63,6 @@ class UpdateTheme extends UpdateJS {
 		$c = $this->cacheFactory->createDistributed('imagePath');
 		$c->clear('');
 		$output->writeln('<info>Image cache cleared</info>');
+		return 0;
 	}
 }

@@ -178,8 +178,8 @@
 <h1>BigInt (64bit) identifiers<a class="headerlink" href="#bigint-64bit-identifiers" title="Permalink to this headline">¶</a></h1>
 <p>Nextcloud uses big integers to store identifiers and auto-increment keys in the database.
 Because changing columns on huge tables can take quite a while (up to hours or days)
-depending on the number of files in the Nextcloud instance, this migration on the filecache-
-and activity tablehas to be triggered manually by a console command.</p>
+depending on the number of files in the Nextcloud instance, this migration on the filecache
+and activity table has to be triggered manually by a console command.</p>
 <p>The command can safely be executed. It will show a success message when there is nothing to do:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>sudo -u www-data php occ db:convert-filecache-bigint
 All tables already up to date!
@@ -247,8 +247,6 @@ mode before running the command to avoid issues with your sync clients.</p>
     <div class="rst-other-versions">
       <dl>
         <dt>Versions</dt>
-        
-          <dd><a href="https://docs.nextcloud.com/server/16/admin_manual">16</a></dd>
         
           <dd><a href="https://docs.nextcloud.com/server/17/admin_manual">17</a></dd>
         

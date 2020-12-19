@@ -6,6 +6,7 @@
  * @author Christoph Wurst <christoph@winzerhof-wurst.at>
  * @author Joas Schilling <coding@schilljs.com>
  * @author Lukas Reschke <lukas@statuscode.ch>
+ * @author Mario Danic <mario@lovelyhq.com>
  * @author Morris Jobke <hey@morrisjobke.de>
  * @author Robin Appelman <robin@icewind.nl>
  * @author Roeland Jago Douma <roeland@famdouma.nl>
@@ -38,9 +39,10 @@ use OC\Authentication\Listeners\RemoteWipeNotificationsListener;
 use OC\Authentication\Listeners\UserDeletedStoreCleanupListener;
 use OC\Authentication\Listeners\UserDeletedTokenCleanupListener;
 use OC\Authentication\Notifications\Notifier as AuthenticationNotifier;
-use OC\Core\Notification\RemoveLinkSharesNotifier;
+use OC\Core\Notification\CoreNotifier;
 use OC\DB\MissingColumnInformation;
 use OC\DB\MissingIndexInformation;
+use OC\DB\MissingPrimaryKeyInformation;
 use OC\DB\SchemaWrapper;
 use OCP\AppFramework\App;
 use OCP\EventDispatcher\IEventDispatcher;
@@ -69,10 +71,12 @@ class Application extends App {
 		$eventDispatcher = $server->query(IEventDispatcher::class);
 
 		$notificationManager = $server->getNotificationManager();
-		$notificationManager->registerNotifierService(RemoveLinkSharesNotifier::class);
+		$notificationManager->registerNotifierService(CoreNotifier::class);
 		$notificationManager->registerNotifierService(AuthenticationNotifier::class);
 
-		$eventDispatcher->addListener(IDBConnection::CHECK_MISSING_INDEXES_EVENT,
+		$oldEventDispatcher = $server->getEventDispatcher();
+
+		$oldEventDispatcher->addListener(IDBConnection::CHECK_MISSING_INDEXES_EVENT,
 			function (GenericEvent $event) use ($container) {
 				/** @var MissingIndexInformation $subject */
 				$subject = $event->getSubject();
@@ -140,6 +144,10 @@ class Application extends App {
 					if (!$table->hasIndex('cards_abid')) {
 						$subject->addHintForMissingSubject($table->getName(), 'cards_abid');
 					}
+
+					if (!$table->hasIndex('cards_abiduri')) {
+						$subject->addHintForMissingSubject($table->getName(), 'cards_abiduri');
+					}
 				}
 
 				if ($schema->hasTable('cards_properties')) {
@@ -174,7 +182,64 @@ class Application extends App {
 			}
 		);
 
-		$eventDispatcher->addListener(IDBConnection::CHECK_MISSING_COLUMNS_EVENT,
+		$oldEventDispatcher->addListener(IDBConnection::CHECK_MISSING_PRIMARY_KEYS_EVENT,
+			function (GenericEvent $event) use ($container) {
+				/** @var MissingPrimaryKeyInformation $subject */
+				$subject = $event->getSubject();
+
+				$schema = new SchemaWrapper($container->query(IDBConnection::class));
+
+				if ($schema->hasTable('federated_reshares')) {
+					$table = $schema->getTable('federated_reshares');
+
+					if (!$table->hasPrimaryKey()) {
+						$subject->addHintForMissingSubject($table->getName());
+					}
+				}
+
+				if ($schema->hasTable('systemtag_object_mapping')) {
+					$table = $schema->getTable('systemtag_object_mapping');
+
+					if (!$table->hasPrimaryKey()) {
+						$subject->addHintForMissingSubject($table->getName());
+					}
+				}
+
+				if ($schema->hasTable('comments_read_markers')) {
+					$table = $schema->getTable('comments_read_markers');
+
+					if (!$table->hasPrimaryKey()) {
+						$subject->addHintForMissingSubject($table->getName());
+					}
+				}
+
+				if ($schema->hasTable('collres_resources')) {
+					$table = $schema->getTable('collres_resources');
+
+					if (!$table->hasPrimaryKey()) {
+						$subject->addHintForMissingSubject($table->getName());
+					}
+				}
+
+				if ($schema->hasTable('collres_accesscache')) {
+					$table = $schema->getTable('collres_accesscache');
+
+					if (!$table->hasPrimaryKey()) {
+						$subject->addHintForMissingSubject($table->getName());
+					}
+				}
+
+				if ($schema->hasTable('filecache_extended')) {
+					$table = $schema->getTable('filecache_extended');
+
+					if (!$table->hasPrimaryKey()) {
+						$subject->addHintForMissingSubject($table->getName());
+					}
+				}
+			}
+		);
+
+		$oldEventDispatcher->addListener(IDBConnection::CHECK_MISSING_COLUMNS_EVENT,
 			function (GenericEvent $event) use ($container) {
 				/** @var MissingColumnInformation $subject */
 				$subject = $event->getSubject();

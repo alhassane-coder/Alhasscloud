@@ -483,15 +483,6 @@ even if requests to the server might extend the session lifetime.</p>
 password for enhanced security. Users need to generate tokens in personal settings
 which can be used as passwords on their clients.</p>
 <p>Defaults to <code class="docutils literal notranslate"><span class="pre">false</span></code></p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s1">&#39;token_auth_activity_update&#39;</span> <span class="o">=&gt;</span> <span class="mi">60</span><span class="p">,</span>
-</pre></div>
-</div>
-<p>The interval at which token activity should be updated.</p>
-<p>Increasing this value means that the last activty on the security page gets
-more outdated.</p>
-<p>Tokens are still checked every 5 minutes for validity
-max value: 300</p>
-<p>Defaults to <code class="docutils literal notranslate"><span class="pre">300</span></code></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s1">&#39;auth.bruteforce.protection.enabled&#39;</span> <span class="o">=&gt;</span> <span class="n">true</span><span class="p">,</span>
 </pre></div>
 </div>
@@ -1010,14 +1001,14 @@ debug specific requests, users or apps</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s1">&#39;logdateformat&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;F d, Y H:i:s&#39;</span><span class="p">,</span>
 </pre></div>
 </div>
-<p>This uses PHP.date formatting; see <a class="reference external" href="http://php.net/manual/en/function.date.php">http://php.net/manual/en/function.date.php</a></p>
+<p>This uses PHP.date formatting; see <a class="reference external" href="https://php.net/manual/en/function.date.php">https://php.net/manual/en/function.date.php</a></p>
 <p>Defaults to ISO 8601 <code class="docutils literal notranslate"><span class="pre">2005-08-15T15:52:01+00:00</span></code> - see DateTime::ATOM
 (<a class="reference external" href="https://secure.php.net/manual/en/class.datetime.php#datetime.constants.atom">https://secure.php.net/manual/en/class.datetime.php#datetime.constants.atom</a>)</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s1">&#39;logtimezone&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Europe/Berlin&#39;</span><span class="p">,</span>
 </pre></div>
 </div>
 <p>The timezone for logfiles. You may change this; see
-<a class="reference external" href="http://php.net/manual/en/timezones.php">http://php.net/manual/en/timezones.php</a></p>
+<a class="reference external" href="https://php.net/manual/en/timezones.php">https://php.net/manual/en/timezones.php</a></p>
 <p>Defaults to <code class="docutils literal notranslate"><span class="pre">UTC</span></code></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s1">&#39;log_query&#39;</span> <span class="o">=&gt;</span> <span class="n">false</span><span class="p">,</span>
 </pre></div>
@@ -1067,6 +1058,12 @@ seen in the first-run wizard and on Personal pages.</p>
 </div>
 <p>When enabled, admins may install apps from the Nextcloud app store.</p>
 <p>Defaults to <code class="docutils literal notranslate"><span class="pre">true</span></code></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s1">&#39;appstoreurl&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;https://apps.nextcloud.com/api/v1&#39;</span><span class="p">,</span>
+</pre></div>
+</div>
+<p>Enables the installation of apps from a self hosted apps store.</p>
+<p>Requires that at least one of the configured apps directories is writeable.</p>
+<p>Defaults to <code class="docutils literal notranslate"><span class="pre">https://apps.nextcloud.com/api/v1</span></code></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s1">&#39;apps_paths&#39;</span> <span class="o">=&gt;</span> <span class="p">[</span>
         <span class="p">[</span>
                 <span class="s1">&#39;path&#39;</span><span class="o">=&gt;</span> <span class="s1">&#39;/var/www/nextcloud/apps&#39;</span><span class="p">,</span>
@@ -1449,6 +1446,19 @@ to be fetched in addition to any requested file.</p>
 </pre></div>
 </div>
 <p>To use swift V3</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s1">&#39;objectstore.multibucket.preview-distribution&#39;</span> <span class="o">=&gt;</span> <span class="n">false</span><span class="p">,</span>
+</pre></div>
+</div>
+<p>If this is set to true and a multibucket object store is configured then
+newly created previews are put into 256 dedicated buckets.</p>
+<p>Those buckets are named like the mulibucket version but with the postfix
+<code class="docutils literal notranslate"><span class="pre">-preview-NUMBER</span></code> where NUMBER is between 0 and 255.</p>
+<p>Keep in mind that only previews of files are put in there that don’t have
+some already. Otherwise the old bucket will be used.</p>
+<p>To migrate existing previews to this new multibucket distribution of previews
+use the occ command <code class="docutils literal notranslate"><span class="pre">preview:repair</span></code>. For now this will only migrate
+previews that were generated before Nextcloud 19 in the flat
+<code class="docutils literal notranslate"><span class="pre">appdata_INSTANCEID/previews/FILEID</span></code> folder structure.</p>
 </div>
 <div class="section" id="sharing">
 <h2>Sharing<a class="headerlink" href="#sharing" title="Permalink to this headline">¶</a></h2>
@@ -1900,8 +1910,6 @@ normal maintenance change. To disable this specific email the appconfig option
     <div class="rst-other-versions">
       <dl>
         <dt>Versions</dt>
-        
-          <dd><a href="https://docs.nextcloud.com/server/16/admin_manual">16</a></dd>
         
           <dd><a href="https://docs.nextcloud.com/server/17/admin_manual">17</a></dd>
         

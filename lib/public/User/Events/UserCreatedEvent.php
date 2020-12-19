@@ -6,6 +6,7 @@ declare(strict_types=1);
  * @copyright 2019 Christoph Wurst <christoph@winzerhof-wurst.at>
  *
  * @author Christoph Wurst <christoph@winzerhof-wurst.at>
+ * @author Morris Jobke <hey@morrisjobke.de>
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -30,6 +31,8 @@ use OCP\EventDispatcher\Event;
 use OCP\IUser;
 
 /**
+ * Emitted when a new user has been created on the back-end.
+ *
  * @since 18.0.0
  */
 class UserCreatedEvent extends Event {

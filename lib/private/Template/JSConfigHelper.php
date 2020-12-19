@@ -292,7 +292,6 @@ class JSConfigHelper {
 				'longFooter' => $this->defaults->getLongFooter(),
 				'folder' => \OC_Util::getTheme(),
 			]),
-			"_oc_capabilities" => json_encode($capabilities),
 		];
 
 		if ($this->currentUser !== null) {
@@ -305,6 +304,7 @@ class JSConfigHelper {
 		}
 
 		$this->initialStateService->provideInitialState('core', 'config', $config);
+		$this->initialStateService->provideInitialState('core', 'capabilities', $capabilities);
 
 		// Allow hooks to modify the output values
 		\OC_Hook::emit('\OCP\Config', 'js', ['array' => &$array]);

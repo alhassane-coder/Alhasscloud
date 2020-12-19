@@ -21,7 +21,6 @@
 
 namespace OCA\Notifications;
 
-
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ServerException;
 use OC\Authentication\Exceptions\InvalidTokenException;
@@ -38,8 +37,11 @@ use OCP\IDBConnection;
 use OCP\ILogger;
 use OCP\IUser;
 use OCP\IUserManager;
+use OCP\L10N\IFactory;
 use OCP\Notification\IManager as INotificationManager;
 use OCP\Notification\INotification;
+use OCP\UserStatus\IManager as IUserStatusManager;
+use OCP\UserStatus\IUserStatus;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class Push {
@@ -59,6 +61,10 @@ class Push {
 	protected $clientService;
 	/** @var ICache */
 	protected $cache;
+	/** @var IUserStatusManager */
+	protected $userStatusManager;
+	/** @var IFactory */
+	protected $l10nFactory;
 	/** @var ILogger */
 	protected $log;
 	/** @var OutputInterface */
@@ -76,6 +82,8 @@ class Push {
 								IUserManager $userManager,
 								IClientService $clientService,
 								ICacheFactory $cacheFactory,
+								IUserStatusManager $userStatusManager,
+								IFactory $l10nFactory,
 								ILogger $log) {
 		$this->db = $connection;
 		$this->notificationManager = $notificationManager;
@@ -85,6 +93,8 @@ class Push {
 		$this->userManager = $userManager;
 		$this->clientService = $clientService;
 		$this->cache = $cacheFactory->createDistributed('pushtokens');
+		$this->userStatusManager = $userStatusManager;
+		$this->l10nFactory = $l10nFactory;
 		$this->log = $log;
 	}
 
@@ -98,10 +108,12 @@ class Push {
 		}
 	}
 
-	public function deferPayloads(): bool {
-		$shouldFlush = !$this->deferPayloads;
+	public function isDeferring(): bool {
+		return $this->deferPayloads;
+	}
+
+	public function deferPayloads(): void {
 		$this->deferPayloads = true;
-		return $shouldFlush;
 	}
 
 	public function flushPayloads(): void {
@@ -119,6 +131,18 @@ class Push {
 			return;
 		}
 
+		$userStatus = $this->userStatusManager->getUserStatuses([
+			$notification->getUser(),
+		]);
+
+		if (isset($userStatus[$notification->getUser()])) {
+			$userStatus = $userStatus[$notification->getUser()];
+			if ($userStatus->getStatus() === IUserStatus::DND) {
+				$this->printInfo('User status is set to DND');
+				return;
+			}
+		}
+
 		$devices = $this->getDevicesForUser($notification->getUser());
 		if (empty($devices)) {
 			$this->printInfo('No devices found for user');
@@ -128,10 +152,7 @@ class Push {
 		$this->printInfo('Trying to push to ' . count($devices) . ' devices');
 		$this->printInfo('');
 
-		$language = $this->config->getSystemValue('force_language', false);
-		$language = \is_string($language) ? $language : $this->config->getUserValue($notification->getUser(), 'core', 'lang', null);
-		$language = $language ?? $this->config->getSystemValue('default_language', 'en');
-
+		$language = $this->l10nFactory->getUserLanguage($user);
 		$this->printInfo('Language is set to ' . $language);
 
 		try {
@@ -297,7 +318,7 @@ class Push {
 			$body = $response->getBody();
 			$bodyData = json_decode($body, true);
 
-			if (is_array($bodyData) && isset($bodyData['unknown'], $bodyData['failed'])) {
+			if (is_array($bodyData) && array_key_exists('unknown', $bodyData) && array_key_exists('failed', $bodyData)) {
 				if (is_array($bodyData['unknown'])) {
 					// Proxy returns null when the array is empty
 					foreach ($bodyData['unknown'] as $unknownDevice) {

@@ -6,6 +6,7 @@ declare(strict_types=1);
  * @copyright 2018 Christoph Wurst <christoph@winzerhof-wurst.at>
  *
  * @author Christoph Wurst <christoph@winzerhof-wurst.at>
+ * @author Joas Schilling <coding@schilljs.com>
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -74,7 +75,7 @@ class Enforce extends Command {
 		);
 	}
 
-	protected function execute(InputInterface $input, OutputInterface $output) {
+	protected function execute(InputInterface $input, OutputInterface $output): int {
 		if ($input->getOption('on')) {
 			$enforcedGroups = $input->getOption('group');
 			$excludedGroups = $input->getOption('exclude');
@@ -89,6 +90,7 @@ class Enforce extends Command {
 		} else {
 			$this->writeNotEnforced($output);
 		}
+		return 0;
 	}
 
 	/**

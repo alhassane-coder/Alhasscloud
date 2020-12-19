@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 /**
  * @copyright Copyright (c) 2016, ownCloud, Inc.
  *
@@ -27,25 +30,31 @@
 namespace OCP\AppFramework;
 
 use OCP\IContainer;
+use Psr\Container\ContainerInterface;
 
 /**
- * Class IAppContainer
+ * This is a tagging interface for a container that belongs to an app
  *
- * This container interface provides short cuts for app developers to access predefined app service.
+ * The interface currently extends IContainer, but this interface is deprecated as of Nextcloud 20,
+ * thus this interface won't extend it anymore once that was removed. So migrate to the ContainerInterface
+ * only.
+ *
  * @since 6.0.0
  */
-interface IAppContainer extends IContainer {
+interface IAppContainer extends ContainerInterface, IContainer {
 
 	/**
 	 * used to return the appname of the set application
 	 * @return string the name of your application
 	 * @since 6.0.0
+	 * @deprecated 20.0.0
 	 */
 	public function getAppName();
 
 	/**
 	 * @return \OCP\IServerContainer
 	 * @since 6.0.0
+	 * @deprecated 20.0.0
 	 */
 	public function getServer();
 
@@ -53,6 +62,7 @@ interface IAppContainer extends IContainer {
 	 * @param string $middleWare
 	 * @return boolean
 	 * @since 6.0.0
+	 * @deprecated 20.0.0 use \OCP\AppFramework\Bootstrap\IRegistrationContext::registerMiddleware
 	 */
 	public function registerMiddleWare($middleWare);
 
@@ -61,6 +71,7 @@ interface IAppContainer extends IContainer {
 	 *
 	 * @param string $serviceName e.g. 'OCA\Files\Capabilities'
 	 * @since 8.2.0
+	 * @deprecated 20.0.0 use \OCP\AppFramework\Bootstrap\IRegistrationContext::registerCapability
 	 */
 	public function registerCapability($serviceName);
 }

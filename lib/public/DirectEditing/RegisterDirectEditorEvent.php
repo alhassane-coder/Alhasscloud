@@ -3,6 +3,7 @@
  * @copyright Copyright (c) 2019 Julius Härtl <jus@bitgrid.net>
  *
  * @author Julius Härtl <jus@bitgrid.net>
+ * @author Morris Jobke <hey@morrisjobke.de>
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -26,6 +27,8 @@ namespace OCP\DirectEditing;
 use OCP\EventDispatcher\Event;
 
 /**
+ * Event to allow to register the direct editor.
+ *
  * @since 18.0.0
  */
 class RegisterDirectEditorEvent extends Event {

@@ -42,17 +42,21 @@ use bantu\IniGetWrapper\IniGetWrapper;
 use DirectoryIterator;
 use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Platforms\SqlitePlatform;
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use GuzzleHttp\Exception\ClientException;
 use OC;
 use OC\AppFramework\Http;
 use OC\DB\Connection;
 use OC\DB\MissingColumnInformation;
 use OC\DB\MissingIndexInformation;
+use OC\DB\MissingPrimaryKeyInformation;
 use OC\DB\SchemaWrapper;
 use OC\IntegrityCheck\Checker;
 use OC\Lock\NoopLockingProvider;
 use OC\MemoryInfo;
+use OCA\Settings\SetupChecks\LegacySSEKeyFormat;
+use OCA\Settings\SetupChecks\PhpDefaultCharset;
+use OCA\Settings\SetupChecks\PhpOutputBuffering;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http\DataDisplayResponse;
 use OCP\AppFramework\Http\DataResponse;
@@ -95,6 +99,8 @@ class CheckSetupController extends Controller {
 	private $memoryInfo;
 	/** @var ISecureRandom */
 	private $secureRandom;
+	/** @var IniGetWrapper */
+	private $iniGetWrapper;
 
 	public function __construct($AppName,
 								IRequest $request,
@@ -109,7 +115,8 @@ class CheckSetupController extends Controller {
 								ILockingProvider $lockingProvider,
 								IDateTimeFormatter $dateTimeFormatter,
 								MemoryInfo $memoryInfo,
-								ISecureRandom $secureRandom) {
+								ISecureRandom $secureRandom,
+								IniGetWrapper $iniGetWrapper) {
 		parent::__construct($AppName, $request);
 		$this->config = $config;
 		$this->clientService = $clientService;
@@ -123,6 +130,7 @@ class CheckSetupController extends Controller {
 		$this->dateTimeFormatter = $dateTimeFormatter;
 		$this->memoryInfo = $memoryInfo;
 		$this->secureRandom = $secureRandom;
+		$this->iniGetWrapper = $iniGetWrapper;
 	}
 
 	/**
@@ -407,25 +415,23 @@ Raw output
 	 * @return bool
 	 */
 	protected function isOpcacheProperlySetup() {
-		$iniWrapper = new IniGetWrapper();
-
-		if (!$iniWrapper->getBool('opcache.enable')) {
+		if (!$this->iniGetWrapper->getBool('opcache.enable')) {
 			return false;
 		}
 
-		if (!$iniWrapper->getBool('opcache.save_comments')) {
+		if (!$this->iniGetWrapper->getBool('opcache.save_comments')) {
 			return false;
 		}
 
-		if ($iniWrapper->getNumeric('opcache.max_accelerated_files') < 10000) {
+		if ($this->iniGetWrapper->getNumeric('opcache.max_accelerated_files') < 10000) {
 			return false;
 		}
 
-		if ($iniWrapper->getNumeric('opcache.memory_consumption') < 128) {
+		if ($this->iniGetWrapper->getNumeric('opcache.memory_consumption') < 128) {
 			return false;
 		}
 
-		if ($iniWrapper->getNumeric('opcache.interned_strings_buffer') < 8) {
+		if ($this->iniGetWrapper->getNumeric('opcache.interned_strings_buffer') < 8) {
 			return false;
 		}
 
@@ -447,6 +453,15 @@ Raw output
 		$this->dispatcher->dispatch(IDBConnection::CHECK_MISSING_INDEXES_EVENT, $event);
 
 		return $indexInfo->getListOfMissingIndexes();
+	}
+
+	protected function hasMissingPrimaryKeys(): array {
+		$info = new MissingPrimaryKeyInformation();
+		// Dispatch event so apps can also hint for pending index updates if needed
+		$event = new GenericEvent($info);
+		$this->dispatcher->dispatch(IDBConnection::CHECK_MISSING_PRIMARY_KEYS_EVENT, $event);
+
+		return $info->getListOfMissingPrimaryKeys();
 	}
 
 	protected function hasMissingColumns(): array {
@@ -615,12 +630,14 @@ Raw output
 			'activity_mq' => ['mail_id'],
 			'authtoken' => ['id'],
 			'bruteforce_attempts' => ['id'],
+			'federated_reshares' => ['share_id'],
 			'filecache' => ['fileid', 'storage', 'parent', 'mimetype', 'mimepart', 'mtime', 'storage_mtime'],
 			'filecache_extended' => ['fileid'],
 			'file_locks' => ['id'],
 			'jobs' => ['id'],
 			'mimetypes' => ['id'],
 			'mounts' => ['id', 'storage_id', 'root_id', 'mount_id'],
+			'share_external' => ['id', 'parent'],
 			'storages' => ['numeric_id'],
 		];
 
@@ -638,7 +655,7 @@ Raw output
 				$column = $table->getColumn($columnName);
 				$isAutoIncrement = $column->getAutoincrement();
 				$isAutoIncrementOnSqlite = $isSqlite && $isAutoIncrement;
-				if ($column->getType()->getName() !== Type::BIGINT && !$isAutoIncrementOnSqlite) {
+				if ($column->getType()->getName() !== Types::BIGINT && !$isAutoIncrementOnSqlite) {
 					$pendingColumns[] = $tableName . '.' . $columnName;
 				}
 			}
@@ -687,6 +704,9 @@ Raw output
 	 * @return DataResponse
 	 */
 	public function check() {
+		$phpDefaultCharset = new PhpDefaultCharset();
+		$phpOutputBuffering = new PhpOutputBuffering();
+		$legacySSEKeyFormat = new LegacySSEKeyFormat($this->l10n, $this->config, $this->urlGenerator);
 		return new DataResponse(
 			[
 				'isGetenvServerWorking' => !empty(getenv('PATH')),
@@ -714,6 +734,7 @@ Raw output
 				'phpOpcacheDocumentation' => $this->urlGenerator->linkToDocs('admin-php-opcache'),
 				'isSettimelimitAvailable' => $this->isSettimelimitAvailable(),
 				'hasFreeTypeSupport' => $this->hasFreeTypeSupport(),
+				'missingPrimaryKeys' => $this->hasMissingPrimaryKeys(),
 				'missingIndexes' => $this->hasMissingIndexes(),
 				'missingColumns' => $this->hasMissingColumns(),
 				'isSqliteUsed' => $this->isSqliteUsed(),
@@ -727,6 +748,9 @@ Raw output
 				'isMysqlUsedWithoutUTF8MB4' => $this->isMysqlUsedWithoutUTF8MB4(),
 				'isEnoughTempSpaceAvailableIfS3PrimaryStorageIsUsed' => $this->isEnoughTempSpaceAvailableIfS3PrimaryStorageIsUsed(),
 				'reverseProxyGeneratedURL' => $this->urlGenerator->getAbsoluteURL('index.php'),
+				PhpDefaultCharset::class => ['pass' => $phpDefaultCharset->run(), 'description' => $phpDefaultCharset->description(), 'severity' => $phpDefaultCharset->severity()],
+				PhpOutputBuffering::class => ['pass' => $phpOutputBuffering->run(), 'description' => $phpOutputBuffering->description(), 'severity' => $phpOutputBuffering->severity()],
+				LegacySSEKeyFormat::class => ['pass' => $legacySSEKeyFormat->run(), 'description' => $legacySSEKeyFormat->description(), 'severity' => $legacySSEKeyFormat->severity(), 'linkToDocumentation' => $legacySSEKeyFormat->linkToDocumentation()],
 			]
 		);
 	}

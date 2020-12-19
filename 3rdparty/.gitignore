@@ -13,6 +13,7 @@ doctrine/annotations/.travis.yml
 doctrine/cache/tests
 doctrine/cache/.travis.yml
 doctrine/cache/composer.json
+doctrine/cache/README.md
 doctrine/collections/tests
 doctrine/collections/.travis.yml
 doctrine/collections/README.md
@@ -23,11 +24,13 @@ doctrine/common/composer.json
 doctrine/dbal/tests
 doctrine/dbal/docs
 doctrine/dbal/run-all.sh
+doctrine/dbal/.doctrine-project.json
 doctrine/dbal/.travis.yml
 doctrine/dbal/.gitignore
 doctrine/dbal/.gitattributes
 doctrine/dbal/.gitmodules
 doctrine/dbal/build.*
+doctrine/dbal/phpcs.xml.dist
 doctrine/dbal/phpunit.xml.dist
 doctrine/inflector/tests
 doctrine/lexer/composer.json
@@ -208,14 +211,13 @@ nikic/php-parser/grammar/tokens.y
 nikic/php-parser/phpunit.xml.dist
 
 
-interfasys/lognormalizer/.gitignore
-interfasys/lognormalizer/.travis.yml
-interfasys/lognormalizer/.scrutinizer.yml
-interfasys/lognormalizer/CHANGELOG.md
-interfasys/lognormalizer/README.md
-interfasys/lognormalizer/composer.json
-interfasys/lognormalizer/phpunit.xml
-interfasys/lognormalizer/tests
+nextcloud/lognormalizer/.gitignore
+nextcloud/lognormalizer/.travis.yml
+nextcloud/lognormalizer/CHANGELOG.md
+nextcloud/lognormalizer/README.md
+nextcloud/lognormalizer/composer.json
+nextcloud/lognormalizer/phpunit.xml
+nextcloud/lognormalizer/tests
 
 deepdiver1975/tarstreamer/.gitignore
 deepdiver1975/tarstreamer/.travis.yml

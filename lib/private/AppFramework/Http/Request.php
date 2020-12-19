@@ -10,6 +10,7 @@ declare(strict_types=1);
  * @author Bernhard Posselt <dev@bernhard-posselt.com>
  * @author Christoph Wurst <christoph@winzerhof-wurst.at>
  * @author Daniel Kesselberg <mail@danielkesselberg.de>
+ * @author Georg Ehrke <oc.list@georgehrke.com>
  * @author Joas Schilling <coding@schilljs.com>
  * @author Juan Pablo Villafáñez <jvillafanez@solidgear.es>
  * @author Julius Härtl <jus@bitgrid.net>
@@ -308,7 +309,7 @@ class Request implements \ArrayAccess, \Countable, IRequest {
 	/**
 	 * Returns the value for a specific http header.
 	 *
-	 * This method returns null if the header did not exist.
+	 * This method returns an empty string if the header did not exist.
 	 *
 	 * @param string $name
 	 * @return string

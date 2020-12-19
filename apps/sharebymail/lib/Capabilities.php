@@ -1,8 +1,12 @@
 <?php
+
+declare(strict_types=1);
+
 /**
  * @copyright Copyright (c) 2017 Bjoern Schiessle <bjoern@schiessle.org>
  *
  * @author Bjoern Schiessle <bjoern@schiessle.org>
+ * @author Roeland Jago Douma <roeland@famdouma.nl>
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -23,26 +27,35 @@
 
 namespace OCA\ShareByMail;
 
+use OCA\ShareByMail\Settings\SettingsManager;
 use OCP\Capabilities\ICapability;
 
 class Capabilities implements ICapability {
 
-	/**
-	 * Function an app uses to return the capabilities
-	 *
-	 * @return array Array containing the apps capabilities
-	 * @since 8.2.0
-	 */
-	public function getCapabilities() {
+	/** @var SettingsManager */
+	private $manager;
+
+	public function __construct(SettingsManager $manager) {
+		$this->manager = $manager;
+	}
+
+	public function getCapabilities(): array {
 		return [
 			'files_sharing' =>
 				[
 					'sharebymail' =>
 						[
 							'enabled' => true,
-							'upload_files_drop' => ['enabled' => true],
-							'password' => ['enabled' => true],
-							'expire_date' => ['enabled' => true]
+							'upload_files_drop' => [
+								'enabled' => true,
+							],
+							'password' => [
+								'enabled' => true,
+								'enforced' => $this->manager->enforcePasswordProtection(),
+							],
+							'expire_date' => [
+								'enabled' => true,
+							],
 						]
 				]
 		];

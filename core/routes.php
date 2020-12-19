@@ -111,7 +111,11 @@ $application->registerRoutes($this, [
 
 		['root' => '/collaboration', 'name' => 'CollaborationResources#removeResource', 'url' => '/resources/collections/{collectionId}', 'verb' => 'DELETE'],
 		['root' => '/collaboration', 'name' => 'CollaborationResources#getCollectionsByResource', 'url' => '/resources/{resourceType}/{resourceId}', 'verb' => 'GET'],
-		['root' => '/collaboration', 'name' => 'CollaborationResources#createCollectionOnResource', 'url' => '/resources/{baseResourceType}/{baseResourceId}', 'verb' => 'POST']
+		['root' => '/collaboration', 'name' => 'CollaborationResources#createCollectionOnResource', 'url' => '/resources/{baseResourceType}/{baseResourceId}', 'verb' => 'POST'],
+
+		// Unified search
+		['root' => '/search', 'name' => 'UnifiedSearch#getProviders', 'url' => '/providers', 'verb' => 'GET'],
+		['root' => '/search', 'name' => 'UnifiedSearch#search', 'url' => '/providers/{providerId}/search', 'verb' => 'GET'],
 
 	],
 ]);

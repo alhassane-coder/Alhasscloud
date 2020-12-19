@@ -7,6 +7,7 @@
  * @author Bjoern Schiessle <bjoern@schiessle.org>
  * @author Björn Schießle <bjoern@schiessle.org>
  * @author Christoph Wurst <christoph@winzerhof-wurst.at>
+ * @author Daniel Kesselberg <mail@danielkesselberg.de>
  * @author Florin Peter <github@florin-peter.de>
  * @author Georg Ehrke <oc.list@georgehrke.com>
  * @author Joas Schilling <coding@schilljs.com>
@@ -127,17 +128,20 @@ class Trashbin {
 	 * @return array (filename => array (timestamp => original location))
 	 */
 	public static function getLocations($user) {
-		$query = \OC_DB::prepare('SELECT `id`, `timestamp`, `location`'
-			. ' FROM `*PREFIX*files_trash` WHERE `user`=?');
-		$result = $query->execute([$user]);
+		$query = \OC::$server->getDatabaseConnection()->getQueryBuilder();
+		$query->select('id', 'timestamp', 'location')
+			->from('files_trash')
+			->where($query->expr()->eq('user', $query->createNamedParameter($user)));
+		$result = $query->execute();
 		$array = [];
-		while ($row = $result->fetchRow()) {
+		while ($row = $result->fetch()) {
 			if (isset($array[$row['id']])) {
 				$array[$row['id']][$row['timestamp']] = $row['location'];
 			} else {
 				$array[$row['id']] = [$row['timestamp'] => $row['location']];
 			}
 		}
+		$result->closeCursor();
 		return $array;
 	}
 
@@ -150,11 +154,19 @@ class Trashbin {
 	 * @return string original location
 	 */
 	public static function getLocation($user, $filename, $timestamp) {
-		$query = \OC_DB::prepare('SELECT `location` FROM `*PREFIX*files_trash`'
-			. ' WHERE `user`=? AND `id`=? AND `timestamp`=?');
-		$result = $query->execute([$user, $filename, $timestamp])->fetchAll();
-		if (isset($result[0]['location'])) {
-			return $result[0]['location'];
+		$query = \OC::$server->getDatabaseConnection()->getQueryBuilder();
+		$query->select('location')
+			->from('files_trash')
+			->where($query->expr()->eq('user', $query->createNamedParameter($user)))
+			->andWhere($query->expr()->eq('id', $query->createNamedParameter($filename)))
+			->andWhere($query->expr()->eq('timestamp', $query->createNamedParameter($timestamp)));
+
+		$result = $query->execute();
+		$row = $result->fetch();
+		$result->closeCursor();
+
+		if (isset($row['location'])) {
+			return $row['location'];
 		} else {
 			return false;
 		}
@@ -207,8 +219,13 @@ class Trashbin {
 
 
 		if ($view->file_exists($target)) {
-			$query = \OC_DB::prepare("INSERT INTO `*PREFIX*files_trash` (`id`,`timestamp`,`location`,`user`) VALUES (?,?,?,?)");
-			$result = $query->execute([$targetFilename, $timestamp, $targetLocation, $user]);
+			$query = \OC::$server->getDatabaseConnection()->getQueryBuilder();
+			$query->insert('files_trash')
+				->setValue('id', $query->createNamedParameter($targetFilename))
+				->setValue('timestamp', $query->createNamedParameter($timestamp))
+				->setValue('location', $query->createNamedParameter($targetLocation))
+				->setValue('user', $query->createNamedParameter($user));
+			$result = $query->execute();
 			if (!$result) {
 				\OC::$server->getLogger()->error('trash bin database couldn\'t be updated for the files owner', ['app' => 'files_trashbin']);
 			}
@@ -329,8 +346,13 @@ class Trashbin {
 		}
 
 		if ($moveSuccessful) {
-			$query = \OC_DB::prepare("INSERT INTO `*PREFIX*files_trash` (`id`,`timestamp`,`location`,`user`) VALUES (?,?,?,?)");
-			$result = $query->execute([$filename, $timestamp, $location, $owner]);
+			$query = \OC::$server->getDatabaseConnection()->getQueryBuilder();
+			$query->insert('files_trash')
+				->setValue('id', $query->createNamedParameter($filename))
+				->setValue('timestamp', $query->createNamedParameter($timestamp))
+				->setValue('location', $query->createNamedParameter($location))
+				->setValue('user', $query->createNamedParameter($owner));
+			$result = $query->execute();
 			if (!$result) {
 				\OC::$server->getLogger()->error('trash bin database couldn\'t be updated', ['app' => 'files_trashbin']);
 			}
@@ -488,8 +510,12 @@ class Trashbin {
 			self::restoreVersions($view, $file, $filename, $uniqueFilename, $location, $timestamp);
 
 			if ($timestamp) {
-				$query = \OC_DB::prepare('DELETE FROM `*PREFIX*files_trash` WHERE `user`=? AND `id`=? AND `timestamp`=?');
-				$query->execute([$user, $filename, $timestamp]);
+				$query = \OC::$server->getDatabaseConnection()->getQueryBuilder();
+				$query->delete('files_trash')
+					->where($query->expr()->eq('user', $query->createNamedParameter($user)))
+					->andWhere($query->expr()->eq('id', $query->createNamedParameter($filename)))
+					->andWhere($query->expr()->eq('timestamp', $query->createNamedParameter($timestamp)));
+				$query->execute();
 			}
 
 			return true;
@@ -575,8 +601,11 @@ class Trashbin {
 
 		// actual file deletion
 		$trash->delete();
-		$query = \OC_DB::prepare('DELETE FROM `*PREFIX*files_trash` WHERE `user`=?');
-		$query->execute([$user]);
+
+		$query = \OC::$server->getDatabaseConnection()->getQueryBuilder();
+		$query->delete('files_trash')
+			->where($query->expr()->eq('user', $query->createNamedParameter($user)));
+		$query->execute();
 
 		// Bulk PostDelete-Hook
 		\OC_Hook::emit('\OCP\Trashbin', 'deleteAll', ['paths' => $filePaths]);
@@ -625,8 +654,13 @@ class Trashbin {
 		$size = 0;
 
 		if ($timestamp) {
-			$query = \OC_DB::prepare('DELETE FROM `*PREFIX*files_trash` WHERE `user`=? AND `id`=? AND `timestamp`=?');
-			$query->execute([$user, $filename, $timestamp]);
+			$query = \OC::$server->getDatabaseConnection()->getQueryBuilder();
+			$query->delete('files_trash')
+				->where($query->expr()->eq('user', $query->createNamedParameter($user)))
+				->andWhere($query->expr()->eq('id', $query->createNamedParameter($filename)))
+				->andWhere($query->expr()->eq('timestamp', $query->createNamedParameter($timestamp)));
+			$query->execute();
+
 			$file = $filename . '.d' . $timestamp;
 		} else {
 			$file = $filename;
@@ -708,8 +742,10 @@ class Trashbin {
 	 * @return bool result of db delete operation
 	 */
 	public static function deleteUser($uid) {
-		$query = \OC_DB::prepare('DELETE FROM `*PREFIX*files_trash` WHERE `user`=?');
-		return $query->execute([$uid]);
+		$query = \OC::$server->getDatabaseConnection()->getQueryBuilder();
+		$query->delete('files_trash')
+			->where($query->expr()->eq('user', $query->createNamedParameter($uid)));
+		return (bool) $query->execute();
 	}
 
 	/**
@@ -966,10 +1002,14 @@ class Trashbin {
 			->andWhere($query->expr()->eq('parent', $query->createNamedParameter($parentId)))
 			->andWhere($query->expr()->iLike('name', $query->createNamedParameter($pattern)));
 
+		$result = $query->execute();
+		$entries = $result->fetchAll();
+		$result->closeCursor();
+
 		/** @var CacheEntry[] $matches */
 		$matches = array_map(function (array $data) {
 			return Cache::cacheEntryFromData($data, \OC::$server->getMimeTypeLoader());
-		}, $query->execute()->fetchAll());
+		}, $entries);
 
 		foreach ($matches as $ma) {
 			if ($timestamp) {
@@ -1059,20 +1099,6 @@ class Trashbin {
 		$view = new View('/' . $user);
 		$fileInfo = $view->getFileInfo('/files_trashbin');
 		return isset($fileInfo['size']) ? $fileInfo['size'] : 0;
-	}
-
-	/**
-	 * register hooks
-	 */
-	public static function registerHooks() {
-		// create storage wrapper on setup
-		\OCP\Util::connectHook('OC_Filesystem', 'preSetup', 'OCA\Files_Trashbin\Storage', 'setupStorage');
-		//Listen to delete user signal
-		\OCP\Util::connectHook('OC_User', 'pre_deleteUser', 'OCA\Files_Trashbin\Hooks', 'deleteUser_hook');
-		//Listen to post write hook
-		\OCP\Util::connectHook('OC_Filesystem', 'post_write', 'OCA\Files_Trashbin\Hooks', 'post_write_hook');
-		// pre and post-rename, disable trash logic for the copy+unlink case
-		\OCP\Util::connectHook('OC_Filesystem', 'delete', 'OCA\Files_Trashbin\Trashbin', 'ensureFileScannedHook');
 	}
 
 	/**

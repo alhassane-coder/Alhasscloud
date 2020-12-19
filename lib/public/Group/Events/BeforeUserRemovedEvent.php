@@ -6,6 +6,7 @@ declare(strict_types=1);
  * @copyright 2019 Christoph Wurst <christoph@winzerhof-wurst.at>
  *
  * @author Christoph Wurst <christoph@winzerhof-wurst.at>
+ * @author Morris Jobke <hey@morrisjobke.de>
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -32,6 +33,10 @@ use OCP\IUser;
 
 /**
  * @since 18.0.0
+ * @deprecated 20.0.0 - it can't be guaranteed that this event is triggered in
+ * all case (e.g. for LDAP users this isn't possible) - if there is a valid use
+ * case please reach out in the issue tracker at
+ * https://github.com/nextcloud/server/issues
  */
 class BeforeUserRemovedEvent extends Event {
 
@@ -43,6 +48,7 @@ class BeforeUserRemovedEvent extends Event {
 
 	/**
 	 * @since 18.0.0
+	 * @deprecated 20.0.0
 	 */
 	public function __construct(IGroup $group, IUser $user) {
 		parent::__construct();
@@ -53,6 +59,7 @@ class BeforeUserRemovedEvent extends Event {
 	/**
 	 * @return IGroup
 	 * @since 18.0.0
+	 * @deprecated 20.0.0
 	 */
 	public function getGroup(): IGroup {
 		return $this->group;
@@ -61,6 +68,7 @@ class BeforeUserRemovedEvent extends Event {
 	/**
 	 * @return IUser
 	 * @since 18.0.0
+	 * @deprecated 20.0.0
 	 */
 	public function getUser(): IUser {
 		return $this->user;

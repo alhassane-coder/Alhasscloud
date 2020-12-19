@@ -92,7 +92,6 @@
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Accessing Nextcloud files using WebDAV</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#nextcloud-desktop-and-mobile-clients">Nextcloud Desktop and mobile clients</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#webdav-configuration">WebDAV configuration</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#app-passwords">App Passwords</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#accessing-files-using-linux">Accessing files using Linux</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#nautilus-file-manager">Nautilus file manager</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#accessing-files-with-kde-and-dolphin-file-manager">Accessing files with KDE and Dolphin file manager</a></li>
@@ -263,12 +262,6 @@ Distributed Authoring and Versioning (WebDAV) is a Hypertext Transfer Protocol
 (HTTP) extension that makes it easy to create, read, and edit files on Web
 servers. With WebDAV you can access your Nextcloud shares on Linux, macOS and
 Windows in the same way as any remote network share, and stay synchronized.</p>
-</div>
-<div class="section" id="app-passwords">
-<h2>App Passwords<a class="headerlink" href="#app-passwords" title="Permalink to this headline">¶</a></h2>
-<p>Nextcloud supports generating unquie application password separate from your user login.
-If you are using a 3rd party authenication provider you will need to generate an application password for WebDAV.
-In Nextcloud’s web GUI, go to the user preferences, go to Security. Generate an App password.</p>
 </div>
 <div class="section" id="accessing-files-using-linux">
 <h2>Accessing files using Linux<a class="headerlink" href="#accessing-files-using-linux" title="Permalink to this headline">¶</a></h2>
@@ -540,7 +533,7 @@ connect to the Nextcloud server as a different user, check <strong>Connect using
 different credentials</strong>.</p>
 </div>
 <div class="figure align-default">
-<a class="reference internal image-reference" href="../_images/explorer_webdav.png"><img alt="screenshot of mapping WebDAV on Windows Explorer" src="../_images/explorer_webdav.png" style="width: 502.40000000000003px; height: 366.40000000000003px;" /></a>
+<a class="reference internal image-reference" href="../_images/explorer_webdav.png"><img alt="screenshot of mapping WebDAV on Windows Explorer" src="../_images/explorer_webdav.png" style="width: 487.20000000000005px; height: 358.40000000000003px;" /></a>
 </div>
 <ol class="arabic simple" start="5">
 <li><p>Click the <code class="docutils literal notranslate"><span class="pre">Finish</span></code> button.</p></li>
@@ -593,8 +586,8 @@ as password.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p><code class="docutils literal notranslate"><span class="pre">Settings</span> <span class="pre">→</span> <span class="pre">Administration</span> <span class="pre">→</span> <span class="pre">Sharing</span> <span class="pre">→</span> <span class="pre">Allow</span> <span class="pre">users</span> <span class="pre">on</span> <span class="pre">this</span>
-<span class="pre">server</span> <span class="pre">to</span> <span class="pre">send</span> <span class="pre">shares</span> <span class="pre">to</span> <span class="pre">other</span> <span class="pre">servers</span></code> needs to be enabled in order
-to make this feature work.</p>
+<span class="pre">server</span> <span class="pre">to</span> <span class="pre">send</span> <span class="pre">shares</span> <span class="pre">to</span> <span class="pre">other</span> <span class="pre">servers.</span> <span class="pre">This</span> <span class="pre">option</span> <span class="pre">also</span> <span class="pre">allows</span> <span class="pre">WebDAV</span> <span class="pre">access</span>
+<span class="pre">to</span> <span class="pre">public</span> <span class="pre">shares</span></code> needs to be enabled in order to make this feature work.</p>
 </div>
 </div>
 <div class="section" id="known-problems">
@@ -779,9 +772,13 @@ longer than 30 minutes using Web Client in Windows 7.</p>
     </span>
     <div class="rst-other-versions">
       <dl>
+        <dt>Languages</dt>
+          <!--Here goes the Langs-->
+      </dl>
+    </div>
+    <div class="rst-other-versions">
+      <dl>
         <dt>Versions</dt>
-        
-          <dd><a href="https://docs.nextcloud.com/server/16/user_manual">16</a></dd>
         
           <dd><a href="https://docs.nextcloud.com/server/17/user_manual">17</a></dd>
         

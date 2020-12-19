@@ -3,6 +3,7 @@
  * @copyright Copyright (c) 2016, ownCloud GmbH.
  *
  * @author Christoph Wurst <christoph@winzerhof-wurst.at>
+ * @author Joas Schilling <coding@schilljs.com>
  * @author Jörn Friedrich Dreyer <jfd@butonic.de>
  * @author Roeland Jago Douma <roeland@famdouma.nl>
  * @author Thomas Müller <thomas.mueller@tmit.eu>
@@ -42,7 +43,7 @@ class ExpireTrash extends Command {
 	 * @var Expiration
 	 */
 	private $expiration;
-	
+
 	/**
 	 * @var IUserManager
 	 */
@@ -71,11 +72,11 @@ class ExpireTrash extends Command {
 			);
 	}
 
-	protected function execute(InputInterface $input, OutputInterface $output) {
+	protected function execute(InputInterface $input, OutputInterface $output): int {
 		$maxAge = $this->expiration->getMaxAgeAsTimestamp();
 		if (!$maxAge) {
 			$output->writeln("No expiry configured.");
-			return;
+			return 1;
 		}
 
 		$users = $input->getArgument('user_id');
@@ -87,6 +88,7 @@ class ExpireTrash extends Command {
 					$this->expireTrashForUser($userObject);
 				} else {
 					$output->writeln("<error>Unknown user $user</error>");
+					return 1;
 				}
 			}
 		} else {
@@ -99,6 +101,7 @@ class ExpireTrash extends Command {
 			$p->finish();
 			$output->writeln('');
 		}
+		return 0;
 	}
 
 	public function expireTrashForUser(IUser $user) {

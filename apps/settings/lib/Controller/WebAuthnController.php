@@ -5,6 +5,7 @@ declare(strict_types=1);
 /**
  * @copyright Copyright (c) 2020, Roeland Jago Douma <roeland@famdouma.nl>
  *
+ * @author Joas Schilling <coding@schilljs.com>
  * @author Roeland Jago Douma <roeland@famdouma.nl>
  *
  * @license GNU AGPL version 3 or any later version
@@ -65,7 +66,7 @@ class WebAuthnController extends Controller {
 
 	/**
 	 * @NoAdminRequired
-	 * @NoSubadminRequired
+	 * @NoSubAdminRequired
 	 * @PasswordConfirmationRequired
 	 * @UseSession
 	 * @NoCSRFRequired
@@ -83,7 +84,7 @@ class WebAuthnController extends Controller {
 
 	/**
 	 * @NoAdminRequired
-	 * @NoSubadminRequired
+	 * @NoSubAdminRequired
 	 * @PasswordConfirmationRequired
 	 * @UseSession
 	 */
@@ -105,7 +106,7 @@ class WebAuthnController extends Controller {
 
 	/**
 	 * @NoAdminRequired
-	 * @NoSubadminRequired
+	 * @NoSubAdminRequired
 	 * @PasswordConfirmationRequired
 	 */
 	public function deleteRegistration(int $id): JSONResponse {

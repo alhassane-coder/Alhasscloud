@@ -6,7 +6,6 @@ declare(strict_types=1);
  * @copyright Copyright (c) 2018 John Molakvoæ (skjnldsv) <skjnldsv@protonmail.com>
  * @copyright Copyright (c) 2019 Janis Köhr <janiskoehr@icloud.com>
  *
- * @author Alexey Pyltsyn <lex61rus@gmail.com>
  * @author Christoph Wurst <christoph@winzerhof-wurst.at>
  * @author Janis Köhr <janis.koehr@novatec-gmbh.de>
  * @author Joas Schilling <coding@schilljs.com>
@@ -39,7 +38,6 @@ use OCP\App\IAppManager;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\DataDisplayResponse;
-use OCP\AppFramework\Http\DataDownloadResponse;
 use OCP\AppFramework\Utility\ITimeFactory;
 use OCP\IConfig;
 use OCP\ILogger;
@@ -131,7 +129,7 @@ class AccessibilityController extends Controller {
 	}
 
 	/**
-	 * @NoAdminRequired
+	 * @PublicPage
 	 * @NoCSRFRequired
 	 * @NoSameSiteCookieRequired
 	 *
@@ -140,7 +138,11 @@ class AccessibilityController extends Controller {
 	public function getCss(): DataDisplayResponse {
 		$css        = '';
 		$imports    = '';
-		$userValues = $this->getUserValues();
+		if ($this->userSession->isLoggedIn()) {
+			$userValues = $this->getUserValues();
+		} else {
+			$userValues = ['dark'];
+		}
 
 		foreach ($userValues as $key => $scssFile) {
 			if ($scssFile !== false) {
@@ -199,46 +201,10 @@ class AccessibilityController extends Controller {
 		$response->addHeader('Pragma', 'cache');
 
 		// store current cache hash
-		$this->config->setUserValue($this->userSession->getUser()->getUID(), $this->appName, 'icons-css', md5($css));
-
-		return $response;
-	}
-
-	/**
-	 * @NoCSRFRequired
-	 * @PublicPage
-	 * @NoSameSiteCookieRequired
-	 *
-	 * @return DataDownloadResponse
-	 */
-	public function getJavascript(): DataDownloadResponse {
-		$user = $this->userSession->getUser();
-
-		if ($user === null) {
-			$theme = false;
-			$highcontrast = false;
-		} else {
-			$theme = $this->config->getUserValue($user->getUID(), $this->appName, 'theme', false);
-			$highcontrast = $this->config->getUserValue($user->getUID(), $this->appName, 'highcontrast', false) !== false;
+		if ($this->userSession->isLoggedIn()) {
+			$this->config->setUserValue($this->userSession->getUser()->getUID(), $this->appName, 'icons-css', md5($css));
 		}
-		if ($theme !== false) {
-			$responseJS = '(function() {
-	OCA.Accessibility = {
-		highcontrast: ' . json_encode($highcontrast) . ',
-		theme: ' . json_encode($theme) . ',
-	};
-	document.body.classList.add(' . json_encode($theme) . ');
-})();';
-		} else {
-			$responseJS = '(function() {
-	OCA.Accessibility = {
-		highcontrast: ' . json_encode($highcontrast) . ',
-		theme: ' . json_encode($theme) . ',
-	};
-})();';
-		}
-		$response = new DataDownloadResponse($responseJS, 'javascript', 'text/javascript');
-		$response->cacheFor(3600);
+
 		return $response;
 	}
 

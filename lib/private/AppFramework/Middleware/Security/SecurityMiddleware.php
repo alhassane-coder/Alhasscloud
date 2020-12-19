@@ -10,6 +10,7 @@ declare(strict_types=1);
  * @author Bjoern Schiessle <bjoern@schiessle.org>
  * @author Christoph Wurst <christoph@winzerhof-wurst.at>
  * @author Daniel Kesselberg <mail@danielkesselberg.de>
+ * @author Holger Hees <holger.hees@gmail.com>
  * @author Joas Schilling <coding@schilljs.com>
  * @author Julien Veyssier <eneiluj@posteo.net>
  * @author Lukas Reschke <lukas@statuscode.ch>
@@ -211,7 +212,7 @@ class SecurityMiddleware extends Middleware {
 	public function afterException($controller, $methodName, \Exception $exception): Response {
 		if ($exception instanceof SecurityException) {
 			if ($exception instanceof StrictCookieMissingException) {
-				return new RedirectResponse(\OC::$WEBROOT);
+				return new RedirectResponse(\OC::$WEBROOT . '/');
 			}
 			if (stripos($this->request->getHeader('Accept'),'html') === false) {
 				$response = new JSONResponse(

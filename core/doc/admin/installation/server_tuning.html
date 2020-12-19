@@ -220,7 +220,7 @@ See <a class="reference internal" href="../configuration_server/caching_configur
 </div>
 <div class="section" id="using-mariadb-mysql-instead-of-sqlite">
 <h2>Using MariaDB/MySQL instead of SQLite<a class="headerlink" href="#using-mariadb-mysql-instead-of-sqlite" title="Permalink to this headline">¶</a></h2>
-<p>MySQL or MariaDB are preferred because of the <a class="reference external" href="http://www.sqlite.org/whentouse.html">performance limitations of
+<p>MySQL or MariaDB are preferred because of the <a class="reference external" href="https://www.sqlite.org/whentouse.html">performance limitations of
 SQLite with highly concurrent applications</a>, like Nextcloud.</p>
 <p>See the section <a class="reference internal" href="../configuration_database/linux_database_configuration.html"><span class="doc">Database configuration</span></a> for how to
 configure Nextcloud for MySQL or MariaDB. If your installation is already running on
@@ -250,7 +250,7 @@ configure Nextcloud to use Redis-based Transactional File Locking.</p>
 <h2>SSL / encryption app<a class="headerlink" href="#ssl-encryption-app" title="Permalink to this headline">¶</a></h2>
 <p>SSL (HTTPS) and file encryption/decryption can be offloaded to a processor’s
 AES-NI extension. This can both speed up these operations while lowering
-processing overhead. This requires a processor with the <a class="reference external" href="http://wikipedia.org/wiki/AES_instruction_set">AES-NI instruction set</a>.</p>
+processing overhead. This requires a processor with the <a class="reference external" href="https://wikipedia.org/wiki/AES_instruction_set">AES-NI instruction set</a>.</p>
 <p>Here are some examples how to check if your CPU / environment supports the
 AES-NI extension:</p>
 <ul class="simple">
@@ -258,7 +258,7 @@ AES-NI extension:</p>
 all cores: <code class="docutils literal notranslate"><span class="pre">grep</span> <span class="pre">-m</span> <span class="pre">1</span> <span class="pre">'^flags'</span> <span class="pre">/proc/cpuinfo</span></code> If the result contains any
 <code class="docutils literal notranslate"><span class="pre">aes</span></code>, the extension is present.</p></li>
 <li><p>Search eg. on the Intel web if the processor used supports the extension
-<a class="reference external" href="http://ark.intel.com/MySearch.aspx?AESTech=true">Intel Processor Feature Filter</a> You may set a filter by
+<a class="reference external" href="https://ark.intel.com/MySearch.aspx?AESTech=true">Intel Processor Feature Filter</a> You may set a filter by
 <code class="docutils literal notranslate"><span class="pre">&quot;AES</span> <span class="pre">New</span> <span class="pre">Instructions&quot;</span></code> to get a reduced result set.</p></li>
 <li><p>For versions of openssl &gt;= 1.0.1, AES-NI does not work via an engine and
 will not show up in the <code class="docutils literal notranslate"><span class="pre">openssl</span> <span class="pre">engine</span></code> command. It is active by default
@@ -272,7 +272,7 @@ support.</p></li>
 </div>
 <div class="section" id="enable-http2-for-faster-loading">
 <h2>Enable HTTP2 for faster loading<a class="headerlink" href="#enable-http2-for-faster-loading" title="Permalink to this headline">¶</a></h2>
-<p>HTTP2 has <a class="reference external" href="https://www.troyhunt.com/i-wanna-go-fast-https-massive-speed-advantage/">huge speed improvements</a> over HTTP with multiple request. Most <a class="reference external" href="http://caniuse.com/#feat=http2">browsers already support HTTP2 over SSL (HTTPS)</a>. So refer to your server manual for guides on how to use HTTP2.</p>
+<p>HTTP2 has <a class="reference external" href="https://www.troyhunt.com/i-wanna-go-fast-https-massive-speed-advantage/">huge speed improvements</a> over HTTP with multiple request. Most <a class="reference external" href="https://caniuse.com/#feat=http2">browsers already support HTTP2 over SSL (HTTPS)</a>. So refer to your server manual for guides on how to use HTTP2.</p>
 </div>
 <div class="section" id="tune-php-fpm">
 <h2>Tune PHP-FPM<a class="headerlink" href="#tune-php-fpm" title="Permalink to this headline">¶</a></h2>
@@ -293,7 +293,7 @@ MySQL cache following values in your <code class="docutils literal notranslate">
 </div>
 <div class="section" id="enable-php-opcache">
 <h2>Enable PHP OPcache<a class="headerlink" href="#enable-php-opcache" title="Permalink to this headline">¶</a></h2>
-<p>The <a class="reference external" href="http://php.net/manual/en/intro.opcache.php">OPcache</a> improves the performance of PHP applications by caching precompiled bytecode. We recommend at least the following settings:</p>
+<p>The <a class="reference external" href="https://php.net/manual/en/intro.opcache.php">OPcache</a> improves the performance of PHP applications by caching precompiled bytecode. We recommend at least the following settings:</p>
 <div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="na">opcache.enable</span><span class="o">=</span><span class="s">1</span>
 <span class="na">opcache.interned_strings_buffer</span><span class="o">=</span><span class="s">8</span>
 <span class="na">opcache.max_accelerated_files</span><span class="o">=</span><span class="s">10000</span>
@@ -302,7 +302,7 @@ MySQL cache following values in your <code class="docutils literal notranslate">
 <span class="na">opcache.revalidate_freq</span><span class="o">=</span><span class="s">1</span>
 </pre></div>
 </div>
-<p>For more details check out the <a class="reference external" href="http://php.net/manual/en/opcache.configuration.php">official documentation</a> or <a class="reference external" href="https://www.scalingphpbook.com/blog/2014/02/14/best-zend-opcache-settings.html">this blog post about some recommended settings</a>.</p>
+<p>For more details check out the <a class="reference external" href="https://php.net/manual/en/opcache.configuration.php">official documentation</a> or <a class="reference external" href="https://www.scalingphpbook.com/blog/2014/02/14/best-zend-opcache-settings.html">this blog post about some recommended settings</a>.</p>
 </div>
 </div>
 
@@ -351,8 +351,6 @@ MySQL cache following values in your <code class="docutils literal notranslate">
     <div class="rst-other-versions">
       <dl>
         <dt>Versions</dt>
-        
-          <dd><a href="https://docs.nextcloud.com/server/16/admin_manual">16</a></dd>
         
           <dd><a href="https://docs.nextcloud.com/server/17/admin_manual">17</a></dd>
         

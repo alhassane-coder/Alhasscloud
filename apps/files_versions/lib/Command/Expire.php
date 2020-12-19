@@ -68,7 +68,7 @@ class Expire implements ICommand {
 			// fails because the command does not have those credentials
 
 			/** @var ILogger $logger */
-			$logger = \OC::$server->query(ILogger::class);
+			$logger = \OC::$server->get(ILogger::class);
 
 			$logger->logException($e, [
 				'level' => ILogger::WARN,

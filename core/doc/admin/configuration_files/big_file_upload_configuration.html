@@ -113,6 +113,7 @@
 <li class="toctree-l2"><a class="reference internal" href="external_storage/auth_mechanisms.html">External Storage authentication mechanisms</a></li>
 <li class="toctree-l2"><a class="reference internal" href="encryption_configuration.html">Encryption configuration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="encryption_details.html">Encryption details</a></li>
+<li class="toctree-l2"><a class="reference internal" href="encryption_migration.html">Encryption migration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="files_locking_transactional.html">Transactional file locking</a></li>
 <li class="toctree-l2"><a class="reference internal" href="previews_configuration.html">Previews configuration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="file_versioning.html">Controlling file versions and aging</a></li>
@@ -277,9 +278,9 @@ necessary, once bug #51747 is fixed.</p>
 <div class="section" id="nginx">
 <h3>nginx<a class="headerlink" href="#nginx" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
-<li><p><a class="reference external" href="http://nginx.org/en/docs/http/ngx_http_core_module.html#client_max_body_size">client_max_body_size</a></p></li>
-<li><p><a class="reference external" href="http://nginx.org/en/docs/http/ngx_http_fastcgi_module.html#fastcgi_read_timeout">fastcgi_read_timeout</a></p></li>
-<li><p><a class="reference external" href="http://nginx.org/en/docs/http/ngx_http_core_module.html#client_body_temp_path">client_body_temp_path</a></p></li>
+<li><p><a class="reference external" href="https://nginx.org/en/docs/http/ngx_http_core_module.html#client_max_body_size">client_max_body_size</a></p></li>
+<li><p><a class="reference external" href="https://nginx.org/en/docs/http/ngx_http_fastcgi_module.html#fastcgi_read_timeout">fastcgi_read_timeout</a></p></li>
+<li><p><a class="reference external" href="https://nginx.org/en/docs/http/ngx_http_core_module.html#client_body_temp_path">client_body_temp_path</a></p></li>
 </ul>
 <p>Since nginx 1.7.11 a new config option <a class="reference external" href="https://nginx.org/en/docs/http/ngx_http_fastcgi_module.html#fastcgi_request_buffering">fastcgi_request_buffering</a>
 is available. Setting this option to <code class="docutils literal notranslate"><span class="pre">fastcgi_request_buffering</span> <span class="pre">off;</span></code> in your nginx config
@@ -296,8 +297,8 @@ swap and temp storage.</p>
 <p>If your site is behind a nginx frontend (for example a loadbalancer):</p>
 <p>By default, downloads will be limited to 1GB due to <code class="docutils literal notranslate"><span class="pre">proxy_buffering</span></code> and <code class="docutils literal notranslate"><span class="pre">proxy_max_temp_file_size</span></code> on the frontend.</p>
 <ul class="simple">
-<li><p>If you can access the frontend’s configuration, disable <a class="reference external" href="http://nginx.org/en/docs/http/ngx_http_proxy_module.html#proxy_buffering">proxy_buffering</a> or increase <a class="reference external" href="http://nginx.org/en/docs/http/ngx_http_proxy_module.html#proxy_max_temp_file_size">proxy_max_temp_file_size</a> from the default 1GB.</p></li>
-<li><p>If you do not have access to the frontend, set the <a class="reference external" href="http://nginx.org/en/docs/http/ngx_http_proxy_module.html#proxy_buffering">X-Accel-Buffering</a> header to <code class="docutils literal notranslate"><span class="pre">add_header</span> <span class="pre">X-Accel-Buffering</span> <span class="pre">no;</span></code> on your backend server.</p></li>
+<li><p>If you can access the frontend’s configuration, disable <a class="reference external" href="https://nginx.org/en/docs/http/ngx_http_proxy_module.html#proxy_buffering">proxy_buffering</a> or increase <a class="reference external" href="https://nginx.org/en/docs/http/ngx_http_proxy_module.html#proxy_max_temp_file_size">proxy_max_temp_file_size</a> from the default 1GB.</p></li>
+<li><p>If you do not have access to the frontend, set the <a class="reference external" href="https://nginx.org/en/docs/http/ngx_http_proxy_module.html#proxy_buffering">X-Accel-Buffering</a> header to <code class="docutils literal notranslate"><span class="pre">add_header</span> <span class="pre">X-Accel-Buffering</span> <span class="pre">no;</span></code> on your backend server.</p></li>
 </ul>
 </div>
 </div>
@@ -392,8 +393,6 @@ configuration to reset it to the default shown in the <code class="docutils lite
     <div class="rst-other-versions">
       <dl>
         <dt>Versions</dt>
-        
-          <dd><a href="https://docs.nextcloud.com/server/16/admin_manual">16</a></dd>
         
           <dd><a href="https://docs.nextcloud.com/server/17/admin_manual">17</a></dd>
         

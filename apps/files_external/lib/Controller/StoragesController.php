@@ -5,6 +5,7 @@
  * @author Jesús Macias <jmacias@solidgear.es>
  * @author Joas Schilling <coding@schilljs.com>
  * @author Juan Pablo Villafáñez <jvillafanez@solidgear.es>
+ * @author Morris Jobke <hey@morrisjobke.de>
  * @author Robin Appelman <robin@icewind.nl>
  * @author Robin McCorkell <robin@mccorkell.me.uk>
  * @author Roeland Jago Douma <roeland@famdouma.nl>
@@ -250,7 +251,7 @@ abstract class StoragesController extends Controller {
 			$backend = $storage->getBackend();
 			// update status (can be time-consuming)
 			$storage->setStatus(
-				\OC_Mount_Config::getBackendStatus(
+				\OCA\Files_External\MountConfig::getBackendStatus(
 					$backend->getStorageClass(),
 					$storage->getBackendOptions(),
 					false,

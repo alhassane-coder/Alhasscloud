@@ -135,16 +135,16 @@
 					color: var(--color-main-text);
 					padding: 10px 12px;
 					box-sizing: border-box;
-					opacity: .7;
 					white-space: nowrap;
 					position: relative;
 					width: 100%;
 					&:hover,
-					&:focus,
+					&:focus {
+						background-color: var(--color-background-hover);
+					}
 					&:active,
 					&.active {
-						opacity: 1;
-						box-shadow: inset 4px 0 var(--color-primary-element);
+						background-color: var(--color-primary-light);
 					}
 					span {
 						display: inline-block;
@@ -433,7 +433,7 @@ nav[role='navigation'] {
 	li {
 		position: relative;
 		cursor: pointer;
-		margin: 0 2px;
+		padding: 0 2px;
 		display: flex;
 		justify-content: center;
 
@@ -446,6 +446,9 @@ nav[role='navigation'] {
 			align-items: center;
 			justify-content: center;
 			opacity: .6;
+			// Make sure most app names don’t ellipsize
+			letter-spacing: -0.5px;
+			font-size: 12px;
 		}
 
 		/* focused app visual feedback */
@@ -453,13 +456,21 @@ nav[role='navigation'] {
 		a:focus,
 		a.active {
 			opacity: 1;
+			font-weight: bold;
+		}
+
+		// Text size back to normal for hover/focus
+		&:hover a,
+		a:focus {
+			font-size: 14px;
 		}
 
 		&:hover a + span,
 		a:focus + span,
 		&:hover span,
 		&:focus span,
-		a:focus span {
+		a:focus span,
+		a.active span {
 			display: inline-block;
 			text-overflow: initial;
 			width: auto;
@@ -482,7 +493,7 @@ nav[role='navigation'] {
 			position: absolute;
 			color: var(--color-primary-text);
 			bottom: 2px;
-			width: calc(100% - 4px);
+			width: 100%;
 			text-align: center;
 			overflow: hidden;
 			text-overflow: ellipsis;

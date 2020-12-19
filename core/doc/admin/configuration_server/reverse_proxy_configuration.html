@@ -262,12 +262,20 @@ reverse proxy. The recommended solution is that your reverse proxy does the redi
 </div>
 <div class="section" id="traefik-1">
 <h3>Traefik 1<a class="headerlink" href="#traefik-1" title="Permalink to this headline">¶</a></h3>
+<p>Using docker tags:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>traefik.frontend.redirect.permanent: &#39;true&#39;
 traefik.frontend.redirect.regex: https://(.*)/.well-known/(card|cal)dav
 traefik.frontend.redirect.replacement: https://$$1/remote.php/dav/
 </pre></div>
 </div>
-<p>Thanks to <a class="reference external" href="https://github.com/pauvos">&#64;pauvos</a> for traefik example.</p>
+<p>Using traefik.toml:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">frontends</span><span class="o">.</span><span class="n">frontend1</span><span class="o">.</span><span class="n">redirect</span><span class="p">]</span>
+  <span class="n">regex</span> <span class="o">=</span> <span class="s2">&quot;https://(.*)/.well-known/(card|cal)dav&quot;</span>
+  <span class="n">replacement</span> <span class="o">=</span> <span class="s2">&quot;https://$1/remote.php/dav/</span>
+  <span class="n">permanent</span> <span class="o">=</span> <span class="n">true</span>
+</pre></div>
+</div>
+<p>Thanks to <a class="reference external" href="https://github.com/pauvos">&#64;pauvos</a> and <a class="reference external" href="https://github.com/mrtumnus">&#64;mrtumnus</a> for traefik examples.</p>
 </div>
 <div class="section" id="traefik-2">
 <h3>Traefik 2<a class="headerlink" href="#traefik-2" title="Permalink to this headline">¶</a></h3>
@@ -372,8 +380,6 @@ create the <code class="file docutils literal notranslate"><span class="pre">con
     <div class="rst-other-versions">
       <dl>
         <dt>Versions</dt>
-        
-          <dd><a href="https://docs.nextcloud.com/server/16/admin_manual">16</a></dd>
         
           <dd><a href="https://docs.nextcloud.com/server/17/admin_manual">17</a></dd>
         

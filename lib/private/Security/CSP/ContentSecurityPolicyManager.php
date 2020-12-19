@@ -7,6 +7,7 @@ declare(strict_types=1);
  *
  * @author Christoph Wurst <christoph@winzerhof-wurst.at>
  * @author Lukas Reschke <lukas@statuscode.ch>
+ * @author Morris Jobke <hey@morrisjobke.de>
  * @author Roeland Jago Douma <roeland@famdouma.nl>
  *
  * @license AGPL-3.0
@@ -57,7 +58,7 @@ class ContentSecurityPolicyManager implements IContentSecurityPolicyManager {
 	 */
 	public function getDefaultPolicy(): ContentSecurityPolicy {
 		$event = new AddContentSecurityPolicyEvent($this);
-		$this->dispatcher->dispatch(AddContentSecurityPolicyEvent::class, $event);
+		$this->dispatcher->dispatchTyped($event);
 
 		$defaultPolicy = new \OC\Security\CSP\ContentSecurityPolicy();
 		foreach ($this->policies as $policy) {

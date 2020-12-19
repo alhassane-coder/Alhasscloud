@@ -30,7 +30,6 @@ use OCP\EventDispatcher\Event;
 use OCP\EventDispatcher\IEventListener;
 
 class FailedLoginListener implements IEventListener {
-
 	/** @var FailedLoginCompliance */
 	private $compliance;
 
@@ -45,5 +44,4 @@ class FailedLoginListener implements IEventListener {
 
 		$this->compliance->onFailedLogin($event->getUid());
 	}
-
 }

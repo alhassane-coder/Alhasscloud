@@ -4,6 +4,7 @@
  * @copyright Copyright (c) 2016, Joas Schilling <coding@schilljs.com>
  *
  * @author Christoph Wurst <christoph@winzerhof-wurst.at>
+ * @author Daniel Kesselberg <mail@danielkesselberg.de>
  * @author Georg Ehrke <oc.list@georgehrke.com>
  * @author Joas Schilling <coding@schilljs.com>
  * @author Roeland Jago Douma <roeland@famdouma.nl>
@@ -325,7 +326,7 @@ EOF;
 	 * Returns a list of addresses that are associated with a principal.
 	 *
 	 * @param string $principal
-	 * @return string?
+	 * @return string|null
 	 */
 	protected function getCalendarUserTypeForPrincipal($principal):?string {
 		$calendarUserType = '{' . self::NS_CALDAV . '}calendar-user-type';

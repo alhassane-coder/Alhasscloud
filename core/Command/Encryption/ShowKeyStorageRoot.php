@@ -4,6 +4,7 @@
  *
  * @author Björn Schießle <bjoern@schiessle.org>
  * @author Christoph Wurst <christoph@winzerhof-wurst.at>
+ * @author Joas Schilling <coding@schilljs.com>
  *
  * @license AGPL-3.0
  *
@@ -48,11 +49,12 @@ class ShowKeyStorageRoot extends Command {
 			->setDescription('Show current key storage root');
 	}
 
-	protected function execute(InputInterface $input, OutputInterface $output) {
+	protected function execute(InputInterface $input, OutputInterface $output): int {
 		$currentRoot = $this->util->getKeyStorageRoot();
 
 		$rootDescription = $currentRoot !== '' ? $currentRoot : 'default storage location (data/)';
 
 		$output->writeln("Current key storage root:  <info>$rootDescription</info>");
+		return 0;
 	}
 }

@@ -26,17 +26,24 @@ declare(strict_types=1);
 namespace OCA\Photos\AppInfo;
 
 use OCP\AppFramework\App;
+use OCP\AppFramework\Bootstrap\IBootContext;
+use OCP\AppFramework\Bootstrap\IBootstrap;
+use OCP\AppFramework\Bootstrap\IRegistrationContext;
 
-class Application extends App {
+class Application extends App implements IBootstrap {
 	public const APP_ID = 'photos';
 
-	public const MIMES = [
-		// 'image/png',			// too rarely used for photos
+	public const IMAGE_MIMES = [
+		'image/png',
 		'image/jpeg',
+		'image/heic',
 		// 'image/gif',			// too rarely used for photos
 		// 'image/x-xbitmap',	// too rarely used for photos
 		// 'image/bmp',			// too rarely used for photos
 		// 'image/svg+xml',		// too rarely used for photos
+	];
+
+	public const VIDEO_MIMES = [
 		// 'video/mpeg',		// too rarely used for photos
 		// 'video/ogg',			// too rarely used for photos
 		// 'video/webm',		// too rarely used for photos
@@ -48,5 +55,11 @@ class Application extends App {
 
 	public function __construct() {
 		parent::__construct(self::APP_ID);
+	}
+
+	public function register(IRegistrationContext $context): void {
+	}
+
+	public function boot(IBootContext $context): void {
 	}
 }

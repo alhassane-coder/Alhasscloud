@@ -5,6 +5,7 @@
  * @author Bjoern Schiessle <bjoern@schiessle.org>
  * @author Björn Schießle <bjoern@schiessle.org>
  * @author Christoph Wurst <christoph@winzerhof-wurst.at>
+ * @author Joas Schilling <coding@schilljs.com>
  * @author Morris Jobke <hey@morrisjobke.de>
  *
  * @license AGPL-3.0
@@ -84,14 +85,14 @@ class ChangeKeyStorageRoot extends Command {
 			);
 	}
 
-	protected function execute(InputInterface $input, OutputInterface $output) {
+	protected function execute(InputInterface $input, OutputInterface $output): int {
 		$oldRoot = $this->util->getKeyStorageRoot();
 		$newRoot = $input->getArgument('newRoot');
 
 		if ($newRoot === null) {
 			$question = new ConfirmationQuestion('No storage root given, do you want to reset the key storage root to the default location? (y/n) ', false);
 			if (!$this->questionHelper->ask($input, $output, $question)) {
-				return;
+				return 1;
 			}
 			$newRoot = '';
 		}
@@ -104,7 +105,9 @@ class ChangeKeyStorageRoot extends Command {
 			$this->util->setKeyStorageRoot($newRoot);
 			$output->writeln('');
 			$output->writeln("Key storage root successfully changed to <info>$newRootDescription</info>");
+			return 0;
 		}
+		return 1;
 	}
 
 	/**

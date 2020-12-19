@@ -20,6 +20,7 @@ class ComposerStaticInit2f23f73bc0cc116b4b1eee1521aa8652
         '3569eecfeed3bcf0bad3c998a494ecb8' => __DIR__ . '/..' . '/sabre/xml/lib/Deserializer/functions.php',
         '93aa591bc4ca510c520999e34229ee79' => __DIR__ . '/..' . '/sabre/xml/lib/Serializer/functions.php',
         '0d59ee240a4cd96ddbb4ff164fccea4d' => __DIR__ . '/..' . '/symfony/polyfill-php73/bootstrap.php',
+        'a4a119a56e50fbb293281d9a48007e0e' => __DIR__ . '/..' . '/symfony/polyfill-php80/bootstrap.php',
         'ebdb698ed4152ae445614b69b5e4bb6a' => __DIR__ . '/..' . '/sabre/http/lib/functions.php',
         '320cde22f66dd4f5d3fd621d3e88b98f' => __DIR__ . '/..' . '/symfony/polyfill-ctype/bootstrap.php',
         '25072dd6e2470089de65ae7bf11d3109' => __DIR__ . '/..' . '/symfony/polyfill-php72/bootstrap.php',
@@ -59,6 +60,7 @@ class ComposerStaticInit2f23f73bc0cc116b4b1eee1521aa8652
         'S' => 
         array (
             'Symfony\\Polyfill\\Util\\' => 22,
+            'Symfony\\Polyfill\\Php80\\' => 23,
             'Symfony\\Polyfill\\Php73\\' => 23,
             'Symfony\\Polyfill\\Php72\\' => 23,
             'Symfony\\Polyfill\\Php56\\' => 23,
@@ -107,6 +109,10 @@ class ComposerStaticInit2f23f73bc0cc116b4b1eee1521aa8652
         array (
             'OpenStack\\' => 10,
         ),
+        'N' => 
+        array (
+            'Nextcloud\\LogNormalizer\\' => 24,
+        ),
         'M' => 
         array (
             'MicrosoftAzure\\Storage\\Common\\' => 30,
@@ -124,7 +130,6 @@ class ComposerStaticInit2f23f73bc0cc116b4b1eee1521aa8652
         ),
         'I' => 
         array (
-            'InterfaSys\\LogNormalizer\\' => 25,
             'Icewind\\Streams\\Tests\\' => 22,
             'Icewind\\Streams\\' => 16,
             'ID3Parser\\' => 10,
@@ -204,6 +209,10 @@ class ComposerStaticInit2f23f73bc0cc116b4b1eee1521aa8652
         'Symfony\\Polyfill\\Util\\' => 
         array (
             0 => __DIR__ . '/..' . '/symfony/polyfill-util',
+        ),
+        'Symfony\\Polyfill\\Php80\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/symfony/polyfill-php80',
         ),
         'Symfony\\Polyfill\\Php73\\' => 
         array (
@@ -359,6 +368,10 @@ class ComposerStaticInit2f23f73bc0cc116b4b1eee1521aa8652
         array (
             0 => __DIR__ . '/..' . '/php-opencloud/openstack/src',
         ),
+        'Nextcloud\\LogNormalizer\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/nextcloud/lognormalizer/src',
+        ),
         'MicrosoftAzure\\Storage\\Common\\' => 
         array (
             0 => __DIR__ . '/..' . '/microsoft/azure-storage-common/src/Common',
@@ -384,10 +397,6 @@ class ComposerStaticInit2f23f73bc0cc116b4b1eee1521aa8652
         'JmesPath\\' => 
         array (
             0 => __DIR__ . '/..' . '/mtdowling/jmespath.php/src',
-        ),
-        'InterfaSys\\LogNormalizer\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/interfasys/lognormalizer/src',
         ),
         'Icewind\\Streams\\Tests\\' => 
         array (
@@ -1298,6 +1307,7 @@ class ComposerStaticInit2f23f73bc0cc116b4b1eee1521aa8652
         'Doctrine\\Common\\Cache\\FileCache' => __DIR__ . '/..' . '/doctrine/cache/lib/Doctrine/Common/Cache/FileCache.php',
         'Doctrine\\Common\\Cache\\FilesystemCache' => __DIR__ . '/..' . '/doctrine/cache/lib/Doctrine/Common/Cache/FilesystemCache.php',
         'Doctrine\\Common\\Cache\\FlushableCache' => __DIR__ . '/..' . '/doctrine/cache/lib/Doctrine/Common/Cache/FlushableCache.php',
+        'Doctrine\\Common\\Cache\\InvalidCacheId' => __DIR__ . '/..' . '/doctrine/cache/lib/Doctrine/Common/Cache/InvalidCacheId.php',
         'Doctrine\\Common\\Cache\\LegacyMongoDBCache' => __DIR__ . '/..' . '/doctrine/cache/lib/Doctrine/Common/Cache/LegacyMongoDBCache.php',
         'Doctrine\\Common\\Cache\\MemcacheCache' => __DIR__ . '/..' . '/doctrine/cache/lib/Doctrine/Common/Cache/MemcacheCache.php',
         'Doctrine\\Common\\Cache\\MemcachedCache' => __DIR__ . '/..' . '/doctrine/cache/lib/Doctrine/Common/Cache/MemcachedCache.php',
@@ -1309,7 +1319,6 @@ class ComposerStaticInit2f23f73bc0cc116b4b1eee1521aa8652
         'Doctrine\\Common\\Cache\\PhpFileCache' => __DIR__ . '/..' . '/doctrine/cache/lib/Doctrine/Common/Cache/PhpFileCache.php',
         'Doctrine\\Common\\Cache\\PredisCache' => __DIR__ . '/..' . '/doctrine/cache/lib/Doctrine/Common/Cache/PredisCache.php',
         'Doctrine\\Common\\Cache\\RedisCache' => __DIR__ . '/..' . '/doctrine/cache/lib/Doctrine/Common/Cache/RedisCache.php',
-        'Doctrine\\Common\\Cache\\RiakCache' => __DIR__ . '/..' . '/doctrine/cache/lib/Doctrine/Common/Cache/RiakCache.php',
         'Doctrine\\Common\\Cache\\SQLite3Cache' => __DIR__ . '/..' . '/doctrine/cache/lib/Doctrine/Common/Cache/SQLite3Cache.php',
         'Doctrine\\Common\\Cache\\Version' => __DIR__ . '/..' . '/doctrine/cache/lib/Doctrine/Common/Cache/Version.php',
         'Doctrine\\Common\\Cache\\VoidCache' => __DIR__ . '/..' . '/doctrine/cache/lib/Doctrine/Common/Cache/VoidCache.php',
@@ -1636,6 +1645,8 @@ class ComposerStaticInit2f23f73bc0cc116b4b1eee1521aa8652
         'Doctrine\\DBAL\\Types\\TimeImmutableType' => __DIR__ . '/..' . '/doctrine/dbal/lib/Doctrine/DBAL/Types/TimeImmutableType.php',
         'Doctrine\\DBAL\\Types\\TimeType' => __DIR__ . '/..' . '/doctrine/dbal/lib/Doctrine/DBAL/Types/TimeType.php',
         'Doctrine\\DBAL\\Types\\Type' => __DIR__ . '/..' . '/doctrine/dbal/lib/Doctrine/DBAL/Types/Type.php',
+        'Doctrine\\DBAL\\Types\\TypeRegistry' => __DIR__ . '/..' . '/doctrine/dbal/lib/Doctrine/DBAL/Types/TypeRegistry.php',
+        'Doctrine\\DBAL\\Types\\Types' => __DIR__ . '/..' . '/doctrine/dbal/lib/Doctrine/DBAL/Types/Types.php',
         'Doctrine\\DBAL\\Types\\VarDateTimeImmutableType' => __DIR__ . '/..' . '/doctrine/dbal/lib/Doctrine/DBAL/Types/VarDateTimeImmutableType.php',
         'Doctrine\\DBAL\\Types\\VarDateTimeType' => __DIR__ . '/..' . '/doctrine/dbal/lib/Doctrine/DBAL/Types/VarDateTimeType.php',
         'Doctrine\\DBAL\\Version' => __DIR__ . '/..' . '/doctrine/dbal/lib/Doctrine/DBAL/Version.php',
@@ -1905,7 +1916,6 @@ class ComposerStaticInit2f23f73bc0cc116b4b1eee1521aa8652
         'Icewind\\Streams\\Url' => __DIR__ . '/..' . '/icewind/streams/src/Url.php',
         'Icewind\\Streams\\UrlCallback' => __DIR__ . '/..' . '/icewind/streams/src/UrlCallBack.php',
         'Icewind\\Streams\\Wrapper' => __DIR__ . '/..' . '/icewind/streams/src/Wrapper.php',
-        'InterfaSys\\LogNormalizer\\Normalizer' => __DIR__ . '/..' . '/interfasys/lognormalizer/src/Normalizer.php',
         'JmesPath\\AstRuntime' => __DIR__ . '/..' . '/mtdowling/jmespath.php/src/AstRuntime.php',
         'JmesPath\\CompilerRuntime' => __DIR__ . '/..' . '/mtdowling/jmespath.php/src/CompilerRuntime.php',
         'JmesPath\\DebugRuntime' => __DIR__ . '/..' . '/mtdowling/jmespath.php/src/DebugRuntime.php',
@@ -2166,6 +2176,7 @@ class ComposerStaticInit2f23f73bc0cc116b4b1eee1521aa8652
         'MicrosoftAzure\\Storage\\Common\\Models\\SignedIdentifier' => __DIR__ . '/..' . '/microsoft/azure-storage-common/src/Common/Models/SignedIdentifier.php',
         'MicrosoftAzure\\Storage\\Common\\Models\\TransactionalMD5Trait' => __DIR__ . '/..' . '/microsoft/azure-storage-common/src/Common/Models/TransactionalMD5Trait.php',
         'MicrosoftAzure\\Storage\\Common\\SharedAccessSignatureHelper' => __DIR__ . '/..' . '/microsoft/azure-storage-common/src/Common/SharedAccessSignatureHelper.php',
+        'Nextcloud\\LogNormalizer\\Normalizer' => __DIR__ . '/..' . '/nextcloud/lognormalizer/src/Normalizer.php',
         'Normalizer' => __DIR__ . '/..' . '/patchwork/utf8/src/Normalizer.php',
         'OS_Guess' => __DIR__ . '/..' . '/pear/pear-core-minimal/src/OS/Guess.php',
         'OpenStack\\BlockStorage\\v2\\Api' => __DIR__ . '/..' . '/php-opencloud/openstack/src/BlockStorage/v2/Api.php',
@@ -3062,6 +3073,7 @@ class ComposerStaticInit2f23f73bc0cc116b4b1eee1521aa8652
         'Stecman\\Component\\Symfony\\Console\\BashCompletion\\Completion\\ShellPathCompletion' => __DIR__ . '/..' . '/stecman/symfony-console-completion/src/Completion/ShellPathCompletion.php',
         'Stecman\\Component\\Symfony\\Console\\BashCompletion\\EnvironmentCompletionContext' => __DIR__ . '/..' . '/stecman/symfony-console-completion/src/EnvironmentCompletionContext.php',
         'Stecman\\Component\\Symfony\\Console\\BashCompletion\\HookFactory' => __DIR__ . '/..' . '/stecman/symfony-console-completion/src/HookFactory.php',
+        'Stringable' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/Stringable.php',
         'SuperClosure\\Analyzer\\AstAnalyzer' => __DIR__ . '/..' . '/jeremeamia/SuperClosure/src/Analyzer/AstAnalyzer.php',
         'SuperClosure\\Analyzer\\ClosureAnalyzer' => __DIR__ . '/..' . '/jeremeamia/SuperClosure/src/Analyzer/ClosureAnalyzer.php',
         'SuperClosure\\Analyzer\\Token' => __DIR__ . '/..' . '/jeremeamia/SuperClosure/src/Analyzer/Token.php',
@@ -3103,6 +3115,7 @@ class ComposerStaticInit2f23f73bc0cc116b4b1eee1521aa8652
         'Symfony\\Component\\Console\\Exception\\InvalidArgumentException' => __DIR__ . '/..' . '/symfony/console/Exception/InvalidArgumentException.php',
         'Symfony\\Component\\Console\\Exception\\InvalidOptionException' => __DIR__ . '/..' . '/symfony/console/Exception/InvalidOptionException.php',
         'Symfony\\Component\\Console\\Exception\\LogicException' => __DIR__ . '/..' . '/symfony/console/Exception/LogicException.php',
+        'Symfony\\Component\\Console\\Exception\\MissingInputException' => __DIR__ . '/..' . '/symfony/console/Exception/MissingInputException.php',
         'Symfony\\Component\\Console\\Exception\\NamespaceNotFoundException' => __DIR__ . '/..' . '/symfony/console/Exception/NamespaceNotFoundException.php',
         'Symfony\\Component\\Console\\Exception\\RuntimeException' => __DIR__ . '/..' . '/symfony/console/Exception/RuntimeException.php',
         'Symfony\\Component\\Console\\Formatter\\OutputFormatter' => __DIR__ . '/..' . '/symfony/console/Formatter/OutputFormatter.php',
@@ -3336,6 +3349,7 @@ class ComposerStaticInit2f23f73bc0cc116b4b1eee1521aa8652
         'Symfony\\Polyfill\\Php56\\Php56' => __DIR__ . '/..' . '/symfony/polyfill-php56/Php56.php',
         'Symfony\\Polyfill\\Php72\\Php72' => __DIR__ . '/..' . '/symfony/polyfill-php72/Php72.php',
         'Symfony\\Polyfill\\Php73\\Php73' => __DIR__ . '/..' . '/symfony/polyfill-php73/Php73.php',
+        'Symfony\\Polyfill\\Php80\\Php80' => __DIR__ . '/..' . '/symfony/polyfill-php80/Php80.php',
         'Symfony\\Polyfill\\Util\\Binary' => __DIR__ . '/..' . '/symfony/polyfill-util/Binary.php',
         'Symfony\\Polyfill\\Util\\BinaryNoFuncOverload' => __DIR__ . '/..' . '/symfony/polyfill-util/BinaryNoFuncOverload.php',
         'Symfony\\Polyfill\\Util\\BinaryOnFuncOverload' => __DIR__ . '/..' . '/symfony/polyfill-util/BinaryOnFuncOverload.php',
@@ -3343,6 +3357,7 @@ class ComposerStaticInit2f23f73bc0cc116b4b1eee1521aa8652
         'Symfony\\Polyfill\\Util\\TestListener' => __DIR__ . '/..' . '/symfony/polyfill-util/TestListener.php',
         'Symfony\\Polyfill\\Util\\TestListenerTrait' => __DIR__ . '/..' . '/symfony/polyfill-util/TestListenerTrait.php',
         'System' => __DIR__ . '/..' . '/pear/pear-core-minimal/src/System.php',
+        'ValueError' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/ValueError.php',
         'Webauthn\\AttestationStatement\\AndroidKeyAttestationStatementSupport' => __DIR__ . '/..' . '/web-auth/webauthn-lib/src/AttestationStatement/AndroidKeyAttestationStatementSupport.php',
         'Webauthn\\AttestationStatement\\AndroidSafetyNetAttestationStatementSupport' => __DIR__ . '/..' . '/web-auth/webauthn-lib/src/AttestationStatement/AndroidSafetyNetAttestationStatementSupport.php',
         'Webauthn\\AttestationStatement\\AttestationObject' => __DIR__ . '/..' . '/web-auth/webauthn-lib/src/AttestationStatement/AttestationObject.php',

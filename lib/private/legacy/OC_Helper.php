@@ -7,7 +7,6 @@
  * @author Bart Visscher <bartv@thisnet.nl>
  * @author Björn Schießle <bjoern@schiessle.org>
  * @author Christoph Wurst <christoph@winzerhof-wurst.at>
- * @author Clark Tomlinson <fallen013@gmail.com>
  * @author Daniel Kesselberg <mail@danielkesselberg.de>
  * @author Felix Moeller <mail@felixmoeller.de>
  * @author Jakob Sack <mail@jakobsack.de>
@@ -44,6 +43,7 @@
  *
  */
 
+use bantu\IniGetWrapper\IniGetWrapper;
 use Symfony\Component\Process\ExecutableFinder;
 
 /**
@@ -220,7 +220,7 @@ class OC_Helper {
 		// Default check will be done with $path directories :
 		$dirs = explode(PATH_SEPARATOR, $path);
 		// WARNING : We have to check if open_basedir is enabled :
-		$obd = OC::$server->getIniWrapper()->getString('open_basedir');
+		$obd = OC::$server->get(IniGetWrapper::class)->getString('open_basedir');
 		if ($obd != "none") {
 			$obd_values = explode(PATH_SEPARATOR, $obd);
 			if (count($obd_values) > 0 and $obd_values[0]) {
@@ -414,7 +414,7 @@ class OC_Helper {
 	 * @return int PHP upload file size limit
 	 */
 	public static function uploadLimit() {
-		$ini = \OC::$server->getIniWrapper();
+		$ini = \OC::$server->get(IniGetWrapper::class);
 		$upload_max_filesize = OCP\Util::computerFileSize($ini->get('upload_max_filesize'));
 		$post_max_size = OCP\Util::computerFileSize($ini->get('post_max_size'));
 		if ((int)$upload_max_filesize === 0 and (int)$post_max_size === 0) {
@@ -436,7 +436,7 @@ class OC_Helper {
 		if (!function_exists($function_name)) {
 			return false;
 		}
-		$ini = \OC::$server->getIniWrapper();
+		$ini = \OC::$server->get(IniGetWrapper::class);
 		$disabled = explode(',', $ini->get('disable_functions') ?: '');
 		$disabled = array_map('trim', $disabled);
 		if (in_array($function_name, $disabled)) {
@@ -474,6 +474,9 @@ class OC_Helper {
 
 	/**
 	 * Calculate the disc space for the given path
+	 *
+	 * BEWARE: this requires that Util::setupFS() was called
+	 * already !
 	 *
 	 * @param string $path
 	 * @param \OCP\Files\FileInfo $rootInfo (optional)

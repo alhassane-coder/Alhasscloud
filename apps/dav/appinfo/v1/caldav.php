@@ -57,8 +57,10 @@ $db = \OC::$server->getDatabaseConnection();
 $userManager = \OC::$server->getUserManager();
 $random = \OC::$server->getSecureRandom();
 $logger = \OC::$server->getLogger();
-$dispatcher = \OC::$server->getEventDispatcher();
-$calDavBackend = new CalDavBackend($db, $principalBackend, $userManager, \OC::$server->getGroupManager(), $random, $logger, $dispatcher, true);
+$dispatcher = \OC::$server->get(\OCP\EventDispatcher\IEventDispatcher::class);
+$legacyDispatcher = \OC::$server->getEventDispatcher();
+
+$calDavBackend = new CalDavBackend($db, $principalBackend, $userManager, \OC::$server->getGroupManager(), $random, $logger, $dispatcher, $legacyDispatcher, true);
 
 $debugging = \OC::$server->getConfig()->getSystemValue('debug', false);
 $sendInvitations = \OC::$server->getConfig()->getAppValue('dav', 'sendInvitations', 'yes') === 'yes';
@@ -82,7 +84,7 @@ $server->httpRequest->setUrl(\OC::$server->getRequest()->getRequestUri());
 $server->setBaseUri($baseuri);
 
 // Add plugins
-$server->addPlugin(new MaintenancePlugin());
+$server->addPlugin(new MaintenancePlugin(\OC::$server->getConfig(), \OC::$server->getL10N('dav')));
 $server->addPlugin(new \Sabre\DAV\Auth\Plugin($authBackend, 'ownCloud'));
 $server->addPlugin(new \Sabre\CalDAV\Plugin());
 

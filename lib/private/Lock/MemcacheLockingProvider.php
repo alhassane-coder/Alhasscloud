@@ -6,6 +6,7 @@ declare(strict_types=1);
  * @copyright Copyright (c) 2016, ownCloud, Inc.
  *
  * @author Christoph Wurst <christoph@winzerhof-wurst.at>
+ * @author Jaakko Salo <jaakkos@gmail.com>
  * @author Robin Appelman <robin@icewind.nl>
  * @author Roeland Jago Douma <roeland@famdouma.nl>
  *
@@ -71,17 +72,18 @@ class MemcacheLockingProvider extends AbstractLockingProvider {
 	/**
 	 * @param string $path
 	 * @param int $type self::LOCK_SHARED or self::LOCK_EXCLUSIVE
+	 * @param string $readablePath human readable path to use in error messages
 	 * @throws \OCP\Lock\LockedException
 	 */
-	public function acquireLock(string $path, int $type) {
+	public function acquireLock(string $path, int $type, string $readablePath = null) {
 		if ($type === self::LOCK_SHARED) {
 			if (!$this->memcache->inc($path)) {
-				throw new LockedException($path, null, $this->getExistingLockForException($path));
+				throw new LockedException($path, null, $this->getExistingLockForException($path), $readablePath);
 			}
 		} else {
 			$this->memcache->add($path, 0);
 			if (!$this->memcache->cas($path, 0, 'exclusive')) {
-				throw new LockedException($path, null, $this->getExistingLockForException($path));
+				throw new LockedException($path, null, $this->getExistingLockForException($path), $readablePath);
 			}
 		}
 		$this->setTTL($path);

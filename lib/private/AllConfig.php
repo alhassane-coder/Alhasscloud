@@ -8,6 +8,7 @@
  * @author Jörn Friedrich Dreyer <jfd@butonic.de>
  * @author Loki3000 <github@labcms.ru>
  * @author Lukas Reschke <lukas@statuscode.ch>
+ * @author MichaIng <micha@dietpi.com>
  * @author Morris Jobke <hey@morrisjobke.de>
  * @author Robin Appelman <robin@icewind.nl>
  * @author Robin McCorkell <robin@mccorkell.me.uk>
@@ -316,7 +317,7 @@ class AllConfig implements \OCP\IConfig {
 	 */
 	public function getUserValue($userId, $appName, $key, $default = '') {
 		$data = $this->getUserValues($userId);
-		if (isset($data[$appName]) and isset($data[$appName][$key])) {
+		if (isset($data[$appName][$key])) {
 			return $data[$appName][$key];
 		} else {
 			return $default;
@@ -354,7 +355,7 @@ class AllConfig implements \OCP\IConfig {
 				'WHERE `userid` = ? AND `appid` = ? AND `configkey` = ?';
 		$this->connection->executeUpdate($sql, [$userId, $appName, $key]);
 
-		if (isset($this->userCache[$userId]) and isset($this->userCache[$userId][$appName])) {
+		if (isset($this->userCache[$userId][$appName])) {
 			unset($this->userCache[$userId][$appName][$key]);
 		}
 	}

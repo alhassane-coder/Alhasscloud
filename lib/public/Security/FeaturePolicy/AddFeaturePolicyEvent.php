@@ -6,6 +6,7 @@ declare(strict_types=1);
  * @copyright Copyright (c) 2019, Roeland Jago Douma <roeland@famdouma.nl>
  *
  * @author Christoph Wurst <christoph@winzerhof-wurst.at>
+ * @author Morris Jobke <hey@morrisjobke.de>
  * @author Roeland Jago Douma <roeland@famdouma.nl>
  *
  * @license GNU AGPL version 3 or any later version
@@ -32,6 +33,8 @@ use OCP\AppFramework\Http\EmptyFeaturePolicy;
 use OCP\EventDispatcher\Event;
 
 /**
+ * Event that allows to register a feature policy header to a request.
+ *
  * @since 17.0.0
  */
 class AddFeaturePolicyEvent extends Event {

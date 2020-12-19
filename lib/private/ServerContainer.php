@@ -31,6 +31,8 @@ use OC\AppFramework\App;
 use OC\AppFramework\DependencyInjection\DIContainer;
 use OC\AppFramework\Utility\SimpleContainer;
 use OCP\AppFramework\QueryException;
+use function explode;
+use function strtolower;
 
 /**
  * Class ServerContainer
@@ -117,19 +119,24 @@ class ServerContainer extends SimpleContainer {
 		throw new QueryException();
 	}
 
+	public function has($id, bool $noRecursion = false): bool {
+		if (!$noRecursion && ($appContainer = $this->getAppContainerForService($id)) !== null) {
+			return $appContainer->has($id);
+		}
+
+		return parent::has($id);
+	}
+
+	/**
+	 * @deprecated 20.0.0 use \Psr\Container\ContainerInterface::get
+	 */
 	public function query(string $name, bool $autoload = true) {
 		$name = $this->sanitizeName($name);
 
-		if (isset($this[$name])) {
-			return $this[$name];
-		}
-
 		// In case the service starts with OCA\ we try to find the service in
 		// the apps container first.
-		if (strpos($name, 'OCA\\') === 0 && substr_count($name, '\\') >= 2) {
-			$segments = explode('\\', $name);
+		if (($appContainer = $this->getAppContainerForService($name)) !== null) {
 			try {
-				$appContainer = $this->getAppContainer(strtolower($segments[1]), $segments[1]);
 				return $appContainer->queryNoFallback($name);
 			} catch (QueryException $e) {
 				// Didn't find the service or the respective app container,
@@ -147,5 +154,23 @@ class ServerContainer extends SimpleContainer {
 		}
 
 		return parent::query($name, $autoload);
+	}
+
+	/**
+	 * @internal
+	 * @param string $id
+	 * @return DIContainer|null
+	 */
+	public function getAppContainerForService(string $id): ?DIContainer {
+		if (strpos($id, 'OCA\\') !== 0 || substr_count($id, '\\') < 2) {
+			return null;
+		}
+
+		try {
+			[,$namespace,] = explode('\\', $id);
+			return $this->getAppContainer(strtolower($namespace), $namespace);
+		} catch (QueryException $e) {
+			return null;
+		}
 	}
 }

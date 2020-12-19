@@ -27,49 +27,45 @@ use OCA\Notifications\Push;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\AppFramework\OCSController;
-use OCP\IConfig;
 use OCP\IRequest;
 use OCP\IUser;
 use OCP\IUserSession;
+use OCP\L10N\IFactory;
 use OCP\Notification\IAction;
 use OCP\Notification\IManager;
 use OCP\Notification\INotification;
+use OCP\UserStatus\IManager as IUserStatusManager;
+use OCP\UserStatus\IUserStatus;
 
 class EndpointController extends OCSController {
 	/** @var Handler */
 	private $handler;
 	/** @var IManager */
 	private $manager;
-	/** @var IConfig */
-	private $config;
+	/** @var IFactory */
+	private $l10nFactory;
 	/** @var IUserSession */
 	private $session;
+	/** @var IUserStatusManager */
+	private $userStatusManager;
 	/** @var Push */
 	private $push;
 
-
-	/**
-	 * @param string $appName
-	 * @param IRequest $request
-	 * @param Handler $handler
-	 * @param IManager $manager
-	 * @param IConfig $config
-	 * @param IUserSession $session
-	 * @param Push $push
-	 */
 	public function __construct(string $appName,
 								IRequest $request,
 								Handler $handler,
 								IManager $manager,
-								IConfig $config,
+								IFactory $l10nFactory,
 								IUserSession $session,
+								IUserStatusManager $userStatusManager,
 								Push $push) {
 		parent::__construct($appName, $request);
 
 		$this->handler = $handler;
 		$this->manager = $manager;
-		$this->config = $config;
+		$this->l10nFactory = $l10nFactory;
 		$this->session = $session;
+		$this->userStatusManager = $userStatusManager;
 		$this->push = $push;
 	}
 
@@ -81,17 +77,25 @@ class EndpointController extends OCSController {
 	 * @return DataResponse
 	 */
 	public function listNotifications(string $apiVersion): DataResponse {
+		$userStatus = $this->userStatusManager->getUserStatuses([
+			$this->getCurrentUser(),
+		]);
+
+		$headers = ['X-Nextcloud-User-Status' => IUserStatus::ONLINE];
+		if (isset($userStatus[$this->getCurrentUser()])) {
+			$userStatus = $userStatus[$this->getCurrentUser()];
+			$headers['X-Nextcloud-User-Status'] = $userStatus->getStatus();
+		}
+
 		// When there are no apps registered that use the notifications
 		// We stop polling for them.
 		if (!$this->manager->hasNotifiers()) {
-			return new DataResponse(null, Http::STATUS_NO_CONTENT);
+			return new DataResponse(null, Http::STATUS_NO_CONTENT, $headers);
 		}
 
 		$filter = $this->manager->createNotification();
 		$filter->setUser($this->getCurrentUser());
-		$language = $this->config->getUserValue($this->getCurrentUser(), 'core', 'lang', null);
-		$language = $language ?? $this->config->getSystemValue('default_language', 'en');
-
+		$language = $this->l10nFactory->getUserLanguage($this->session->getUser());
 		$notifications = $this->handler->get($filter);
 
 		$data = [];
@@ -110,11 +114,13 @@ class EndpointController extends OCSController {
 		}
 
 		$eTag = $this->generateETag($notificationIds);
+
+		$headers['ETag'] = $eTag;
 		if ($apiVersion !== 'v1' && $this->request->getHeader('If-None-Match') === $eTag) {
-			return new DataResponse([], Http::STATUS_NOT_MODIFIED);
+			return new DataResponse([], Http::STATUS_NOT_MODIFIED, $headers);
 		}
 
-		return new DataResponse($data, Http::STATUS_OK, ['ETag' => $eTag]);
+		return new DataResponse($data, Http::STATUS_OK, $headers);
 	}
 
 	/**
@@ -140,8 +146,7 @@ class EndpointController extends OCSController {
 			return new DataResponse(null, Http::STATUS_NOT_FOUND);
 		}
 
-		$language = $this->config->getUserValue($this->getCurrentUser(), 'core', 'lang', null);
-		$language = $language ?? $this->config->getSystemValue('default_language', 'en');
+		$language = $this->l10nFactory->getUserLanguage($this->session->getUser());
 
 		try {
 			$notification = $this->manager->prepare($notification, $language);

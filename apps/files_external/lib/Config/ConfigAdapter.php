@@ -5,7 +5,6 @@
  * @author Arthur Schiwon <blizzz@arthur-schiwon.de>
  * @author Christoph Wurst <christoph@winzerhof-wurst.at>
  * @author Joas Schilling <coding@schilljs.com>
- * @author Julius Härtl <jus@bitgrid.net>
  * @author Morris Jobke <hey@morrisjobke.de>
  * @author Robin Appelman <robin@icewind.nl>
  * @author Robin McCorkell <robin@mccorkell.me.uk>
@@ -80,7 +79,7 @@ class ConfigAdapter implements IMountProvider {
 	 */
 	private function prepareStorageConfig(StorageConfig &$storage, IUser $user) {
 		foreach ($storage->getBackendOptions() as $option => $value) {
-			$storage->setBackendOption($option, \OC_Mount_Config::substitutePlaceholdersInConfig($value, $user->getUID()));
+			$storage->setBackendOption($option, \OCA\Files_External\MountConfig::substitutePlaceholdersInConfig($value, $user->getUID()));
 		}
 
 		$objectStore = $storage->getBackendOption('objectstore');

@@ -2,6 +2,7 @@
 /**
  * @copyright Copyright (c) 2016, Joas Schilling <coding@schilljs.com>
  *
+ * @author GretaD <gretadoci@gmail.com>
  * @author Guillaume COMPAGNON <gcompagnon@outlook.com>
  * @author Joas Schilling <coding@schilljs.com>
  * @author Julius Härtl <jus@bitgrid.net>
@@ -81,10 +82,10 @@ class Capabilities implements IPublicCapability {
 				'color-element-bright' => $this->util->elementColor($color),
 				'color-element-dark' => $this->util->elementColor($color, false),
 				'logo' => $this->url->getAbsoluteURL($this->theming->getLogo()),
-				'background' => $backgroundLogo === 'backgroundColor' ?
+				'background' => $backgroundLogo === 'backgroundColor' || ($backgroundLogo === false && $this->theming->getColorPrimary() !== '#0082c9') ?
 					$this->theming->getColorPrimary() :
 					$this->url->getAbsoluteURL($this->theming->getBackground()),
-				'background-plain' => $backgroundLogo === 'backgroundColor',
+				'background-plain' => $backgroundLogo === 'backgroundColor' || ($backgroundLogo === false && $this->theming->getColorPrimary() !== '#0082c9'),
 				'background-default' => !$this->util->isBackgroundThemed(),
 				'logoheader' => $this->url->getAbsoluteURL($this->theming->getLogo()),
 				'favicon' => $this->url->getAbsoluteURL($this->theming->getLogo()),

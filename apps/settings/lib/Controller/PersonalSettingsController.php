@@ -4,6 +4,7 @@
  *
  * @author Arthur Schiwon <blizzz@arthur-schiwon.de>
  * @author Christoph Wurst <christoph@winzerhof-wurst.at>
+ * @author Joas Schilling <coding@schilljs.com>
  * @author Robin Appelman <robin@icewind.nl>
  *
  * @license GNU AGPL version 3 or any later version
@@ -61,7 +62,7 @@ class PersonalSettingsController extends Controller {
 	 *
 	 * @NoCSRFRequired
 	 * @NoAdminRequired
-	 * @NoSubadminRequired
+	 * @NoSubAdminRequired
 	 */
 	public function index($section) {
 		return $this->getIndexResponse('personal', $section);

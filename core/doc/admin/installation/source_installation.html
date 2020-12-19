@@ -214,13 +214,12 @@ Red Hat Enterprise Linux may need to set new rules to enable installing
 Nextcloud. See <a class="reference internal" href="#selinux-tips-label"><span class="std std-ref">SELinux configuration tips</span></a> for a suggested configuration.</p>
 </div>
 <p>If you prefer a more automated installation of Nextcloud and there are no packages for your Linux distribution, you have the option to
-install the community <a class="reference external" href="http://snapcraft.io/docs/core/install/">Snap Packages</a>. See
-<a class="reference internal" href="#snaps-label"><span class="std std-ref">Installing via Snap packages</span></a> You can also use the <a class="reference external" href="https://github.com/nextcloud/vm/">Nextcloud VM scripts</a> to install directly on a clean Ubuntu Server. It will setup everything for you and include scripts for automated installation of apps like; Collabora, OnlyOffice, Talk and so on. Please note that those two options are not officially supported by Nextcloud GmbH.</p>
+install the community <a class="reference external" href="https://snapcraft.io/nextcloud">Snap Package</a>. This includes a full production-ready stack, will maintain your HTTPS certificates for you, and will automatically update as needed to stay secure. You can also use the <a class="reference external" href="https://github.com/nextcloud/vm/">Nextcloud VM scripts</a> to install directly on a clean Ubuntu Server. It will setup everything for you and include scripts for automated installation of apps like; Collabora, OnlyOffice, Talk and so on. Please note that those two options are not officially supported by Nextcloud GmbH.</p>
 <p>This installation guide is giving a general overview of required dependencies and their configuration. For a distribution specific setup guide have a look at the <a class="reference internal" href="example_ubuntu.html"><span class="doc">Example installation on Ubuntu 20.04 LTS</span></a> and <a class="reference internal" href="example_centos.html"><span class="doc">Example installation on CentOS 8</span></a>.</p>
 <div class="section" id="prerequisites-for-manual-installation">
 <span id="prerequisites-label"></span><h2>Prerequisites for manual installation<a class="headerlink" href="#prerequisites-for-manual-installation" title="Permalink to this headline">¶</a></h2>
 <p>The Nextcloud .tar archive contains all of the required PHP modules. This
-section lists all required and optional PHP modules.  Consult the <a class="reference external" href="http://php.net/manual/en/extensions.php">PHP manual</a> for more information on modules.
+section lists all required and optional PHP modules.  Consult the <a class="reference external" href="https://php.net/manual/en/extensions.php">PHP manual</a> for more information on modules.
 Your Linux distribution should have packages for all required modules. You can
 check the presence of a module by typing <code class="docutils literal notranslate"><span class="pre">php</span> <span class="pre">-m</span> <span class="pre">|</span> <span class="pre">grep</span> <span class="pre">-i</span> <span class="pre">&lt;module_name&gt;</span></code>.
 If you get a result, the module is present.</p>
@@ -268,9 +267,11 @@ of non-ASCII characters)</p></li>
 <li><p>PHP module bcmath (for passwordless login)</p></li>
 <li><p>PHP module gmp (for passwordless login)</p></li>
 </ul>
-<p>Recommended for specific apps (<em>optional</em>):
-* PHP module gmp (for SFTP storage)
-* PHP module exif (for image rotation in pictures app)</p>
+<p>Recommended for specific apps (<em>optional</em>):</p>
+<ul class="simple">
+<li><p>PHP module gmp (for SFTP storage)</p></li>
+<li><p>PHP module exif (for image rotation in pictures app)</p></li>
+</ul>
 <p>For enhanced server performance (<em>optional</em>) select one of the following
 memcaches:</p>
 <ul class="simple">
@@ -688,8 +689,6 @@ spread the deployment of new major releases out over time.</p>
     <div class="rst-other-versions">
       <dl>
         <dt>Versions</dt>
-        
-          <dd><a href="https://docs.nextcloud.com/server/16/admin_manual">16</a></dd>
         
           <dd><a href="https://docs.nextcloud.com/server/17/admin_manual">17</a></dd>
         

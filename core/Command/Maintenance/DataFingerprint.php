@@ -2,6 +2,7 @@
 /**
  * @copyright Copyright (c) 2016, ownCloud, Inc.
  *
+ * @author Joas Schilling <coding@schilljs.com>
  * @author Roeland Jago Douma <roeland@famdouma.nl>
  *
  * @license AGPL-3.0
@@ -48,7 +49,8 @@ class DataFingerprint extends Command {
 			->setDescription('update the systems data-fingerprint after a backup is restored');
 	}
 
-	protected function execute(InputInterface $input, OutputInterface $output) {
+	protected function execute(InputInterface $input, OutputInterface $output): int {
 		$this->config->setSystemValue('data-fingerprint', md5($this->timeFactory->getTime()));
+		return 0;
 	}
 }

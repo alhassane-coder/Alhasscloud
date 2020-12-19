@@ -6,6 +6,7 @@ declare(strict_types=1);
  * @copyright 2018 Christoph Wurst <christoph@winzerhof-wurst.at>
  *
  * @author Christoph Wurst <christoph@winzerhof-wurst.at>
+ * @author Joas Schilling <coding@schilljs.com>
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -50,11 +51,12 @@ class Cleanup extends Base {
 		$this->addArgument('provider-id', InputArgument::REQUIRED);
 	}
 
-	protected function execute(InputInterface $input, OutputInterface $output) {
+	protected function execute(InputInterface $input, OutputInterface $output): int {
 		$providerId = $input->getArgument('provider-id');
 
 		$this->registry->cleanUp($providerId);
 
 		$output->writeln("<info>All user-provider associations for provider <options=bold>$providerId</> have been removed.</info>");
+		return 0;
 	}
 }

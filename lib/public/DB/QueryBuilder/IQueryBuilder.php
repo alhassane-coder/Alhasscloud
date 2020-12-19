@@ -3,6 +3,7 @@
  * @copyright Copyright (c) 2016, ownCloud, Inc.
  *
  * @author Christoph Wurst <christoph@winzerhof-wurst.at>
+ * @author Daniel Kesselberg <mail@danielkesselberg.de>
  * @author Joas Schilling <coding@schilljs.com>
  * @author Lukas Reschke <lukas@statuscode.ch>
  * @author Robin Appelman <robin@icewind.nl>
@@ -521,7 +522,7 @@ interface IQueryBuilder {
 	 * </code>
 	 *
 	 * @param string $key The column to set.
-	 * @param string $value The value, expression, placeholder, etc.
+	 * @param IParameter|string $value The value, expression, placeholder, etc.
 	 *
 	 * @return $this This QueryBuilder instance.
 	 * @since 8.2.0
@@ -650,7 +651,7 @@ interface IQueryBuilder {
 	 * </code>
 	 *
 	 * @param string $column The column into which the value should be inserted.
-	 * @param string $value The value that should be inserted into the column.
+	 * @param IParameter|string $value The value that should be inserted into the column.
 	 *
 	 * @return $this This QueryBuilder instance.
 	 * @since 8.2.0

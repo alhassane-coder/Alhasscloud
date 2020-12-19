@@ -34,16 +34,16 @@ use OCP\AppFramework\OCSController as Controller;
 use OCP\Collaboration\AutoComplete\AutoCompleteEvent;
 use OCP\Collaboration\AutoComplete\IManager;
 use OCP\Collaboration\Collaborators\ISearch;
+use OCP\EventDispatcher\IEventDispatcher;
 use OCP\IRequest;
-use OCP\Share;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use OCP\Share\IShare;
 
 class AutoCompleteController extends Controller {
 	/** @var ISearch */
 	private $collaboratorSearch;
 	/** @var IManager */
 	private $autoCompleteManager;
-	/** @var EventDispatcherInterface */
+	/** @var IEventDispatcher */
 	private $dispatcher;
 
 	public function __construct(
@@ -51,7 +51,7 @@ class AutoCompleteController extends Controller {
 		IRequest $request,
 		ISearch $collaboratorSearch,
 		IManager $autoCompleteManager,
-		EventDispatcherInterface $dispatcher
+		IEventDispatcher $dispatcher
 	) {
 		parent::__construct($appName, $request);
 
@@ -71,7 +71,7 @@ class AutoCompleteController extends Controller {
 	 * @param int $limit
 	 * @return DataResponse
 	 */
-	public function get($search, $itemType, $itemId, $sorter = null, $shareTypes = [Share::SHARE_TYPE_USER], $limit = 10): DataResponse {
+	public function get($search, $itemType, $itemId, $sorter = null, $shareTypes = [IShare::TYPE_USER], $limit = 10): DataResponse {
 		// if enumeration/user listings are disabled, we'll receive an empty
 		// result from search() – thus nothing else to do here.
 		[$results,] = $this->collaboratorSearch->search($search, $shareTypes, false, $limit, 0);

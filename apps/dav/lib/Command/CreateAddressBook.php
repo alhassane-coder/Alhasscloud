@@ -4,6 +4,7 @@
  *
  * @author Björn Schießle <bjoern@schiessle.org>
  * @author Christoph Wurst <christoph@winzerhof-wurst.at>
+ * @author Joas Schilling <coding@schilljs.com>
  * @author Roeland Jago Douma <roeland@famdouma.nl>
  * @author Thomas Müller <thomas.mueller@tmit.eu>
  *
@@ -64,7 +65,7 @@ class CreateAddressBook extends Command {
 						'Name of the addressbook');
 	}
 
-	protected function execute(InputInterface $input, OutputInterface $output) {
+	protected function execute(InputInterface $input, OutputInterface $output): int {
 		$user = $input->getArgument('user');
 		if (!$this->userManager->userExists($user)) {
 			throw new \InvalidArgumentException("User <$user> in unknown.");
@@ -72,5 +73,6 @@ class CreateAddressBook extends Command {
 
 		$name = $input->getArgument('name');
 		$this->cardDavBackend->createAddressBook("principals/users/$user", $name, []);
+		return 0;
 	}
 }

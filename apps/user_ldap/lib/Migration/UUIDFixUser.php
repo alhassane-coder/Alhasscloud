@@ -3,6 +3,7 @@
  * @copyright Copyright (c) 2017 Arthur Schiwon <blizzz@arthur-schiwon.de>
  *
  * @author Arthur Schiwon <blizzz@arthur-schiwon.de>
+ * @author Morris Jobke <hey@morrisjobke.de>
  * @author Roeland Jago Douma <roeland@famdouma.nl>
  * @author Vinicius Cubas Brand <vinicius@eita.org.br>
  *
@@ -26,6 +27,7 @@
 namespace OCA\User_LDAP\Migration;
 
 use OCA\User_LDAP\Group_Proxy;
+use OCA\User_LDAP\GroupPluginManager;
 use OCA\User_LDAP\Helper;
 use OCA\User_LDAP\LDAP;
 use OCA\User_LDAP\Mapping\UserMapping;
@@ -34,7 +36,7 @@ use OCP\IConfig;
 class UUIDFixUser extends UUIDFix {
 	public function __construct(UserMapping $mapper, LDAP $ldap, IConfig $config, Helper $helper) {
 		$this->mapper = $mapper;
-		$groupPluginManager = \OC::$server->query('LDAPGroupPluginManager');
+		$groupPluginManager = \OC::$server->query(GroupPluginManager::class);
 		$this->proxy = new Group_Proxy($helper->getServerConfigurationPrefixes(true), $ldap, $groupPluginManager);
 	}
 }

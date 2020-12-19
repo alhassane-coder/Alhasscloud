@@ -7,6 +7,7 @@
  * @author Julius Härtl <jus@bitgrid.net>
  * @author Ko- <k.stoffelen@cs.ru.nl>
  * @author Lukas Reschke <lukas@statuscode.ch>
+ * @author Morris Jobke <hey@morrisjobke.de>
  * @author Robin Appelman <robin@icewind.nl>
  * @author Roeland Jago Douma <roeland@famdouma.nl>
  * @author Thomas Müller <thomas.mueller@tmit.eu>
@@ -46,7 +47,8 @@ $serverFactory = new \OCA\DAV\Connector\Sabre\ServerFactory(
 	\OC::$server->getTagManager(),
 	\OC::$server->getRequest(),
 	\OC::$server->getPreviewManager(),
-	\OC::$server->getEventDispatcher()
+	\OC::$server->getEventDispatcher(),
+	\OC::$server->getL10N('dav')
 );
 
 // Backends

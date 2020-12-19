@@ -5,6 +5,7 @@
  * @author Björn Schießle <bjoern@schiessle.org>
  * @author Christoph Wurst <christoph@winzerhof-wurst.at>
  * @author Joas Schilling <coding@schilljs.com>
+ * @author Morris Jobke <hey@morrisjobke.de>
  * @author Roeland Jago Douma <roeland@famdouma.nl>
  * @author Thomas Müller <thomas.mueller@tmit.eu>
  * @author Vincent Petry <pvince81@owncloud.com>
@@ -110,7 +111,7 @@ class File implements \OCP\Encryption\IFile {
 
 		// check if it is a group mount
 		if (\OCP\App::isEnabled("files_external")) {
-			$mounts = \OC_Mount_Config::getSystemMountPoints();
+			$mounts = \OCA\Files_External\MountConfig::getSystemMountPoints();
 			foreach ($mounts as $mount) {
 				if ($mount['mountpoint'] == substr($ownerPath, 1, strlen($mount['mountpoint']))) {
 					$mountedFor = $this->util->getUserWithAccessToMountPoint($mount['applicable']['users'], $mount['applicable']['groups']);

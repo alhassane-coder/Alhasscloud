@@ -6,9 +6,11 @@
  * @author Björn Schießle <bjoern@schiessle.org>
  * @author Christoph Wurst <christoph@winzerhof-wurst.at>
  * @author Daniel Calviño Sánchez <danxuliu@gmail.com>
+ * @author Daniel Kesselberg <mail@danielkesselberg.de>
  * @author Joas Schilling <coding@schilljs.com>
  * @author Lukas Reschke <lukas@statuscode.ch>
  * @author Maxence Lange <maxence@nextcloud.com>
+ * @author Morris Jobke <hey@morrisjobke.de>
  * @author Robin Appelman <robin@icewind.nl>
  * @author Roeland Jago Douma <roeland@famdouma.nl>
  *
@@ -30,7 +32,6 @@
 
 namespace OC\Share20;
 
-use OC\CapabilitiesManager;
 use OC\Share20\Exception\ProviderException;
 use OCA\FederatedFileSharing\AddressHandler;
 use OCA\FederatedFileSharing\FederatedShareProvider;
@@ -39,8 +40,10 @@ use OCA\FederatedFileSharing\TokenHandler;
 use OCA\ShareByMail\Settings\SettingsManager;
 use OCA\ShareByMail\ShareByMailProvider;
 use OCP\Defaults;
+use OCP\EventDispatcher\IEventDispatcher;
 use OCP\IServerContainer;
 use OCP\Share\IProviderFactory;
+use OCP\Share\IShare;
 
 /**
  * Class ProviderFactory
@@ -126,7 +129,8 @@ class ProviderFactory implements IProviderFactory {
 				$this->serverContainer->query(\OCP\OCS\IDiscoveryService::class),
 				$this->serverContainer->getJobList(),
 				\OC::$server->getCloudFederationProviderManager(),
-				\OC::$server->getCloudFederationFactory()
+				\OC::$server->getCloudFederationFactory(),
+				$this->serverContainer->query(IEventDispatcher::class)
 			);
 			$tokenHandler = new TokenHandler(
 				$this->serverContainer->getSecureRandom()
@@ -181,7 +185,7 @@ class ProviderFactory implements IProviderFactory {
 				$settingsManager,
 				$this->serverContainer->query(Defaults::class),
 				$this->serverContainer->getHasher(),
-				$this->serverContainer->query(CapabilitiesManager::class)
+				$this->serverContainer->get(IEventDispatcher::class)
 			);
 		}
 
@@ -278,18 +282,18 @@ class ProviderFactory implements IProviderFactory {
 	public function getProviderForType($shareType) {
 		$provider = null;
 
-		if ($shareType === \OCP\Share::SHARE_TYPE_USER ||
-			$shareType === \OCP\Share::SHARE_TYPE_GROUP ||
-			$shareType === \OCP\Share::SHARE_TYPE_LINK
+		if ($shareType === IShare::TYPE_USER ||
+			$shareType === IShare::TYPE_GROUP ||
+			$shareType === IShare::TYPE_LINK
 		) {
 			$provider = $this->defaultShareProvider();
-		} elseif ($shareType === \OCP\Share::SHARE_TYPE_REMOTE || $shareType === \OCP\Share::SHARE_TYPE_REMOTE_GROUP) {
+		} elseif ($shareType === IShare::TYPE_REMOTE || $shareType === IShare::TYPE_REMOTE_GROUP) {
 			$provider = $this->federatedShareProvider();
-		} elseif ($shareType === \OCP\Share::SHARE_TYPE_EMAIL) {
+		} elseif ($shareType === IShare::TYPE_EMAIL) {
 			$provider = $this->getShareByMailProvider();
-		} elseif ($shareType === \OCP\Share::SHARE_TYPE_CIRCLE) {
+		} elseif ($shareType === IShare::TYPE_CIRCLE) {
 			$provider = $this->getShareByCircleProvider();
-		} elseif ($shareType === \OCP\Share::SHARE_TYPE_ROOM) {
+		} elseif ($shareType === IShare::TYPE_ROOM) {
 			$provider = $this->getRoomShareProvider();
 		}
 

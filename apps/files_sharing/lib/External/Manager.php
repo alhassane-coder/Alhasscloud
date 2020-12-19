@@ -8,6 +8,7 @@
  * @author Daniel Hansson <daniel@techandme.se>
  * @author Joas Schilling <coding@schilljs.com>
  * @author Jörn Friedrich Dreyer <jfd@butonic.de>
+ * @author Julius Härtl <jus@bitgrid.net>
  * @author Lukas Reschke <lukas@statuscode.ch>
  * @author Morris Jobke <hey@morrisjobke.de>
  * @author Robin Appelman <robin@icewind.nl>
@@ -33,7 +34,9 @@
 namespace OCA\Files_Sharing\External;
 
 use OC\Files\Filesystem;
+use OCA\FederatedFileSharing\Events\FederatedShareAddedEvent;
 use OCA\Files_Sharing\Helper;
+use OCP\EventDispatcher\IEventDispatcher;
 use OCP\Federation\ICloudFederationFactory;
 use OCP\Federation\ICloudFederationProviderManager;
 use OCP\Files;
@@ -50,39 +53,25 @@ use OCP\Share\IShare;
 class Manager {
 	public const STORAGE = '\OCA\Files_Sharing\External\Storage';
 
-	/**
-	 * @var string
-	 */
+	/** @var string|null */
 	private $uid;
 
-	/**
-	 * @var IDBConnection
-	 */
+	/** @var IDBConnection */
 	private $connection;
 
-	/**
-	 * @var \OC\Files\Mount\Manager
-	 */
+	/** @var \OC\Files\Mount\Manager */
 	private $mountManager;
 
-	/**
-	 * @var IStorageFactory
-	 */
+	/** @var IStorageFactory */
 	private $storageLoader;
 
-	/**
-	 * @var IClientService
-	 */
+	/** @var IClientService */
 	private $clientService;
 
-	/**
-	 * @var IManager
-	 */
+	/** @var IManager */
 	private $notificationManager;
 
-	/**
-	 * @var IDiscoveryService
-	 */
+	/** @var IDiscoveryService */
 	private $discoveryService;
 
 	/** @var ICloudFederationProviderManager */
@@ -97,19 +86,9 @@ class Manager {
 	/** @var IUserManager */
 	private $userManager;
 
-	/**
-	 * @param IDBConnection $connection
-	 * @param \OC\Files\Mount\Manager $mountManager
-	 * @param IStorageFactory $storageLoader
-	 * @param IClientService $clientService
-	 * @param IManager $notificationManager
-	 * @param IDiscoveryService $discoveryService
-	 * @param ICloudFederationProviderManager $cloudFederationProviderManager
-	 * @param ICloudFederationFactory $cloudFederationFactory
-	 * @param IGroupManager $groupManager
-	 * @param IUserManager $userManager
-	 * @param string $uid
-	 */
+	/** @var IEventDispatcher */
+	private $eventDispatcher;
+
 	public function __construct(IDBConnection $connection,
 								\OC\Files\Mount\Manager $mountManager,
 								IStorageFactory $storageLoader,
@@ -120,7 +99,8 @@ class Manager {
 								ICloudFederationFactory $cloudFederationFactory,
 								IGroupManager $groupManager,
 								IUserManager $userManager,
-								$uid) {
+								?string $uid,
+								IEventDispatcher $eventDispatcher) {
 		$this->connection = $connection;
 		$this->mountManager = $mountManager;
 		$this->storageLoader = $storageLoader;
@@ -132,6 +112,7 @@ class Manager {
 		$this->cloudFederationFactory = $cloudFederationFactory;
 		$this->groupManager = $groupManager;
 		$this->userManager = $userManager;
+		$this->eventDispatcher = $eventDispatcher;
 	}
 
 	/**
@@ -145,12 +126,12 @@ class Manager {
 	 * @param int $shareType
 	 * @param boolean $accepted
 	 * @param string $user
-	 * @param int $remoteId
+	 * @param string $remoteId
 	 * @param int $parent
 	 * @return Mount|null
 	 * @throws \Doctrine\DBAL\DBALException
 	 */
-	public function addShare($remote, $token, $password, $name, $owner, $shareType, $accepted=false, $user = null, $remoteId = -1, $parent = -1) {
+	public function addShare($remote, $token, $password, $name, $owner, $shareType, $accepted = false, $user = null, $remoteId = '', $parent = -1) {
 		$user = $user ? $user : $this->uid;
 		$accepted = $accepted ? IShare::STATUS_ACCEPTED : IShare::STATUS_PENDING;
 		$name = Filesystem::normalizePath('/' . $name);
@@ -247,9 +228,9 @@ class Manager {
 		$validShare = is_array($share) && isset($share['share_type']) && isset($share['user']);
 
 		// check if the user is allowed to access it
-		if ($validShare && (int)$share['share_type'] === Share::SHARE_TYPE_USER && $share['user'] === $this->uid) {
+		if ($validShare && (int)$share['share_type'] === IShare::TYPE_USER && $share['user'] === $this->uid) {
 			return $share;
-		} elseif ($validShare && (int)$share['share_type'] === Share::SHARE_TYPE_GROUP) {
+		} elseif ($validShare && (int)$share['share_type'] === IShare::TYPE_GROUP) {
 			$user = $this->userManager->get($this->uid);
 			if ($this->groupManager->get($share['user'])->inGroup($user)) {
 				return $share;
@@ -277,7 +258,7 @@ class Manager {
 			$hash = md5($mountPoint);
 			$userShareAccepted = false;
 
-			if ((int)$share['share_type'] === Share::SHARE_TYPE_USER) {
+			if ((int)$share['share_type'] === IShare::TYPE_USER) {
 				$acceptShare = $this->connection->prepare('
 				UPDATE `*PREFIX*share_external`
 				SET `accepted` = ?,
@@ -300,7 +281,8 @@ class Manager {
 			}
 			if ($userShareAccepted === true) {
 				$this->sendFeedbackToRemote($share['remote'], $share['share_token'], $share['remote_id'], 'accept');
-				\OC_Hook::emit(Share::class, 'federated_share_added', ['server' => $share['remote']]);
+				$event = new FederatedShareAddedEvent($share['remote']);
+				$this->eventDispatcher->dispatchTyped($event);
 				$result = true;
 			}
 		}
@@ -321,7 +303,7 @@ class Manager {
 		$share = $this->getShare($id);
 		$result = false;
 
-		if ($share && (int)$share['share_type'] === Share::SHARE_TYPE_USER) {
+		if ($share && (int)$share['share_type'] === IShare::TYPE_USER) {
 			$removeShare = $this->connection->prepare('
 				DELETE FROM `*PREFIX*share_external` WHERE `id` = ? AND `user` = ?');
 			$removeShare->execute([$id, $this->uid]);
@@ -329,7 +311,7 @@ class Manager {
 
 			$this->processNotification($id);
 			$result = true;
-		} elseif ($share && (int)$share['share_type'] === Share::SHARE_TYPE_GROUP) {
+		} elseif ($share && (int)$share['share_type'] === IShare::TYPE_GROUP) {
 			$result = $this->writeShareToDb(
 				$share['remote'],
 				$share['share_token'],
@@ -365,7 +347,7 @@ class Manager {
 	 *
 	 * @param string $remote
 	 * @param string $token
-	 * @param int $remoteId Share id on the remote host
+	 * @param string $remoteId Share id on the remote host
 	 * @param string $feedback
 	 * @return boolean
 	 */
@@ -406,7 +388,7 @@ class Manager {
 	 *
 	 * @param string $remoteDomain
 	 * @param string $token
-	 * @param $remoteId id of the share
+	 * @param string $remoteId id of the share
 	 * @param string $feedback
 	 * @return bool
 	 */
@@ -517,7 +499,7 @@ class Manager {
 
 		$share = $getShare->fetch();
 		$getShare->closeCursor();
-		if ($result && $share !== false && (int)$share['share_type'] === Share::SHARE_TYPE_USER) {
+		if ($result && $share !== false && (int)$share['share_type'] === IShare::TYPE_USER) {
 			try {
 				$this->sendFeedbackToRemote($share['remote'], $share['share_token'], $share['remote_id'], 'decline');
 			} catch (\Throwable $e) {
@@ -530,7 +512,7 @@ class Manager {
 			WHERE `id` = ?
 			');
 			$result = (bool)$query->execute([(int)$share['id']]);
-		} elseif ($result && $share !== false && (int)$share['share_type'] === Share::SHARE_TYPE_GROUP) {
+		} elseif ($result && $share !== false && (int)$share['share_type'] === IShare::TYPE_GROUP) {
 			$query = $this->connection->prepare('
 				UPDATE `*PREFIX*share_external`
 				SET `accepted` = ?

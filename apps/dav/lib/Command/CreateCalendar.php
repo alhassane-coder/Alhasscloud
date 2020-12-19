@@ -30,6 +30,7 @@ namespace OCA\DAV\Command;
 use OCA\DAV\CalDAV\CalDavBackend;
 use OCA\DAV\CalDAV\Proxy\ProxyMapper;
 use OCA\DAV\Connector\Sabre\Principal;
+use OCP\EventDispatcher\IEventDispatcher;
 use OCP\IDBConnection;
 use OCP\IGroupManager;
 use OCP\IUserManager;
@@ -73,7 +74,7 @@ class CreateCalendar extends Command {
 				'Name of the calendar');
 	}
 
-	protected function execute(InputInterface $input, OutputInterface $output) {
+	protected function execute(InputInterface $input, OutputInterface $output): int {
 		$user = $input->getArgument('user');
 		if (!$this->userManager->userExists($user)) {
 			throw new \InvalidArgumentException("User <$user> in unknown.");
@@ -89,10 +90,12 @@ class CreateCalendar extends Command {
 		);
 		$random = \OC::$server->getSecureRandom();
 		$logger = \OC::$server->getLogger();
-		$dispatcher = \OC::$server->getEventDispatcher();
+		$dispatcher = \OC::$server->get(IEventDispatcher::class);
+		$legacyDispatcher = \OC::$server->getEventDispatcher();
 
 		$name = $input->getArgument('name');
-		$caldav = new CalDavBackend($this->dbConnection, $principalBackend, $this->userManager, $this->groupManager, $random, $logger, $dispatcher);
+		$caldav = new CalDavBackend($this->dbConnection, $principalBackend, $this->userManager, $this->groupManager, $random, $logger, $dispatcher, $legacyDispatcher);
 		$caldav->createCalendar("principals/users/$user", $name, []);
+		return 0;
 	}
 }

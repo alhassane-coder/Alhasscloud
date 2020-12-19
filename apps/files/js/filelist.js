@@ -383,8 +383,6 @@
 				}
 			});
 
-			this.updateSearch();
-
 			this.$fileList.on('click','td.filename>a.name, td.filesize, td.date', _.bind(this._onClickFile, this));
 
 			this.$fileList.on("droppedOnFavorites", function (event, file) {
@@ -435,6 +433,8 @@
 			this.triedActionOnce = false;
 
 			OC.Plugins.attach('OCA.Files.FileList', this);
+
+			OCA.Files.App && OCA.Files.App.updateCurrentFileList(this);
 
 			this.initHeadersAndFooters()
 		},
@@ -648,7 +648,7 @@
 				return;
 			}
 
-			if (!fileName) {
+			if (!fileName && OCA.Files.Sidebar.close) {
 				OCA.Files.Sidebar.close()
 				return
 			} else if (typeof fileName !== 'string') {
@@ -740,6 +740,7 @@
 		 * Event handler when leaving previously hidden state
 		 */
 		_onShow: function(e) {
+			OCA.Files.App && OCA.Files.App.updateCurrentFileList(this);
 			if (this.shown) {
 				if (e.itemId === this.id) {
 					this._setCurrentDir('/', false);
@@ -1126,7 +1127,6 @@
 			if ($targetDir !== undefined && e.which === 1) {
 				e.preventDefault();
 				this.changeDirectory($targetDir, true, true);
-				this.updateSearch();
 			}
 		},
 
@@ -3234,7 +3234,12 @@
 				$('#searchresults').addClass('filter-empty');
 				$('#searchresults .emptycontent').addClass('emptycontent-search');
 				if ( $('#searchresults').length === 0 || $('#searchresults').hasClass('hidden') ) {
-					var error = t('files', 'No search results in other folders for {tag}{filter}{endtag}', {filter:this._filter});
+					var error;
+					if (this._filter.length > 2) {
+						error = t('files', 'No search results in other folders for {tag}{filter}{endtag}', {filter:this._filter});
+					} else {
+						error = t('files', 'Enter more than two characters to search in other folders');
+					}
 					this.$el.find('.nofilterresults').removeClass('hidden').
 						find('p').html(error.replace('{tag}', '<strong>').replace('{endtag}', '</strong>'));
 				}
@@ -3255,17 +3260,7 @@
 		getFilter:function(filter) {
 			return this._filter;
 		},
-		/**
-		 * update the search object to use this filelist when filtering
-		 */
-		updateSearch:function() {
-			if (OCA.Search.files) {
-				OCA.Search.files.setFileList(this);
-			}
-			if (OC.Search) {
-				OC.Search.clear();
-			}
-		},
+
 		/**
 		 * Update UI based on the current selection
 		 */
@@ -3834,7 +3829,7 @@
 	OCA.Files.FileList = FileList;
 })();
 
-$(document).ready(function() {
+window.addEventListener('DOMContentLoaded', function() {
 	// FIXME: unused ?
 	OCA.Files.FileList.useUndo = (window.onbeforeunload)?true:false;
 	$(window).on('beforeunload', function () {

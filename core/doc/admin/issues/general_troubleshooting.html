@@ -212,7 +212,7 @@ to typical mistakes or frequently occurring issues</p>
 </dl>
 </li>
 <li><p>The Nextcloud IRC chat channel <code class="docutils literal notranslate"><span class="pre">irc://#nextcloud&#64;freenode.net</span></code> on
-freenode.net, also accessible via <a class="reference external" href="http://webchat.freenode.net/?channels=nextcloudhttps://docs.nextcloud.org/server/latest/developer_manual/bugtracker/index.html">webchat</a></p></li>
+freenode.net, also accessible via <a class="reference external" href="https://webchat.freenode.net/?channels=nextcloudhttps://docs.nextcloud.org/server/latest/developer_manual/bugtracker/index.html">webchat</a></p></li>
 </ul>
 <p>Please understand that all these channels essentially consist of users like you
 helping each other out. Consider helping others out where you can, to contribute
@@ -447,8 +447,8 @@ document root of your Web server and add the following lines:</p>
   RewriteRule ^\.well-known/host-meta /nextcloud/public.php?service=host-meta [QSA,L]
   RewriteRule ^\.well-known/host-meta\.json /nextcloud/public.php?service=host-meta-json [QSA,L]
   RewriteRule ^\.well-known/webfinger /nextcloud/public.php?service=webfinger [QSA,L]
-  RewriteRule ^\.well-known/carddav /nextcloud/remote.php/dav/ [R=301,L]
-  RewriteRule ^\.well-known/caldav /nextcloud/remote.php/dav/ [R=301,L]
+  RewriteRule ^\.well-known/carddav /nextcloud/remote.php/dav [R=301,L]
+  RewriteRule ^\.well-known/caldav /nextcloud/remote.php/dav [R=301,L]
 &lt;/IfModule&gt;
 </pre></div>
 </div>
@@ -575,8 +575,6 @@ first.</p>
     <div class="rst-other-versions">
       <dl>
         <dt>Versions</dt>
-        
-          <dd><a href="https://docs.nextcloud.com/server/16/admin_manual">16</a></dd>
         
           <dd><a href="https://docs.nextcloud.com/server/17/admin_manual">17</a></dd>
         

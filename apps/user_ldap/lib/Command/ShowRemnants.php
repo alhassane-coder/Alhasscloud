@@ -3,6 +3,7 @@
  * @copyright Copyright (c) 2016, ownCloud, Inc.
  *
  * @author Arthur Schiwon <blizzz@arthur-schiwon.de>
+ * @author Daniel Kesselberg <mail@danielkesselberg.de>
  * @author Joas Schilling <coding@schilljs.com>
  * @author Morris Jobke <hey@morrisjobke.de>
  * @author Roeland Jago Douma <roeland@famdouma.nl>
@@ -75,7 +76,7 @@ class ShowRemnants extends Command {
 	 *
 	 * {@inheritdoc}
 	 */
-	protected function execute(InputInterface $input, OutputInterface $output) {
+	protected function execute(InputInterface $input, OutputInterface $output): int {
 		/** @var \Symfony\Component\Console\Helper\Table $table */
 		$table = new Table($output);
 		$table->setHeaders([
@@ -103,5 +104,6 @@ class ShowRemnants extends Command {
 			$table->setRows($rows);
 			$table->render();
 		}
+		return 0;
 	}
 }

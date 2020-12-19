@@ -27,10 +27,18 @@ namespace OCA\Activity\Migration;
 use Closure;
 use Doctrine\DBAL\Types\Type;
 use OCP\DB\ISchemaWrapper;
+use OCP\IDBConnection;
 use OCP\Migration\IOutput;
 use OCP\Migration\SimpleMigrationStep;
 
 class Version2011Date20201006132544 extends SimpleMigrationStep {
+
+	/** @var IDBConnection */
+	protected $connection;
+
+	public function __construct(IDBConnection $connection) {
+		$this->connection = $connection;
+	}
 
 	/**
 	 * @param IOutput $output
@@ -50,9 +58,32 @@ class Version2011Date20201006132544 extends SimpleMigrationStep {
 		$column->setLength(32);
 
 		$column = $table->getColumn('amq_subjectparams');
-		$column->setType(Type::getType('text'));
-		$column->setNotnull(true);
+		// Can't switch from Long to clob on Oracle, so we need an intermediate column
+		if ($column->getType()->getName() !== Type::TEXT) {
+			$table->addColumn('amq_subjectparams2', 'text', [
+				'notnull' => false,
+			]);
+		}
 
 		return $schema;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 *
+	 * @since 13.0.0
+	 */
+	public function postSchemaChange(IOutput $output, \Closure $schemaClosure, array $options): void {
+		/** @var ISchemaWrapper $schema */
+		$schema = $schemaClosure();
+
+		if (!$schema->getTable('activity_mq')->hasColumn('amq_subjectparams2')) {
+			return;
+		}
+
+		$query = $this->connection->getQueryBuilder();
+		$query->update('activity_mq')
+			->set('amq_subjectparams2', 'amq_subjectparams');
+		$query->execute();
 	}
 }

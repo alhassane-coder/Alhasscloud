@@ -3,6 +3,7 @@
  * @copyright Copyright (c) 2016 Arthur Schiwon <blizzz@arthur-schiwon.de>
  *
  * @author Arthur Schiwon <blizzz@arthur-schiwon.de>
+ * @author Morris Jobke <hey@morrisjobke.de>
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -66,7 +67,7 @@ class Admin implements ISettings {
 			'storages'             => $this->globalStoragesService->getStorages(),
 			'backends'             => $this->backendService->getAvailableBackends(),
 			'authMechanisms'       => $this->backendService->getAuthMechanisms(),
-			'dependencies'         => \OC_Mount_Config::dependencyMessage($this->backendService->getBackends()),
+			'dependencies'         => \OCA\Files_External\MountConfig::dependencyMessage($this->backendService->getBackends()),
 			'allowUserMounting'    => $this->backendService->isUserMountingAllowed(),
 			'globalCredentials'    => $this->globalAuth->getAuth(''),
 			'globalCredentialsUid' => '',

@@ -5,6 +5,7 @@ declare(strict_types=1);
 /**
  * @copyright 2018, Maxence Lange <maxence@artificial-owl.com>
  *
+ * @author Julius Härtl <jus@bitgrid.net>
  * @author Maxence Lange <maxence@artificial-owl.com>
  *
  * @license GNU AGPL version 3 or any later version
@@ -35,6 +36,7 @@ use OCP\Dashboard\IDashboardManager;
  * are used by the IDashboardManager when creating push event.
  *
  * @since 15.0.0
+ * @deprecated 20.0.0
  *
  */
 interface IEventsService {
@@ -46,6 +48,7 @@ interface IEventsService {
 	 * @see IDashboardManager::createUsersEvent
 	 *
 	 * @since 15.0.0
+	 * @deprecated 20.0.0
 	 *
 	 * @param string $widgetId
 	 * @param array $users
@@ -61,6 +64,7 @@ interface IEventsService {
 	 * @see IDashboardManager::createGroupsEvent
 	 *
 	 * @since 15.0.0
+	 * @deprecated 20.0.0
 	 *
 	 * @param string $widgetId
 	 * @param array $groups
@@ -76,6 +80,7 @@ interface IEventsService {
 	 * @see IDashboardManager::createGlobalEvent
 	 *
 	 * @since 15.0.0
+	 * @deprecated 20.0.0
 	 *
 	 * @param string $widgetId
 	 * @param array $payload

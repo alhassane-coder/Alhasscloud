@@ -52,11 +52,14 @@ declare(strict_types=1);
  */
 use OC\App\DependencyAnalyzer;
 use OC\App\Platform;
+use OC\AppFramework\Bootstrap\Coordinator;
 use OC\DB\MigrationService;
 use OC\Installer;
 use OC\Repair;
 use OC\ServerNotAvailableException;
 use OCP\App\ManagerEvent;
+use OCP\AppFramework\QueryException;
+use OCP\Authentication\IAlternativeLogin;
 use OCP\ILogger;
 
 /**
@@ -91,7 +94,7 @@ class OC_App {
 	 * @return bool
 	 */
 	public static function isAppLoaded(string $app): bool {
-		return in_array($app, self::$loadedApps, true);
+		return isset(self::$loadedApps[$app]);
 	}
 
 	/**
@@ -124,7 +127,7 @@ class OC_App {
 		// prevent app.php from printing output
 		ob_start();
 		foreach ($apps as $app) {
-			if (($types === [] or self::isType($app, $types)) && !in_array($app, self::$loadedApps)) {
+			if (!isset(self::$loadedApps[$app]) && ($types === [] || self::isType($app, $types))) {
 				self::loadApp($app);
 			}
 		}
@@ -140,7 +143,7 @@ class OC_App {
 	 * @throws Exception
 	 */
 	public static function loadApp(string $app) {
-		self::$loadedApps[] = $app;
+		self::$loadedApps[$app] = true;
 		$appPath = self::getAppPath($app);
 		if ($appPath === false) {
 			return;
@@ -149,7 +152,20 @@ class OC_App {
 		// in case someone calls loadApp() directly
 		self::registerAutoloading($app, $appPath);
 
-		if (is_file($appPath . '/appinfo/app.php')) {
+		/** @var Coordinator $coordinator */
+		$coordinator = \OC::$server->query(Coordinator::class);
+		$isBootable = $coordinator->isBootable($app);
+
+		$hasAppPhpFile = is_file($appPath . '/appinfo/app.php');
+
+		if ($isBootable && $hasAppPhpFile) {
+			\OC::$server->getLogger()->error('/appinfo/app.php is not loaded when \OCP\AppFramework\Bootstrap\IBootstrap on the application class is used. Migrate everything from app.php to the Application class.', [
+				'app' => $app,
+			]);
+		} elseif ($hasAppPhpFile) {
+			\OC::$server->getLogger()->debug('/appinfo/app.php is deprecated, use \OCP\AppFramework\Bootstrap\IBootstrap on the application class instead.', [
+				'app' => $app,
+			]);
 			\OC::$server->getEventLogger()->start('load_app_' . $app, 'Load app: ' . $app);
 			try {
 				self::requireAppFile($app);
@@ -157,15 +173,22 @@ class OC_App {
 				if ($ex instanceof ServerNotAvailableException) {
 					throw $ex;
 				}
-				\OC::$server->getLogger()->logException($ex);
-
 				if (!\OC::$server->getAppManager()->isShipped($app) && !self::isType($app, ['authentication'])) {
+					\OC::$server->getLogger()->logException($ex, [
+						'message' => "App $app threw an error during app.php load and will be disabled: " . $ex->getMessage(),
+					]);
+
 					// Only disable apps which are not shipped and that are not authentication apps
 					\OC::$server->getAppManager()->disableApp($app, true);
+				} else {
+					\OC::$server->getLogger()->logException($ex, [
+						'message' => "App $app threw an error during app.php load: " . $ex->getMessage(),
+					]);
 				}
 			}
 			\OC::$server->getEventLogger()->end('load_app_' . $app);
 		}
+		$coordinator->bootApp($app);
 
 		$info = self::getAppInfo($app);
 		if (!empty($info['activity']['filters'])) {
@@ -652,8 +675,10 @@ class OC_App {
 
 	/**
 	 * @param array $entry
+	 * @deprecated 20.0.0 Please register your alternative login option using the registerAlternativeLogin() on the RegistrationContext in your Application class implementing the OCP\Authentication\IAlternativeLogin interface
 	 */
 	public static function registerLogIn(array $entry) {
+		\OC::$server->getLogger()->debug('OC_App::registerLogIn() is deprecated, please register your alternative login option using the registerAlternativeLogin() on the RegistrationContext in your Application class implementing the OCP\Authentication\IAlternativeLogin interface');
 		self::$altLogin[] = $entry;
 	}
 
@@ -661,13 +686,54 @@ class OC_App {
 	 * @return array
 	 */
 	public static function getAlternativeLogIns(): array {
+		/** @var Coordinator $bootstrapCoordinator */
+		$bootstrapCoordinator = \OC::$server->query(Coordinator::class);
+
+		foreach ($bootstrapCoordinator->getRegistrationContext()->getAlternativeLogins() as $registration) {
+			if (!in_array(IAlternativeLogin::class, class_implements($registration['class']), true)) {
+				\OC::$server->getLogger()->error('Alternative login option {option} does not implement {interface} and is therefore ignored.', [
+					'option' => $registration['class'],
+					'interface' => IAlternativeLogin::class,
+					'app' => $registration['app'],
+				]);
+				continue;
+			}
+
+			try {
+				/** @var IAlternativeLogin $provider */
+				$provider = \OC::$server->query($registration['class']);
+			} catch (QueryException $e) {
+				\OC::$server->getLogger()->logException($e, [
+					'message' => 'Alternative login option {option} can not be initialised.',
+					'option' => $registration['class'],
+					'app' => $registration['app'],
+				]);
+			}
+
+			try {
+				$provider->load();
+
+				self::$altLogin[] = [
+					'name' => $provider->getLabel(),
+					'href' => $provider->getLink(),
+					'style' => $provider->getClass(),
+				];
+			} catch (Throwable $e) {
+				\OC::$server->getLogger()->logException($e, [
+					'message' => 'Alternative login option {option} had an error while loading.',
+					'option' => $registration['class'],
+					'app' => $registration['app'],
+				]);
+			}
+		}
+
 		return self::$altLogin;
 	}
 
 	/**
 	 * get a list of all apps in the apps folder
 	 *
-	 * @return array an array of app names (string IDs)
+	 * @return string[] an array of app names (string IDs)
 	 * @todo: change the name of this method to getInstalledApps, which is more accurate
 	 */
 	public static function getAllApps(): array {

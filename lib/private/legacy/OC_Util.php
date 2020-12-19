@@ -25,6 +25,7 @@
  * @author Joas Schilling <coding@schilljs.com>
  * @author John Molakvoæ (skjnldsv) <skjnldsv@protonmail.com>
  * @author Jörn Friedrich Dreyer <jfd@butonic.de>
+ * @author Julius Härtl <jus@bitgrid.net>
  * @author Kawohl <john@owncloud.com>
  * @author Lukas Reschke <lukas@statuscode.ch>
  * @author Markus Goetz <markus@woboq.com>
@@ -62,11 +63,14 @@
  *
  */
 
+use bantu\IniGetWrapper\IniGetWrapper;
 use OC\AppFramework\Http\Request;
+use OC\Files\Storage\LocalRootStorage;
 use OCP\IConfig;
 use OCP\IGroupManager;
 use OCP\ILogger;
 use OCP\IUser;
+use OCP\IUserSession;
 
 class OC_Util {
 	public static $scripts = [];
@@ -88,7 +92,7 @@ class OC_Util {
 		//first set up the local "root" storage
 		\OC\Files\Filesystem::initMountManager();
 		if (!self::$rootMounted) {
-			\OC\Files\Filesystem::mount('\OC\Files\Storage\Local', ['datadir' => $configDataDirectory], '/');
+			\OC\Files\Filesystem::mount(LocalRootStorage::class, ['datadir' => $configDataDirectory], '/');
 			self::$rootMounted = true;
 		}
 	}
@@ -293,6 +297,16 @@ class OC_Util {
 			self::initObjectStoreRootFS($objectStore);
 		} else {
 			self::initLocalStorageRootFS();
+		}
+
+		/** @var \OCP\Files\Config\IMountProviderCollection $mountProviderCollection */
+		$mountProviderCollection = \OC::$server->query(\OCP\Files\Config\IMountProviderCollection::class);
+		$rootMountProviders = $mountProviderCollection->getRootMounts();
+
+		/** @var \OC\Files\Mount\Manager $mountManager */
+		$mountManager = \OC\Files\Filesystem::getMountManager();
+		foreach ($rootMountProviders as $rootMountProvider) {
+			$mountManager->addMount($rootMountProvider);
 		}
 
 		if ($user != '' && !\OC::$server->getUserManager()->userExists($user)) {
@@ -542,16 +556,16 @@ class OC_Util {
 
 		$timestamp = filemtime(OC::$SERVERROOT . '/version.php');
 		require OC::$SERVERROOT . '/version.php';
-		/** @var $timestamp int */
+		/** @var int $timestamp */
 		self::$versionCache['OC_Version_Timestamp'] = $timestamp;
-		/** @var $OC_Version string */
+		/** @var string $OC_Version */
 		self::$versionCache['OC_Version'] = $OC_Version;
-		/** @var $OC_VersionString string */
+		/** @var string $OC_VersionString */
 		self::$versionCache['OC_VersionString'] = $OC_VersionString;
-		/** @var $OC_Build string */
+		/** @var string $OC_Build */
 		self::$versionCache['OC_Build'] = $OC_Build;
 
-		/** @var $OC_Channel string */
+		/** @var string $OC_Channel */
 		self::$versionCache['OC_Channel'] = $OC_Channel;
 	}
 
@@ -726,7 +740,7 @@ class OC_Util {
 		$webServerRestart = false;
 		$setup = new \OC\Setup(
 			$config,
-			\OC::$server->getIniWrapper(),
+			\OC::$server->get(IniGetWrapper::class),
 			\OC::$server->getL10N('lib'),
 			\OC::$server->query(\OCP\Defaults::class),
 			\OC::$server->getLogger(),
@@ -850,9 +864,8 @@ class OC_Util {
 		];
 		$missingDependencies = [];
 		$invalidIniSettings = [];
-		$moduleHint = $l->t('Please ask your server administrator to install the module.');
 
-		$iniWrapper = \OC::$server->getIniWrapper();
+		$iniWrapper = \OC::$server->get(IniGetWrapper::class);
 		foreach ($dependencies['classes'] as $class => $module) {
 			if (!class_exists($class)) {
 				$missingDependencies[] = $module;
@@ -889,7 +902,7 @@ class OC_Util {
 		foreach ($missingDependencies as $missingDependency) {
 			$errors[] = [
 				'error' => $l->t('PHP module %s not installed.', [$missingDependency]),
-				'hint' => $moduleHint
+				'hint' => $l->t('Please ask your server administrator to install the module.'),
 			];
 			$webServerRestart = true;
 		}
@@ -970,6 +983,7 @@ class OC_Util {
 			try {
 				$result = \OC_DB::executeAudited('SHOW SERVER_VERSION');
 				$data = $result->fetchRow();
+				$result->closeCursor();
 				if (isset($data['server_version'])) {
 					$version = $data['server_version'];
 					if (version_compare($version, '9.0.0', '<')) {
@@ -998,23 +1012,21 @@ class OC_Util {
 		if (\OC::$server->getConfig()->getSystemValue('check_data_directory_permissions', true) === false) {
 			return  [];
 		}
-		$l = \OC::$server->getL10N('lib');
-		$errors = [];
-		$permissionsModHint = $l->t('Please change the permissions to 0770 so that the directory'
-			. ' cannot be listed by other users.');
+
 		$perms = substr(decoct(@fileperms($dataDirectory)), -3);
 		if (substr($perms, -1) !== '0') {
 			chmod($dataDirectory, 0770);
 			clearstatcache();
 			$perms = substr(decoct(@fileperms($dataDirectory)), -3);
 			if ($perms[2] !== '0') {
-				$errors[] = [
+				$l = \OC::$server->getL10N('lib');
+				return [[
 					'error' => $l->t('Your data directory is readable by other users'),
-					'hint' => $permissionsModHint
-				];
+					'hint' => $l->t('Please change the permissions to 0770 so that the directory cannot be listed by other users.'),
+				]];
 			}
 		}
-		return $errors;
+		return [];
 	}
 
 	/**
@@ -1090,6 +1102,8 @@ class OC_Util {
 	 * @suppress PhanDeprecatedFunction
 	 */
 	public static function getDefaultPageUrl() {
+		/** @var IConfig $config */
+		$config = \OC::$server->get(IConfig::class);
 		$urlGenerator = \OC::$server->getURLGenerator();
 		// Deny the redirect if the URL contains a @
 		// This prevents unvalidated redirects like ?redirect_url=:user@domain.com
@@ -1101,8 +1115,16 @@ class OC_Util {
 				$location = $urlGenerator->getAbsoluteURL($defaultPage);
 			} else {
 				$appId = 'files';
-				$config = \OC::$server->getConfig();
-				$defaultApps = explode(',', $config->getSystemValue('defaultapp', 'files'));
+				$defaultApps = explode(',', $config->getSystemValue('defaultapp', 'dashboard,files'));
+
+				/** @var IUserSession $userSession */
+				$userSession = \OC::$server->get(IUserSession::class);
+				$user = $userSession->getUser();
+				if ($user) {
+					$userDefaultApps = explode(',', $config->getUserValue($user->getUID(), 'core', 'defaultapp'));
+					$defaultApps = array_filter(array_merge($userDefaultApps, $defaultApps));
+				}
+
 				// find the first app that is enabled for the current user
 				foreach ($defaultApps as $defaultApp) {
 					$defaultApp = OC_App::cleanAppId(strip_tags($defaultApp));

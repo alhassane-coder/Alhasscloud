@@ -27,11 +27,15 @@ namespace OCA\Support\AppInfo;
 use OCA\Support\Notification\Notifier;
 use OCA\Support\Subscription\SubscriptionAdapter;
 use OCP\AppFramework\App;
-use OCP\IUser;
+use OCP\AppFramework\Bootstrap\IBootContext;
+use OCP\AppFramework\Bootstrap\IBootstrap;
+use OCP\AppFramework\Bootstrap\IRegistrationContext;
+use OCP\ILogger;
+use OCP\Notification\IManager;
 use OCP\Support\Subscription\Exception\AlreadyRegisteredException;
 use OCP\Support\Subscription\IRegistry;
 
-class Application extends App {
+class Application extends App implements IBootstrap {
 
 	public const APP_ID = 'support';
 
@@ -39,34 +43,25 @@ class Application extends App {
 		parent::__construct(self::APP_ID);
 	}
 
-	public function register() {
-		$container = $this->getContainer();
-		$server = $container->getServer();
+	public function register(IRegistrationContext $context): void {
+	}
+
+	public function boot(IBootContext $context): void {
+		$container = $context->getAppContainer();
 
 		/* @var $registry IRegistry */
 		$registry = $container->query(IRegistry::class);
-		$subscription = $container->query(SubscriptionAdapter::class);
 		try {
-			$registry->register($subscription);
+			$registry->registerService(SubscriptionAdapter::class);
 		} catch (AlreadyRegisteredException $e) {
-			$server->getLogger()->logException($e, ['message' => 'Multiple subscription adapters are registered.', 'app' => 'support']);
+			$logger = $context->getServerContainer()->query(ILogger::class);
+			$logger->logException($e, ['message' => 'Multiple subscription adapters are registered.', 'app' => 'support']);
 		}
 
-		$user = $server->getUserSession()->getUser();
-		if (!$user instanceof IUser) {
-			// Nothing to do for guests
-			return;
-		}
-
-		if ($server->getAppManager()->isEnabledForUser('notifications')) {
-			// Notifications app is available, so we register.
-			// Since notifications also work for non-admins we don't check this here.
-			$this->registerNotifier();
-		}
+		$context->injectFn(\Closure::fromCallable([$this, 'registerNotifier']));
 	}
 
-	public function registerNotifier() {
-		$notificationsManager = $this->getContainer()->getServer()->getNotificationManager();
+	public function registerNotifier(IManager $notificationsManager) {
 		$notificationsManager->registerNotifierService(Notifier::class);
 	}
 }

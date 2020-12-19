@@ -6,6 +6,7 @@ declare(strict_types=1);
  * @copyright Copyright (c) 2018 Denis Mosolov <denismosolov@gmail.com>
  *
  * @author Denis Mosolov <denismosolov@gmail.com>
+ * @author Joas Schilling <coding@schilljs.com>
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -55,7 +56,7 @@ class Delete extends Base {
 			);
 	}
 
-	protected function execute(InputInterface $input, OutputInterface $output) {
+	protected function execute(InputInterface $input, OutputInterface $output): int {
 		$gid = $input->getArgument('groupid');
 		if ($gid === 'admin') {
 			$output->writeln('<error>Group "' . $gid . '" could not be deleted.</error>');
@@ -72,5 +73,6 @@ class Delete extends Base {
 			$output->writeln('<error>Group "' . $gid . '" could not be deleted. Please check the logs.</error>');
 			return 1;
 		}
+		return 0;
 	}
 }

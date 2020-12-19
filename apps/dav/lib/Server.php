@@ -54,16 +54,19 @@ use OCA\DAV\Connector\Sabre\DummyGetResponsePlugin;
 use OCA\DAV\Connector\Sabre\FakeLockerPlugin;
 use OCA\DAV\Connector\Sabre\FilesPlugin;
 use OCA\DAV\Connector\Sabre\FilesReportPlugin;
+use OCA\DAV\Connector\Sabre\PropfindCompressionPlugin;
 use OCA\DAV\Connector\Sabre\QuotaPlugin;
 use OCA\DAV\Connector\Sabre\SharesPlugin;
 use OCA\DAV\Connector\Sabre\TagsPlugin;
 use OCA\DAV\DAV\CustomPropertiesBackend;
 use OCA\DAV\DAV\PublicAuth;
+use OCA\DAV\Events\SabrePluginAuthInitEvent;
 use OCA\DAV\Files\BrowserErrorPagePlugin;
 use OCA\DAV\Files\LazySearchBackend;
 use OCA\DAV\Provisioning\Apple\AppleProvisioningPlugin;
 use OCA\DAV\SystemTag\SystemTagPlugin;
 use OCA\DAV\Upload\ChunkingPlugin;
+use OCP\EventDispatcher\IEventDispatcher;
 use OCP\IRequest;
 use OCP\SabrePluginEvent;
 use Sabre\CardDAV\VCFExportPlugin;
@@ -87,12 +90,14 @@ class Server {
 		$this->baseUri = $baseUri;
 		$logger = \OC::$server->getLogger();
 		$dispatcher = \OC::$server->getEventDispatcher();
+		/** @var IEventDispatcher $newDispatcher */
+		$newDispatcher = \OC::$server->query(IEventDispatcher::class);
 
 		$root = new RootCollection();
 		$this->server = new \OCA\DAV\Connector\Sabre\Server(new CachingTree($root));
 
 		// Add maintenance plugin
-		$this->server->addPlugin(new \OCA\DAV\Connector\Sabre\MaintenancePlugin(\OC::$server->getConfig()));
+		$this->server->addPlugin(new \OCA\DAV\Connector\Sabre\MaintenancePlugin(\OC::$server->getConfig(), \OC::$server->getL10N('dav')));
 
 		// Backends
 		$authBackend = new Auth(
@@ -116,6 +121,9 @@ class Server {
 		// allow setup of additional auth backends
 		$event = new SabrePluginEvent($this->server);
 		$dispatcher->dispatch('OCA\DAV\Connector\Sabre::authInit', $event);
+
+		$newAuthEvent = new SabrePluginAuthInitEvent($this->server);
+		$newDispatcher->dispatchTyped($newAuthEvent);
 
 		$bearerAuthBackend = new BearerAuth(
 			\OC::$server->getUserSession(),
@@ -314,6 +322,10 @@ class Server {
 				$root->addChild($appCollection);
 			}
 		});
+
+		$this->server->addPlugin(
+			new PropfindCompressionPlugin()
+		);
 	}
 
 	public function exec() {

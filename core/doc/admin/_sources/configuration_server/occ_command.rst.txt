@@ -198,7 +198,8 @@ The ``app`` commands list, enable, and disable apps::
   app:enable       enable an app
   app:getpath      get an absolute path to the app directory
   app:list         list all available apps
-  app:update       update an app or all apps 
+  app:update       update an app or all apps
+  app:remove       disable and remove an app
 
 Download and install an app::
 
@@ -736,7 +737,7 @@ It is also possible to transfer only one directory along with it's contents. Thi
  sudo -u www-data php occ files:transfer-ownership --path="path_to_dir" <source-user> <destination-user>
 
 Users may also transfer files or folders selectively by themselves.
-See `user documentation <https://docs.nextcloud.com/server/latest/user_manual/files/transfer_ownership.html>`_ for details.
+See `user documentation <https://docs.nextcloud.com/server/latest/user_manual/en/files/transfer_ownership.html>`_ for details.
 
 .. _occ_sharing_label:
 

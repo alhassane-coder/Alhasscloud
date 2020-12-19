@@ -2,6 +2,7 @@
 /**
  * @copyright Copyright (c) 2018 Georg Ehrke
  *
+ * @author Daniel Kesselberg <mail@danielkesselberg.de>
  * @author Georg Ehrke <oc.list@georgehrke.com>
  * @author Roeland Jago Douma <roeland@famdouma.nl>
  *
@@ -27,7 +28,7 @@ declare(strict_types=1);
 namespace OCA\DAV\Migration;
 
 use Closure;
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use OCP\DB\ISchemaWrapper;
 use OCP\IDBConnection;
 use OCP\Migration\IOutput;
@@ -58,7 +59,7 @@ class Version1008Date20181105104826 extends SimpleMigrationStep {
 		$schema = $schemaClosure();
 		$table = $schema->getTable('calendarsubscriptions');
 
-		$table->addColumn('source_copy', Type::TEXT, [
+		$table->addColumn('source_copy', Types::TEXT, [
 			'notnull' => false,
 			'length' => null,
 		]);

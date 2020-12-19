@@ -4,6 +4,7 @@
  *
  * @author Daniel Kesselberg <mail@danielkesselberg.de>
  * @author Joas Schilling <coding@schilljs.com>
+ * @author John Molakvoæ (skjnldsv) <skjnldsv@protonmail.com>
  * @author Morris Jobke <hey@morrisjobke.de>
  * @author Robin Appelman <robin@icewind.nl>
  *
@@ -60,7 +61,7 @@ class Disable extends Command implements CompletionAwareInterface {
 			);
 	}
 
-	protected function execute(InputInterface $input, OutputInterface $output) {
+	protected function execute(InputInterface $input, OutputInterface $output): int {
 		$appIds = $input->getArgument('app-id');
 
 		foreach ($appIds as $appId) {
@@ -78,7 +79,8 @@ class Disable extends Command implements CompletionAwareInterface {
 
 		try {
 			$this->appManager->disableApp($appId);
-			$output->writeln($appId . ' disabled');
+			$appVersion = \OC_App::getAppVersion($appId);
+			$output->writeln($appId . ' ' . $appVersion . ' disabled');
 		} catch (\Exception $e) {
 			$output->writeln($e->getMessage());
 			$this->exitCode = 2;

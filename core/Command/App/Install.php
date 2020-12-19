@@ -3,6 +3,8 @@
  * @copyright Copyright (c) 2016, ownCloud, Inc.
  *
  * @author Christoph Wurst <christoph@winzerhof-wurst.at>
+ * @author Joas Schilling <coding@schilljs.com>
+ * @author John Molakvoæ (skjnldsv) <skjnldsv@protonmail.com>
  * @author Morris Jobke <hey@morrisjobke.de>
  * @author Roeland Jago Douma <roeland@famdouma.nl>
  * @author sualko <klaus@jsxc.org>
@@ -51,7 +53,7 @@ class Install extends Command {
 		;
 	}
 
-	protected function execute(InputInterface $input, OutputInterface $output) {
+	protected function execute(InputInterface $input, OutputInterface $output): int {
 		$appId = $input->getArgument('app-id');
 
 		if (\OC_App::getAppPath($appId)) {
@@ -74,7 +76,8 @@ class Install extends Command {
 			return 1;
 		}
 
-		$output->writeln($appId . ' installed');
+		$appVersion = \OC_App::getAppVersion($appId);
+		$output->writeln($appId . ' ' . $appVersion . ' installed');
 
 		if (!$input->getOption('keep-disabled')) {
 			$appClass = new \OC_App();

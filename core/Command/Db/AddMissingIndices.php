@@ -7,11 +7,11 @@ declare(strict_types=1);
  *
  * @author Bjoern Schiessle <bjoern@schiessle.org>
  * @author Joas Schilling <coding@schilljs.com>
+ * @author Mario Danic <mario@lovelyhq.com>
  * @author Morris Jobke <hey@morrisjobke.de>
  * @author Robin Appelman <robin@icewind.nl>
  * @author Roeland Jago Douma <roeland@famdouma.nl>
  * @author Thomas Citharel <nextcloud@tcit.fr>
- * @author Mario Danic <mario@lovelyhq.com>
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -69,12 +69,13 @@ class AddMissingIndices extends Command {
 			->setDescription('Add missing indices to the database tables');
 	}
 
-	protected function execute(InputInterface $input, OutputInterface $output) {
+	protected function execute(InputInterface $input, OutputInterface $output): int {
 		$this->addCoreIndexes($output);
 
 		// Dispatch event so apps can also update indexes if needed
 		$event = new GenericEvent($output);
 		$this->dispatcher->dispatch(IDBConnection::ADD_MISSING_INDEXES_EVENT, $event);
+		return 0;
 	}
 
 	/**
@@ -192,8 +193,23 @@ class AddMissingIndices extends Command {
 		}
 
 		$output->writeln('<info>Check indices of the cards table.</info>');
+		$cardsUpdated = false;
 		if ($schema->hasTable('cards')) {
 			$table = $schema->getTable('cards');
+
+			if ($table->hasIndex('addressbookid_uri_index')) {
+				$output->writeln('<info>Renaming addressbookid_uri_index index to  to the cards table, this can take some time...</info>');
+
+				foreach ($table->getIndexes() as $index) {
+					if ($index->getColumns() === ['addressbookid', 'uri']) {
+						$table->renameIndex('addressbookid_uri_index', 'cards_abiduri');
+					}
+				}
+
+				$this->connection->migrateToSchema($schema->getWrappedSchema());
+				$cardsUpdated = true;
+			}
+
 			if (!$table->hasIndex('cards_abid')) {
 				$output->writeln('<info>Adding cards_abid index to the cards table, this can take some time...</info>');
 
@@ -205,6 +221,24 @@ class AddMissingIndices extends Command {
 
 				$table->addIndex(['addressbookid'], 'cards_abid');
 				$this->connection->migrateToSchema($schema->getWrappedSchema());
+				$cardsUpdated = true;
+			}
+
+			if (!$table->hasIndex('cards_abiduri')) {
+				$output->writeln('<info>Adding cards_abiduri index to the cards table, this can take some time...</info>');
+
+				foreach ($table->getIndexes() as $index) {
+					if ($index->getColumns() === ['addressbookid', 'uri']) {
+						$table->dropIndex($index->getName());
+					}
+				}
+
+				$table->addIndex(['addressbookid', 'uri'], 'cards_abiduri');
+				$this->connection->migrateToSchema($schema->getWrappedSchema());
+				$cardsUpdated = true;
+			}
+
+			if ($cardsUpdated) {
 				$updated = true;
 				$output->writeln('<info>cards table updated successfully.</info>');
 			}

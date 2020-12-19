@@ -3,6 +3,7 @@
  * @copyright Copyright (c) 2017 Arthur Schiwon <blizzz@arthur-schiwon.de>
  *
  * @author Bjoern Schiessle <bjoern@schiessle.org>
+ * @author Joas Schilling <coding@schilljs.com>
  * @author John Molakvoæ (skjnldsv) <skjnldsv@protonmail.com>
  *
  * @license GNU AGPL version 3 or any later version
@@ -30,6 +31,7 @@ use OCP\Collaboration\Collaborators\SearchResultType;
 use OCP\Federation\ICloudFederationProviderManager;
 use OCP\Federation\ICloudIdManager;
 use OCP\Share;
+use OCP\Share\IShare;
 
 class RemoteGroupPlugin implements ISearchPlugin {
 	protected $shareeEnumeration;
@@ -63,7 +65,7 @@ class RemoteGroupPlugin implements ISearchPlugin {
 				'guid' => $remoteGroup,
 				'name' => $remoteGroup,
 				'value' => [
-					'shareType' => Share::SHARE_TYPE_REMOTE_GROUP,
+					'shareType' => IShare::TYPE_REMOTE_GROUP,
 					'shareWith' => $search,
 					'server' => $serverUrl,
 				],

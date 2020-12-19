@@ -2,6 +2,7 @@
 /**
  * @copyright Copyright (c) 2016 Robin Appelman <robin@icewind.nl>
  *
+ * @author Joas Schilling <coding@schilljs.com>
  * @author Robin Appelman <robin@icewind.nl>
  *
  * @license GNU AGPL version 3 or any later version
@@ -61,7 +62,7 @@ class AddUser extends Base {
 			);
 	}
 
-	protected function execute(InputInterface $input, OutputInterface $output) {
+	protected function execute(InputInterface $input, OutputInterface $output): int {
 		$group = $this->groupManager->get($input->getArgument('group'));
 		if (is_null($group)) {
 			$output->writeln('<error>group not found</error>');
@@ -73,5 +74,6 @@ class AddUser extends Base {
 			return 1;
 		}
 		$group->addUser($user);
+		return 0;
 	}
 }

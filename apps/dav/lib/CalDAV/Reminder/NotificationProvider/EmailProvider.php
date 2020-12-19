@@ -8,6 +8,7 @@ declare(strict_types=1);
  *
  * @author Christoph Wurst <christoph@winzerhof-wurst.at>
  * @author Georg Ehrke <oc.list@georgehrke.com>
+ * @author Joas Schilling <coding@schilljs.com>
  * @author Roeland Jago Douma <roeland@famdouma.nl>
  * @author Thomas Citharel <nextcloud@tcit.fr>
  *
@@ -35,7 +36,6 @@ use OCP\IConfig;
 use OCP\IL10N;
 use OCP\ILogger;
 use OCP\IURLGenerator;
-use OCP\IUser;
 use OCP\L10N\IFactory as L10NFactory;
 use OCP\Mail\IEMailTemplate;
 use OCP\Mail\IMailer;
@@ -349,7 +349,7 @@ class EmailProvider extends AbstractProvider {
 		foreach ($users as $user) {
 			$emailAddress = $user->getEMailAddress();
 			if ($emailAddress) {
-				$lang = $this->getLangForUser($user);
+				$lang = $this->l10nFactory->getUserLanguage($user);
 				if ($lang) {
 					$emailAddresses[$emailAddress] = [
 						'LANG' => $lang,
@@ -361,14 +361,6 @@ class EmailProvider extends AbstractProvider {
 		}
 
 		return $emailAddresses;
-	}
-
-	/**
-	 * @param IUser $user
-	 * @return string
-	 */
-	private function getLangForUser(IUser $user): ?string {
-		return $this->config->getUserValue($user->getUID(), 'core', 'lang', null);
 	}
 
 	/**
@@ -389,9 +381,7 @@ class EmailProvider extends AbstractProvider {
 
 		$diff = $dtstartDt->diff($dtendDt);
 
-		/** @phan-suppress-next-line PhanUndeclaredClassMethod */
 		$dtstartDt = new \DateTime($dtstartDt->format(\DateTime::ATOM));
-		/** @phan-suppress-next-line PhanUndeclaredClassMethod */
 		$dtendDt = new \DateTime($dtendDt->format(\DateTime::ATOM));
 
 		if ($isAllDay) {
@@ -408,9 +398,7 @@ class EmailProvider extends AbstractProvider {
 
 		$startTimezone = $endTimezone = null;
 		if (!$vevent->DTSTART->isFloating()) {
-			/** @phan-suppress-next-line PhanUndeclaredClassMethod */
 			$startTimezone = $vevent->DTSTART->getDateTime()->getTimezone()->getName();
-			/** @phan-suppress-next-line PhanUndeclaredClassMethod */
 			$endTimezone = $this->getDTEndFromEvent($vevent)->getDateTime()->getTimezone()->getName();
 		}
 

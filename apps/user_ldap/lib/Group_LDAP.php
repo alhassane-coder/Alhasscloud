@@ -20,8 +20,8 @@
  * @author Roeland Jago Douma <roeland@famdouma.nl>
  * @author Roland Tapken <roland@bitarbeiter.net>
  * @author Thomas Müller <thomas.mueller@tmit.eu>
+ * @author Tobias Perschon <tobias@perschon.at>
  * @author Victor Dubiniuk <dubiniuk@owncloud.com>
- * @author Vincent Petry <pvince81@owncloud.com>
  * @author Vinicius Cubas Brand <vinicius@eita.org.br>
  * @author Xuanwo <xuanwo@yunify.com>
  *
@@ -43,37 +43,39 @@
 
 namespace OCA\User_LDAP;
 
+use Closure;
+use Exception;
+use OC;
 use OC\Cache\CappedMemoryCache;
+use OC\ServerNotAvailableException;
 use OCP\Group\Backend\IGetDisplayNameBackend;
 use OCP\GroupInterface;
 use OCP\ILogger;
 
-class Group_LDAP extends BackendUtility implements \OCP\GroupInterface, IGroupLDAP, IGetDisplayNameBackend {
+class Group_LDAP extends BackendUtility implements GroupInterface, IGroupLDAP, IGetDisplayNameBackend {
 	protected $enabled = false;
 
-	/**
-	 * @var string[] $cachedGroupMembers array of users with gid as key
-	 */
+	/** @var string[] $cachedGroupMembers array of users with gid as key */
 	protected $cachedGroupMembers;
-
-	/**
-	 * @var string[] $cachedGroupsByMember array of groups with uid as key
-	 */
+	/** @var string[] $cachedGroupsByMember array of groups with uid as key */
 	protected $cachedGroupsByMember;
-
-	/**
-	 * @var string[] $cachedNestedGroups array of groups with gid (DN) as key
-	 */
+	/** @var string[] $cachedNestedGroups array of groups with gid (DN) as key */
 	protected $cachedNestedGroups;
-
 	/** @var GroupPluginManager */
 	protected $groupPluginManager;
+	/** @var ILogger */
+	protected $logger;
+
+	/**
+	 * @var string $ldapGroupMemberAssocAttr contains the LDAP setting (in lower case) with the same name
+	 */
+	protected $ldapGroupMemberAssocAttr;
 
 	public function __construct(Access $access, GroupPluginManager $groupPluginManager) {
 		parent::__construct($access);
 		$filter = $this->access->connection->ldapGroupFilter;
-		$gassoc = $this->access->connection->ldapGroupMemberAssocAttr;
-		if (!empty($filter) && !empty($gassoc)) {
+		$gAssoc = $this->access->connection->ldapGroupMemberAssocAttr;
+		if (!empty($filter) && !empty($gAssoc)) {
 			$this->enabled = true;
 		}
 
@@ -81,6 +83,8 @@ class Group_LDAP extends BackendUtility implements \OCP\GroupInterface, IGroupLD
 		$this->cachedGroupsByMember = new CappedMemoryCache();
 		$this->cachedNestedGroups = new CappedMemoryCache();
 		$this->groupPluginManager = $groupPluginManager;
+		$this->logger = OC::$server->getLogger();
+		$this->ldapGroupMemberAssocAttr = strtolower($gAssoc);
 	}
 
 	/**
@@ -89,8 +93,8 @@ class Group_LDAP extends BackendUtility implements \OCP\GroupInterface, IGroupLD
 	 * @param string $uid uid of the user
 	 * @param string $gid gid of the group
 	 * @return bool
-	 *
-	 * Checks whether the user is member of a group or not.
+	 * @throws Exception
+	 * @throws ServerNotAvailableException
 	 */
 	public function inGroup($uid, $gid) {
 		if (!$this->enabled) {
@@ -105,8 +109,7 @@ class Group_LDAP extends BackendUtility implements \OCP\GroupInterface, IGroupLD
 		$userDN = $this->access->username2dn($uid);
 
 		if (isset($this->cachedGroupMembers[$gid])) {
-			$isInGroup = in_array($userDN, $this->cachedGroupMembers[$gid]);
-			return $isInGroup;
+			return in_array($userDN, $this->cachedGroupMembers[$gid]);
 		}
 
 		$cacheKeyMembers = 'inGroup-members:' . $gid;
@@ -139,31 +142,38 @@ class Group_LDAP extends BackendUtility implements \OCP\GroupInterface, IGroupLD
 		}
 
 		//extra work if we don't get back user DNs
-		if (strtolower($this->access->connection->ldapGroupMemberAssocAttr) === 'memberuid') {
-			$requestAttributes = $this->access->userManager->getAttributes(true);
-			$dns = [];
-			$filterParts = [];
-			$bytes = 0;
-			foreach ($members as $mid) {
-				$filter = str_replace('%uid', $mid, $this->access->connection->ldapLoginFilter);
-				$filterParts[] = $filter;
-				$bytes += strlen($filter);
-				if ($bytes >= 9000000) {
-					// AD has a default input buffer of 10 MB, we do not want
-					// to take even the chance to exceed it
+		switch ($this->ldapGroupMemberAssocAttr) {
+			case 'memberuid':
+			case 'zimbramailforwardingaddress':
+				$requestAttributes = $this->access->userManager->getAttributes(true);
+				$dns = [];
+				$filterParts = [];
+				$bytes = 0;
+				foreach ($members as $mid) {
+					if ($this->ldapGroupMemberAssocAttr === 'zimbramailforwardingaddress') {
+						$parts = explode('@', $mid); //making sure we get only the uid
+						$mid = $parts[0];
+					}
+					$filter = str_replace('%uid', $mid, $this->access->connection->ldapLoginFilter);
+					$filterParts[] = $filter;
+					$bytes += strlen($filter);
+					if ($bytes >= 9000000) {
+						// AD has a default input buffer of 10 MB, we do not want
+						// to take even the chance to exceed it
+						$filter = $this->access->combineFilterWithOr($filterParts);
+						$users = $this->access->fetchListOfUsers($filter, $requestAttributes, count($filterParts));
+						$bytes = 0;
+						$filterParts = [];
+						$dns = array_merge($dns, $users);
+					}
+				}
+				if (count($filterParts) > 0) {
 					$filter = $this->access->combineFilterWithOr($filterParts);
-					$bytes = 0;
-					$filterParts = [];
 					$users = $this->access->fetchListOfUsers($filter, $requestAttributes, count($filterParts));
 					$dns = array_merge($dns, $users);
 				}
-			}
-			if (count($filterParts) > 0) {
-				$filter = $this->access->combineFilterWithOr($filterParts);
-				$users = $this->access->fetchListOfUsers($filter, $requestAttributes, count($filterParts));
-				$dns = array_merge($dns, $users);
-			}
-			$members = $dns;
+				$members = $dns;
+				break;
 		}
 
 		$isInGroup = in_array($userDN, $members);
@@ -175,13 +185,13 @@ class Group_LDAP extends BackendUtility implements \OCP\GroupInterface, IGroupLD
 	}
 
 	/**
-	 * @param string $dnGroup
-	 * @return array
+	 * For a group that has user membership defined by an LDAP search url
+	 * attribute returns the users that match the search url otherwise returns
+	 * an empty array.
 	 *
-	 * For a group that has user membership defined by an LDAP search url attribute returns the users
-	 * that match the search url otherwise returns an empty array.
+	 * @throws ServerNotAvailableException
 	 */
-	public function getDynamicGroupMembers($dnGroup) {
+	public function getDynamicGroupMembers(string $dnGroup): array {
 		$dynamicGroupMemberURL = strtolower($this->access->connection->ldapDynamicGroupMemberURL);
 
 		if (empty($dynamicGroupMemberURL)) {
@@ -207,26 +217,26 @@ class Group_LDAP extends BackendUtility implements \OCP\GroupInterface, IGroupLD
 					$dynamicMembers[$value['dn'][0]] = 1;
 				}
 			} else {
-				\OCP\Util::writeLog('user_ldap', 'No search filter found on member url ' .
-					'of group ' . $dnGroup, ILogger::DEBUG);
+				$this->logger->debug('No search filter found on member url of group {dn}',
+					[
+						'app' => 'user_ldap',
+						'dn' => $dnGroup,
+					]
+				);
 			}
 		}
 		return $dynamicMembers;
 	}
 
 	/**
-	 * @param string $dnGroup
-	 * @param array|null &$seen
-	 * @return array|mixed|null
-	 * @throws \OC\ServerNotAvailableException
+	 * @throws ServerNotAvailableException
 	 */
-	private function _groupMembers($dnGroup, &$seen = null) {
+	private function _groupMembers(string $dnGroup, ?array &$seen = null): array {
 		if ($seen === null) {
 			$seen = [];
 		}
 		$allMembers = [];
 		if (array_key_exists($dnGroup, $seen)) {
-			// avoid loops
 			return [];
 		}
 		// used extensively in cron job, caching makes sense for nested groups
@@ -289,13 +299,10 @@ class Group_LDAP extends BackendUtility implements \OCP\GroupInterface, IGroupLD
 	}
 
 	/**
-	 * @param string $DN
-	 * @param array|null &$seen
-	 * @return array
-	 * @throws \OC\ServerNotAvailableException
+	 * @throws ServerNotAvailableException
 	 */
-	private function _getGroupDNsFromMemberOf($DN) {
-		$groups = $this->access->readAttribute($DN, 'memberOf');
+	private function _getGroupDNsFromMemberOf(string $dn): array {
+		$groups = $this->access->readAttribute($dn, 'memberOf');
 		if (!is_array($groups)) {
 			return [];
 		}
@@ -313,17 +320,11 @@ class Group_LDAP extends BackendUtility implements \OCP\GroupInterface, IGroupLD
 			return $nestedGroups;
 		};
 
-		$groups = $this->walkNestedGroups($DN, $fetcher, $groups);
+		$groups = $this->walkNestedGroups($dn, $fetcher, $groups);
 		return $this->filterValidGroups($groups);
 	}
 
-	/**
-	 * @param string $dn
-	 * @param \Closure $fetcher args: string $dn, array $seen, returns: string[] of dns
-	 * @param array $list
-	 * @return array
-	 */
-	private function walkNestedGroups(string $dn, \Closure $fetcher, array $list): array {
+	private function walkNestedGroups(string $dn, Closure $fetcher, array $list): array {
 		$nesting = (int)$this->access->connection->ldapNestedGroups;
 		// depending on the input, we either have a list of DNs or a list of LDAP records
 		// also, the output expects either DNs or records. Testing the first element should suffice.
@@ -360,11 +361,11 @@ class Group_LDAP extends BackendUtility implements \OCP\GroupInterface, IGroupLD
 	/**
 	 * translates a gidNumber into an ownCloud internal name
 	 *
-	 * @param string $gid as given by gidNumber on POSIX LDAP
-	 * @param string $dn a DN that belongs to the same domain as the group
 	 * @return string|bool
+	 * @throws Exception
+	 * @throws ServerNotAvailableException
 	 */
-	public function gidNumber2Name($gid, $dn) {
+	public function gidNumber2Name(string $gid, string $dn) {
 		$cacheKey = 'gidNumberToName' . $gid;
 		$groupName = $this->access->connection->getFromCache($cacheKey);
 		if (!is_null($groupName) && isset($groupName)) {
@@ -377,14 +378,22 @@ class Group_LDAP extends BackendUtility implements \OCP\GroupInterface, IGroupLD
 			'objectClass=posixGroup',
 			$this->access->connection->ldapGidNumber . '=' . $gid
 		]);
+		return $this->getNameOfGroup($filter, $cacheKey) ?? false;
+	}
+
+	/**
+	 * @throws ServerNotAvailableException
+	 * @throws Exception
+	 */
+	private function getNameOfGroup(string $filter, string $cacheKey) {
 		$result = $this->access->searchGroups($filter, ['dn'], 1);
 		if (empty($result)) {
-			return false;
+			return null;
 		}
 		$dn = $result[0]['dn'][0];
 
 		//and now the group name
-		//NOTE once we have separate ownCloud group IDs and group names we can
+		//NOTE once we have separate Nextcloud group IDs and group names we can
 		//directly read the display name attribute instead of the DN
 		$name = $this->access->dn2groupname($dn);
 
@@ -396,11 +405,10 @@ class Group_LDAP extends BackendUtility implements \OCP\GroupInterface, IGroupLD
 	/**
 	 * returns the entry's gidNumber
 	 *
-	 * @param string $dn
-	 * @param string $attribute
 	 * @return string|bool
+	 * @throws ServerNotAvailableException
 	 */
-	private function getEntryGidNumber($dn, $attribute) {
+	private function getEntryGidNumber(string $dn, string $attribute) {
 		$value = $this->access->readAttribute($dn, $attribute);
 		if (is_array($value) && !empty($value)) {
 			return $value[0];
@@ -409,22 +417,20 @@ class Group_LDAP extends BackendUtility implements \OCP\GroupInterface, IGroupLD
 	}
 
 	/**
-	 * returns the group's primary ID
-	 *
-	 * @param string $dn
 	 * @return string|bool
+	 * @throws ServerNotAvailableException
 	 */
-	public function getGroupGidNumber($dn) {
+	public function getGroupGidNumber(string $dn) {
 		return $this->getEntryGidNumber($dn, 'gidNumber');
 	}
 
 	/**
 	 * returns the user's gidNumber
 	 *
-	 * @param string $dn
 	 * @return string|bool
+	 * @throws ServerNotAvailableException
 	 */
-	public function getUserGidNumber($dn) {
+	public function getUserGidNumber(string $dn) {
 		$gidNumber = false;
 		if ($this->access->connection->hasGidNumber) {
 			$gidNumber = $this->getEntryGidNumber($dn, $this->access->connection->ldapGidNumber);
@@ -436,17 +442,13 @@ class Group_LDAP extends BackendUtility implements \OCP\GroupInterface, IGroupLD
 	}
 
 	/**
-	 * returns a filter for a "users has specific gid" search or count operation
-	 *
-	 * @param string $groupDN
-	 * @param string $search
-	 * @return string
-	 * @throws \Exception
+	 * @throws ServerNotAvailableException
+	 * @throws Exception
 	 */
-	private function prepareFilterForUsersHasGidNumber($groupDN, $search = '') {
+	private function prepareFilterForUsersHasGidNumber(string $groupDN, string $search = ''): string {
 		$groupID = $this->getGroupGidNumber($groupDN);
 		if ($groupID === false) {
-			throw new \Exception('Not a valid group');
+			throw new Exception('Not a valid group');
 		}
 
 		$filterParts = [];
@@ -462,13 +464,14 @@ class Group_LDAP extends BackendUtility implements \OCP\GroupInterface, IGroupLD
 	/**
 	 * returns a list of users that have the given group as gid number
 	 *
-	 * @param string $groupDN
-	 * @param string $search
-	 * @param int $limit
-	 * @param int $offset
-	 * @return string[]
+	 * @throws ServerNotAvailableException
 	 */
-	public function getUsersInGidNumber($groupDN, $search = '', $limit = -1, $offset = 0) {
+	public function getUsersInGidNumber(
+		string $groupDN,
+		string $search = '',
+		?int $limit = -1,
+		?int $offset = 0
+	): array {
 		try {
 			$filter = $this->prepareFilterForUsersHasGidNumber($groupDN, $search);
 			$users = $this->access->fetchListOfUsers(
@@ -478,37 +481,18 @@ class Group_LDAP extends BackendUtility implements \OCP\GroupInterface, IGroupLD
 				$offset
 			);
 			return $this->access->nextcloudUserNames($users);
-		} catch (\Exception $e) {
+		} catch (ServerNotAvailableException $e) {
+			throw $e;
+		} catch (Exception $e) {
 			return [];
 		}
 	}
 
 	/**
-	 * returns the number of users that have the given group as gid number
-	 *
-	 * @param string $groupDN
-	 * @param string $search
-	 * @param int $limit
-	 * @param int $offset
-	 * @return int
+	 * @throws ServerNotAvailableException
+	 * @return bool
 	 */
-	public function countUsersInGidNumber($groupDN, $search = '', $limit = -1, $offset = 0) {
-		try {
-			$filter = $this->prepareFilterForUsersHasGidNumber($groupDN, $search);
-			$users = $this->access->countUsers($filter, ['dn'], $limit, $offset);
-			return (int)$users;
-		} catch (\Exception $e) {
-			return 0;
-		}
-	}
-
-	/**
-	 * gets the gidNumber of a user
-	 *
-	 * @param string $dn
-	 * @return string
-	 */
-	public function getUserGroupByGid($dn) {
+	public function getUserGroupByGid(string $dn) {
 		$groupID = $this->getUserGidNumber($dn);
 		if ($groupID !== false) {
 			$groupName = $this->gidNumber2Name($groupID, $dn);
@@ -523,11 +507,11 @@ class Group_LDAP extends BackendUtility implements \OCP\GroupInterface, IGroupLD
 	/**
 	 * translates a primary group ID into an Nextcloud internal name
 	 *
-	 * @param string $gid as given by primaryGroupID on AD
-	 * @param string $dn a DN that belongs to the same domain as the group
 	 * @return string|bool
+	 * @throws Exception
+	 * @throws ServerNotAvailableException
 	 */
-	public function primaryGroupID2Name($gid, $dn) {
+	public function primaryGroupID2Name(string $gid, string $dn) {
 		$cacheKey = 'primaryGroupIDtoName';
 		$groupNames = $this->access->connection->getFromCache($cacheKey);
 		if (!is_null($groupNames) && isset($groupNames[$gid])) {
@@ -544,30 +528,16 @@ class Group_LDAP extends BackendUtility implements \OCP\GroupInterface, IGroupLD
 			$this->access->connection->ldapGroupFilter,
 			'objectsid=' . $domainObjectSid . '-' . $gid
 		]);
-		$result = $this->access->searchGroups($filter, ['dn'], 1);
-		if (empty($result)) {
-			return false;
-		}
-		$dn = $result[0]['dn'][0];
-
-		//and now the group name
-		//NOTE once we have separate Nextcloud group IDs and group names we can
-		//directly read the display name attribute instead of the DN
-		$name = $this->access->dn2groupname($dn);
-
-		$this->access->connection->writeToCache($cacheKey, $name);
-
-		return $name;
+		return $this->getNameOfGroup($filter, $cacheKey) ?? false;
 	}
 
 	/**
 	 * returns the entry's primary group ID
 	 *
-	 * @param string $dn
-	 * @param string $attribute
 	 * @return string|bool
+	 * @throws ServerNotAvailableException
 	 */
-	private function getEntryGroupID($dn, $attribute) {
+	private function getEntryGroupID(string $dn, string $attribute) {
 		$value = $this->access->readAttribute($dn, $attribute);
 		if (is_array($value) && !empty($value)) {
 			return $value[0];
@@ -576,22 +546,18 @@ class Group_LDAP extends BackendUtility implements \OCP\GroupInterface, IGroupLD
 	}
 
 	/**
-	 * returns the group's primary ID
-	 *
-	 * @param string $dn
 	 * @return string|bool
+	 * @throws ServerNotAvailableException
 	 */
-	public function getGroupPrimaryGroupID($dn) {
+	public function getGroupPrimaryGroupID(string $dn) {
 		return $this->getEntryGroupID($dn, 'primaryGroupToken');
 	}
 
 	/**
-	 * returns the user's primary group ID
-	 *
-	 * @param string $dn
 	 * @return string|bool
+	 * @throws ServerNotAvailableException
 	 */
-	public function getUserPrimaryGroupIDs($dn) {
+	public function getUserPrimaryGroupIDs(string $dn) {
 		$primaryGroupID = false;
 		if ($this->access->connection->hasPrimaryGroups) {
 			$primaryGroupID = $this->getEntryGroupID($dn, 'primaryGroupID');
@@ -603,17 +569,13 @@ class Group_LDAP extends BackendUtility implements \OCP\GroupInterface, IGroupLD
 	}
 
 	/**
-	 * returns a filter for a "users in primary group" search or count operation
-	 *
-	 * @param string $groupDN
-	 * @param string $search
-	 * @return string
-	 * @throws \Exception
+	 * @throws Exception
+	 * @throws ServerNotAvailableException
 	 */
-	private function prepareFilterForUsersInPrimaryGroup($groupDN, $search = '') {
+	private function prepareFilterForUsersInPrimaryGroup(string $groupDN, string $search = ''): string {
 		$groupID = $this->getGroupPrimaryGroupID($groupDN);
 		if ($groupID === false) {
-			throw new \Exception('Not a valid group');
+			throw new Exception('Not a valid group');
 		}
 
 		$filterParts = [];
@@ -627,15 +589,14 @@ class Group_LDAP extends BackendUtility implements \OCP\GroupInterface, IGroupLD
 	}
 
 	/**
-	 * returns a list of users that have the given group as primary group
-	 *
-	 * @param string $groupDN
-	 * @param string $search
-	 * @param int $limit
-	 * @param int $offset
-	 * @return string[]
+	 * @throws ServerNotAvailableException
 	 */
-	public function getUsersInPrimaryGroup($groupDN, $search = '', $limit = -1, $offset = 0) {
+	public function getUsersInPrimaryGroup(
+		string $groupDN,
+		string $search = '',
+		?int $limit = -1,
+		?int $offset = 0
+	): array {
 		try {
 			$filter = $this->prepareFilterForUsersInPrimaryGroup($groupDN, $search);
 			$users = $this->access->fetchListOfUsers(
@@ -645,37 +606,38 @@ class Group_LDAP extends BackendUtility implements \OCP\GroupInterface, IGroupLD
 				$offset
 			);
 			return $this->access->nextcloudUserNames($users);
-		} catch (\Exception $e) {
+		} catch (ServerNotAvailableException $e) {
+			throw $e;
+		} catch (Exception $e) {
 			return [];
 		}
 	}
 
 	/**
-	 * returns the number of users that have the given group as primary group
-	 *
-	 * @param string $groupDN
-	 * @param string $search
-	 * @param int $limit
-	 * @param int $offset
-	 * @return int
+	 * @throws ServerNotAvailableException
 	 */
-	public function countUsersInPrimaryGroup($groupDN, $search = '', $limit = -1, $offset = 0) {
+	public function countUsersInPrimaryGroup(
+		string $groupDN,
+		string $search = '',
+		int $limit = -1,
+		int $offset = 0
+	): int {
 		try {
 			$filter = $this->prepareFilterForUsersInPrimaryGroup($groupDN, $search);
 			$users = $this->access->countUsers($filter, ['dn'], $limit, $offset);
 			return (int)$users;
-		} catch (\Exception $e) {
+		} catch (ServerNotAvailableException $e) {
+			throw $e;
+		} catch (Exception $e) {
 			return 0;
 		}
 	}
 
 	/**
-	 * gets the primary group of a user
-	 *
-	 * @param string $dn
-	 * @return string
+	 * @return string|bool
+	 * @throws ServerNotAvailableException
 	 */
-	public function getUserPrimaryGroup($dn) {
+	public function getUserPrimaryGroup(string $dn) {
 		$groupID = $this->getUserPrimaryGroupIDs($dn);
 		if ($groupID !== false) {
 			$groupName = $this->primaryGroupID2Name($groupID, $dn);
@@ -688,15 +650,15 @@ class Group_LDAP extends BackendUtility implements \OCP\GroupInterface, IGroupLD
 	}
 
 	/**
-	 * Get all groups a user belongs to
-	 *
-	 * @param string $uid Name of the user
-	 * @return array with group names
-	 *
 	 * This function fetches all groups a user belongs to. It does not check
 	 * if the user exists at all.
 	 *
 	 * This function includes groups based on dynamic group membership.
+	 *
+	 * @param string $uid Name of the user
+	 * @return array with group names
+	 * @throws Exception
+	 * @throws ServerNotAvailableException
 	 */
 	public function getUserGroups($uid) {
 		if (!$this->enabled) {
@@ -747,8 +709,12 @@ class Group_LDAP extends BackendUtility implements \OCP\GroupInterface, IGroupLD
 						}
 					}
 				} else {
-					\OCP\Util::writeLog('user_ldap', 'No search filter found on member url ' .
-						'of group ' . print_r($dynamicGroup, true), ILogger::DEBUG);
+					$this->logger->debug('No search filter found on member url of group {dn}',
+						[
+							'app' => 'user_ldap',
+							'dn' => $dynamicGroup,
+						]
+					);
 				}
 			}
 		}
@@ -758,8 +724,8 @@ class Group_LDAP extends BackendUtility implements \OCP\GroupInterface, IGroupLD
 		// memberof doesn't support memberuid, so skip it here.
 		if ((int)$this->access->connection->hasMemberOfFilterSupport === 1
 			&& (int)$this->access->connection->useMemberOfToDetectMembership === 1
-			&& strtolower($this->access->connection->ldapGroupMemberAssocAttr) !== 'memberuid'
-		) {
+			&& $this->ldapGroupMemberAssocAttr !== 'memberuid'
+			&& $this->ldapGroupMemberAssocAttr !== 'zimbramailforwardingaddress') {
 			$groupDNs = $this->_getGroupDNsFromMemberOf($userDN);
 			if (is_array($groupDNs)) {
 				foreach ($groupDNs as $dn) {
@@ -783,22 +749,33 @@ class Group_LDAP extends BackendUtility implements \OCP\GroupInterface, IGroupLD
 		}
 
 		//uniqueMember takes DN, memberuid the uid, so we need to distinguish
-		if ((strtolower($this->access->connection->ldapGroupMemberAssocAttr) === 'uniquemember')
-			|| (strtolower($this->access->connection->ldapGroupMemberAssocAttr) === 'member')
-		) {
-			$uid = $userDN;
-		} elseif (strtolower($this->access->connection->ldapGroupMemberAssocAttr) === 'memberuid') {
-			$result = $this->access->readAttribute($userDN, 'uid');
-			if ($result === false) {
-				\OCP\Util::writeLog('user_ldap', 'No uid attribute found for DN ' . $userDN . ' on ' .
-					$this->access->connection->ldapHost, ILogger::DEBUG);
-				$uid = false;
-			} else {
-				$uid = $result[0];
-			}
-		} else {
-			// just in case
-			$uid = $userDN;
+		switch ($this->ldapGroupMemberAssocAttr) {
+			case 'uniquemember':
+			case 'member':
+				$uid = $userDN;
+				break;
+
+			case 'memberuid':
+			case 'zimbramailforwardingaddress':
+				$result = $this->access->readAttribute($userDN, 'uid');
+				if ($result === false) {
+					$this->logger->debug('No uid attribute found for DN {dn} on {host}',
+						[
+							'app' => 'user_ldap',
+							'dn' => $userDN,
+							'host' => $this->access->connection->ldapHost,
+						]
+					);
+					$uid = false;
+				} else {
+					$uid = $result[0];
+				}
+				break;
+
+			default:
+				// just in case
+				$uid = $userDN;
+				break;
 		}
 
 		if ($uid !== false) {
@@ -826,11 +803,9 @@ class Group_LDAP extends BackendUtility implements \OCP\GroupInterface, IGroupLD
 	}
 
 	/**
-	 * @param string $dn
-	 * @param array|null &$seen
-	 * @return array
+	 * @throws ServerNotAvailableException
 	 */
-	private function getGroupsByMember($dn, &$seen = null) {
+	private function getGroupsByMember(string $dn, array &$seen = null): array {
 		if ($seen === null) {
 			$seen = [];
 		}
@@ -841,6 +816,11 @@ class Group_LDAP extends BackendUtility implements \OCP\GroupInterface, IGroupLD
 		$allGroups = [];
 		$seen[$dn] = true;
 		$filter = $this->access->connection->ldapGroupMemberAssocAttr . '=' . $dn;
+
+		if ($this->ldapGroupMemberAssocAttr === 'zimbramailforwardingaddress') {
+			//in this case the member entries are email addresses
+			$filter .= '@*';
+		}
 
 		$nesting = (int)$this->access->connection->ldapNestedGroups;
 		if ($nesting === 0) {
@@ -856,6 +836,11 @@ class Group_LDAP extends BackendUtility implements \OCP\GroupInterface, IGroupLD
 				}
 				return $this->getGroupsByMember($dn, $seen);
 			};
+
+			if (empty($dn)) {
+				$dn = "";
+			}
+
 			$allGroups = $this->walkNestedGroups($dn, $fetcher, $groups);
 		}
 		$visibleGroups = $this->filterValidGroups($allGroups);
@@ -870,7 +855,8 @@ class Group_LDAP extends BackendUtility implements \OCP\GroupInterface, IGroupLD
 	 * @param int $limit
 	 * @param int $offset
 	 * @return array with user ids
-	 * @throws \Exception
+	 * @throws Exception
+	 * @throws ServerNotAvailableException
 	 */
 	public function usersInGroup($gid, $search = '', $limit = -1, $offset = 0) {
 		if (!$this->enabled) {
@@ -915,50 +901,57 @@ class Group_LDAP extends BackendUtility implements \OCP\GroupInterface, IGroupLD
 		}
 
 		$groupUsers = [];
-		$isMemberUid = (strtolower($this->access->connection->ldapGroupMemberAssocAttr) === 'memberuid');
 		$attrs = $this->access->userManager->getAttributes(true);
 		foreach ($members as $member) {
-			if ($isMemberUid) {
-				//we got uids, need to get their DNs to 'translate' them to user names
-				$filter = $this->access->combineFilterWithAnd([
-					str_replace('%uid', trim($member), $this->access->connection->ldapLoginFilter),
-					$this->access->combineFilterWithAnd([
-						$this->access->getFilterPartForUserSearch($search),
-						$this->access->connection->ldapUserFilter
-					])
-				]);
-				$ldap_users = $this->access->fetchListOfUsers($filter, $attrs, 1);
-				if (count($ldap_users) < 1) {
-					continue;
-				}
-				$groupUsers[] = $this->access->dn2username($ldap_users[0]['dn'][0]);
-			} else {
-				//we got DNs, check if we need to filter by search or we can give back all of them
-				$uid = $this->access->dn2username($member);
-				if (!$uid) {
-					continue;
-				}
-
-				$cacheKey = 'userExistsOnLDAP' . $uid;
-				$userExists = $this->access->connection->getFromCache($cacheKey);
-				if ($userExists === false) {
-					continue;
-				}
-				if ($userExists === null || $search !== '') {
-					if (!$this->access->readAttribute($member,
-						$this->access->connection->ldapUserDisplayName,
+			switch ($this->ldapGroupMemberAssocAttr) {
+				case 'zimbramailforwardingaddress':
+					//we get email addresses and need to convert them to uids
+					$parts = explode('@', $member);
+					$member = $parts[0];
+					//no break needed because we just needed to remove the email part and now we have uids
+				case 'memberuid':
+					//we got uids, need to get their DNs to 'translate' them to user names
+					$filter = $this->access->combineFilterWithAnd([
+						str_replace('%uid', trim($member), $this->access->connection->ldapLoginFilter),
 						$this->access->combineFilterWithAnd([
 							$this->access->getFilterPartForUserSearch($search),
 							$this->access->connection->ldapUserFilter
-						]))) {
-						if ($search === '') {
-							$this->access->connection->writeToCache($cacheKey, false);
-						}
-						continue;
+						])
+					]);
+					$ldap_users = $this->access->fetchListOfUsers($filter, $attrs, 1);
+					if (empty($ldap_users)) {
+						break;
 					}
-					$this->access->connection->writeToCache($cacheKey, true);
-				}
-				$groupUsers[] = $uid;
+					$groupUsers[] = $this->access->dn2username($ldap_users[0]['dn'][0]);
+					break;
+				default:
+					//we got DNs, check if we need to filter by search or we can give back all of them
+					$uid = $this->access->dn2username($member);
+					if (!$uid) {
+						break;
+					}
+
+					$cacheKey = 'userExistsOnLDAP' . $uid;
+					$userExists = $this->access->connection->getFromCache($cacheKey);
+					if ($userExists === false) {
+						break;
+					}
+					if ($userExists === null || $search !== '') {
+						if (!$this->access->readAttribute($member,
+							$this->access->connection->ldapUserDisplayName,
+							$this->access->combineFilterWithAnd([
+								$this->access->getFilterPartForUserSearch($search),
+								$this->access->connection->ldapUserFilter
+							]))) {
+							if ($search === '') {
+								$this->access->connection->writeToCache($cacheKey, false);
+							}
+							break;
+						}
+						$this->access->connection->writeToCache($cacheKey, true);
+					}
+					$groupUsers[] = $uid;
+					break;
 			}
 		}
 
@@ -978,6 +971,8 @@ class Group_LDAP extends BackendUtility implements \OCP\GroupInterface, IGroupLD
 	 * @param string $gid the internal group name
 	 * @param string $search optional, a search string
 	 * @return int|bool
+	 * @throws Exception
+	 * @throws ServerNotAvailableException
 	 */
 	public function countUsersInGroup($gid, $search = '') {
 		if ($this->groupPluginManager->implementsActions(GroupInterface::COUNT_USERS)) {
@@ -1015,8 +1010,8 @@ class Group_LDAP extends BackendUtility implements \OCP\GroupInterface, IGroupLD
 		}
 		$search = $this->access->escapeFilterPart($search, true);
 		$isMemberUid =
-			(strtolower($this->access->connection->ldapGroupMemberAssocAttr)
-				=== 'memberuid');
+			($this->ldapGroupMemberAssocAttr === 'memberuid' ||
+				$this->ldapGroupMemberAssocAttr === 'zimbramailforwardingaddress');
 
 		//we need to apply the search filter
 		//alternatives that need to be checked:
@@ -1029,6 +1024,11 @@ class Group_LDAP extends BackendUtility implements \OCP\GroupInterface, IGroupLD
 		$groupUsers = [];
 		foreach ($members as $member) {
 			if ($isMemberUid) {
+				if ($this->ldapGroupMemberAssocAttr === 'zimbramailforwardingaddress') {
+					//we get email addresses and need to convert them to uids
+					$parts = explode('@', $member);
+					$member = $parts[0];
+				}
 				//we got uids, need to get their DNs to 'translate' them to user names
 				$filter = $this->access->combineFilterWithAnd([
 					str_replace('%uid', $member, $this->access->connection->ldapLoginFilter),
@@ -1047,8 +1047,8 @@ class Group_LDAP extends BackendUtility implements \OCP\GroupInterface, IGroupLD
 					continue;
 				}
 				// dn2username will also check if the users belong to the allowed base
-				if ($ocname = $this->access->dn2username($member)) {
-					$groupUsers[] = $ocname;
+				if ($ncGroupId = $this->access->dn2username($member)) {
+					$groupUsers[] = $ncGroupId;
 				}
 			}
 		}
@@ -1071,6 +1071,7 @@ class Group_LDAP extends BackendUtility implements \OCP\GroupInterface, IGroupLD
 	 * Uses a paged search if available to override a
 	 * server side search limit.
 	 * (active directory has a limit of 1000 by default)
+	 * @throws Exception
 	 */
 	public function getGroups($search = '', $limit = -1, $offset = 0) {
 		if (!$this->enabled) {
@@ -1079,7 +1080,6 @@ class Group_LDAP extends BackendUtility implements \OCP\GroupInterface, IGroupLD
 		$cacheKey = 'getGroups-' . $search . '-' . $limit . '-' . $offset;
 
 		//Check cache before driving unnecessary searches
-		\OCP\Util::writeLog('user_ldap', 'getGroups ' . $cacheKey, ILogger::DEBUG);
 		$ldap_groups = $this->access->connection->getFromCache($cacheKey);
 		if (!is_null($ldap_groups)) {
 			return $ldap_groups;
@@ -1094,7 +1094,6 @@ class Group_LDAP extends BackendUtility implements \OCP\GroupInterface, IGroupLD
 			$this->access->connection->ldapGroupFilter,
 			$this->access->getFilterPartForGroupSearch($search)
 		]);
-		\OCP\Util::writeLog('user_ldap', 'getGroups Filter ' . $filter, ILogger::DEBUG);
 		$ldap_groups = $this->access->fetchListOfGroups($filter,
 			[$this->access->connection->ldapGroupDisplayName, 'dn'],
 			$limit,
@@ -1106,18 +1105,11 @@ class Group_LDAP extends BackendUtility implements \OCP\GroupInterface, IGroupLD
 	}
 
 	/**
-	 * @param string $group
-	 * @return bool
-	 */
-	public function groupMatchesFilter($group) {
-		return (strripos($group, $this->groupSearch) !== false);
-	}
-
-	/**
 	 * check if a group exists
 	 *
 	 * @param string $gid
 	 * @return bool
+	 * @throws ServerNotAvailableException
 	 */
 	public function groupExists($gid) {
 		$groupExists = $this->access->connection->getFromCache('groupExists' . $gid);
@@ -1138,7 +1130,7 @@ class Group_LDAP extends BackendUtility implements \OCP\GroupInterface, IGroupLD
 			return false;
 		}
 
-		//if group really still exists, we will be able to read its objectclass
+		//if group really still exists, we will be able to read its objectClass
 		if (!is_array($this->access->readAttribute($dn, '', $this->access->connection->ldapGroupFilter))) {
 			$this->access->connection->writeToCache('groupExists' . $gid, false);
 			return false;
@@ -1148,6 +1140,10 @@ class Group_LDAP extends BackendUtility implements \OCP\GroupInterface, IGroupLD
 		return true;
 	}
 
+	/**
+	 * @throws ServerNotAvailableException
+	 * @throws Exception
+	 */
 	protected function filterValidGroups(array $listOfGroups): array {
 		$validGroupDNs = [];
 		foreach ($listOfGroups as $key => $item) {
@@ -1191,7 +1187,8 @@ class Group_LDAP extends BackendUtility implements \OCP\GroupInterface, IGroupLD
 	 *
 	 * @param string $gid
 	 * @return bool
-	 * @throws \Exception
+	 * @throws Exception
+	 * @throws ServerNotAvailableException
 	 */
 	public function createGroup($gid) {
 		if ($this->groupPluginManager->implementsActions(GroupInterface::CREATE_GROUP)) {
@@ -1211,7 +1208,7 @@ class Group_LDAP extends BackendUtility implements \OCP\GroupInterface, IGroupLD
 			}
 			return $dn != null;
 		}
-		throw new \Exception('Could not create group in LDAP backend.');
+		throw new Exception('Could not create group in LDAP backend.');
 	}
 
 	/**
@@ -1219,7 +1216,7 @@ class Group_LDAP extends BackendUtility implements \OCP\GroupInterface, IGroupLD
 	 *
 	 * @param string $gid gid of the group to delete
 	 * @return bool
-	 * @throws \Exception
+	 * @throws Exception
 	 */
 	public function deleteGroup($gid) {
 		if ($this->groupPluginManager->implementsActions(GroupInterface::DELETE_GROUP)) {
@@ -1230,7 +1227,7 @@ class Group_LDAP extends BackendUtility implements \OCP\GroupInterface, IGroupLD
 			}
 			return $ret;
 		}
-		throw new \Exception('Could not delete group in LDAP backend.');
+		throw new Exception('Could not delete group in LDAP backend.');
 	}
 
 	/**
@@ -1239,7 +1236,7 @@ class Group_LDAP extends BackendUtility implements \OCP\GroupInterface, IGroupLD
 	 * @param string $uid Name of the user to add to group
 	 * @param string $gid Name of the group in which add the user
 	 * @return bool
-	 * @throws \Exception
+	 * @throws Exception
 	 */
 	public function addToGroup($uid, $gid) {
 		if ($this->groupPluginManager->implementsActions(GroupInterface::ADD_TO_GROUP)) {
@@ -1249,7 +1246,7 @@ class Group_LDAP extends BackendUtility implements \OCP\GroupInterface, IGroupLD
 			}
 			return $ret;
 		}
-		throw new \Exception('Could not add user to group in LDAP backend.');
+		throw new Exception('Could not add user to group in LDAP backend.');
 	}
 
 	/**
@@ -1258,7 +1255,7 @@ class Group_LDAP extends BackendUtility implements \OCP\GroupInterface, IGroupLD
 	 * @param string $uid Name of the user to remove from group
 	 * @param string $gid Name of the group from which remove the user
 	 * @return bool
-	 * @throws \Exception
+	 * @throws Exception
 	 */
 	public function removeFromGroup($uid, $gid) {
 		if ($this->groupPluginManager->implementsActions(GroupInterface::REMOVE_FROM_GROUP)) {
@@ -1268,21 +1265,21 @@ class Group_LDAP extends BackendUtility implements \OCP\GroupInterface, IGroupLD
 			}
 			return $ret;
 		}
-		throw new \Exception('Could not remove user from group in LDAP backend.');
+		throw new Exception('Could not remove user from group in LDAP backend.');
 	}
 
 	/**
 	 * Gets group details
 	 *
 	 * @param string $gid Name of the group
-	 * @return array | false
-	 * @throws \Exception
+	 * @return array|false
+	 * @throws Exception
 	 */
 	public function getGroupDetails($gid) {
 		if ($this->groupPluginManager->implementsActions(GroupInterface::GROUP_DETAILS)) {
 			return $this->groupPluginManager->getGroupDetails($gid);
 		}
-		throw new \Exception('Could not get group details in LDAP backend.');
+		throw new Exception('Could not get group details in LDAP backend.');
 	}
 
 	/**
@@ -1292,6 +1289,7 @@ class Group_LDAP extends BackendUtility implements \OCP\GroupInterface, IGroupLD
 	 *
 	 * @param string $gid
 	 * @return resource of the LDAP connection
+	 * @throws ServerNotAvailableException
 	 */
 	public function getNewLDAPConnection($gid) {
 		$connection = clone $this->access->getConnection();
@@ -1299,7 +1297,7 @@ class Group_LDAP extends BackendUtility implements \OCP\GroupInterface, IGroupLD
 	}
 
 	/**
-	 * @throws \OC\ServerNotAvailableException
+	 * @throws ServerNotAvailableException
 	 */
 	public function getDisplayName(string $gid): string {
 		if ($this->groupPluginManager instanceof IGetDisplayNameBackend) {

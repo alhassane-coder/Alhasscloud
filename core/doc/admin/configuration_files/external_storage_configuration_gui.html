@@ -122,6 +122,7 @@
 <li class="toctree-l2"><a class="reference internal" href="external_storage/auth_mechanisms.html">External Storage authentication mechanisms</a></li>
 <li class="toctree-l2"><a class="reference internal" href="encryption_configuration.html">Encryption configuration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="encryption_details.html">Encryption details</a></li>
+<li class="toctree-l2"><a class="reference internal" href="encryption_migration.html">Encryption migration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="files_locking_transactional.html">Transactional file locking</a></li>
 <li class="toctree-l2"><a class="reference internal" href="previews_configuration.html">Previews configuration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="file_versioning.html">Controlling file versions and aging</a></li>
@@ -279,7 +280,8 @@ individually with the following options:</p>
 <li><p>Mac NFD Compatability</p></li>
 <li><p>Read Only</p></li>
 </ul>
-<p>The <strong>Encryption</strong> checkbox is visible only when the Encryption app is enabled.</p>
+<p>The <strong>Encryption</strong> checkbox is visible only when the Encryption app is enabled. Note that server-side
+encryption is not available for other Nextcloud servers used as external storage.</p>
 <p><strong>Enable Sharing</strong> allows the Nextcloud admin to enable or disable sharing on individual mountpoints.
 When sharing is disabled the shares are retained internally, so that you can re-enable sharing
 and the previous shares become available again. Sharing is disabled by default.</p>
@@ -291,7 +293,7 @@ and the previous shares become available again. Sharing is disabled by default.<
 <h2>Using self-signed certificates<a class="headerlink" href="#using-self-signed-certificates" title="Permalink to this headline">¶</a></h2>
 <p>When using self-signed certificates for external storage mounts the certificate
 must be imported into the personal settings of the user. Please refer to
-<a class="reference external" href="http://ownclouden.blogspot.de/2014/11/owncloud-https-external-mount.html">Nextcloud HTTPS External Mount</a>
+<a class="reference external" href="https://ownclouden.blogspot.de/2014/11/owncloud-https-external-mount.html">Nextcloud HTTPS External Mount</a>
 for more information.</p>
 </div>
 <div class="section" id="available-storage-backends">
@@ -386,8 +388,6 @@ the mounted external storage.</p>
     <div class="rst-other-versions">
       <dl>
         <dt>Versions</dt>
-        
-          <dd><a href="https://docs.nextcloud.com/server/16/admin_manual">16</a></dd>
         
           <dd><a href="https://docs.nextcloud.com/server/17/admin_manual">17</a></dd>
         

@@ -157,7 +157,7 @@ class SubscriptionAdapter implements ISubscription, ISupportedApps {
 
 		if ($nextcloudVersion >= 19) {
 			$filesSubscription[] = 'contactsinteraction';
-		}		
+		}
 
 		$supportedApps = [];
 
@@ -199,5 +199,26 @@ class SubscriptionAdapter implements ISubscription, ISupportedApps {
 	public function hasExtendedSupport(): bool {
 		$subscriptionInfo = $this->subscriptionService->getMinimalSubscriptionInfo();
 		return $subscriptionInfo['extendedSupport'] ?? false;
+	}
+
+	/**
+	 * Indicates if a hard user limit is reached and no new users should be created
+	 *
+	 * @since 21.0.0
+	 */
+	public function isHardUserLimitReached(): bool {
+		$subscriptionInfo = $this->subscriptionService->getMinimalSubscriptionInfo();
+		if (!isset($subscriptionInfo['hasHardUserLimit']) || $subscriptionInfo['hasHardUserLimit'] === false) {
+			return false;
+		}
+
+		list(
+			$instanceSize,
+			$hasSubscription,
+			$isInvalidSubscription,
+			$isOverLimit,
+			$subscriptionInfo
+			) = $this->getSubscriptionInfo();
+		return $isOverLimit;
 	}
 }

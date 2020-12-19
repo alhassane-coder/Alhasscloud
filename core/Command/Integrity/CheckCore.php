@@ -4,6 +4,7 @@
  *
  * @author Carla Schroder <carla@owncloud.com>
  * @author Christoph Wurst <christoph@winzerhof-wurst.at>
+ * @author Joas Schilling <coding@schilljs.com>
  * @author Roeland Jago Douma <roeland@famdouma.nl>
  * @author Victor Dubiniuk <dubiniuk@owncloud.com>
  *
@@ -59,11 +60,12 @@ class CheckCore extends Base {
 	/**
 	 * {@inheritdoc }
 	 */
-	protected function execute(InputInterface $input, OutputInterface $output) {
+	protected function execute(InputInterface $input, OutputInterface $output): int {
 		$result = $this->checker->verifyCoreSignature();
 		$this->writeArrayInOutputFormat($input, $output, $result);
 		if (count($result)>0) {
 			return 1;
 		}
+		return 0;
 	}
 }

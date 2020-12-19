@@ -6,6 +6,7 @@ declare(strict_types=1);
  * @copyright 2019 Christoph Wurst <christoph@winzerhof-wurst.at>
  *
  * @author Christoph Wurst <christoph@winzerhof-wurst.at>
+ * @author Joas Schilling <coding@schilljs.com>
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -60,7 +61,7 @@ class Test extends Command {
 			);
 	}
 
-	protected function execute(InputInterface $input, OutputInterface $output) {
+	protected function execute(InputInterface $input, OutputInterface $output): int {
 		$name = $input->getArgument('name');
 		$uid = $input->getArgument('uid');
 

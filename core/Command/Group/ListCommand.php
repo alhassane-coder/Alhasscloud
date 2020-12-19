@@ -2,6 +2,7 @@
 /**
  * @copyright Copyright (c) 2016 Robin Appelman <robin@icewind.nl>
  *
+ * @author Joas Schilling <coding@schilljs.com>
  * @author Robin Appelman <robin@icewind.nl>
  *
  * @license GNU AGPL version 3 or any later version
@@ -67,9 +68,10 @@ class ListCommand extends Base {
 			);
 	}
 
-	protected function execute(InputInterface $input, OutputInterface $output) {
+	protected function execute(InputInterface $input, OutputInterface $output): int {
 		$groups = $this->groupManager->search('', (int)$input->getOption('limit'), (int)$input->getOption('offset'));
 		$this->writeArrayInOutputFormat($input, $output, $this->formatGroups($groups));
+		return 0;
 	}
 
 	/**

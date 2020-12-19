@@ -119,18 +119,14 @@ class Tags implements ITags {
 	 * @param string $user The user whose data the object will operate on.
 	 * @param string $type The type of items for which tags will be loaded.
 	 * @param array $defaultTags Tags that should be created at construction.
-	 * @param boolean $includeShared Whether to include tags for items shared with this user by others.
+	 *
+	 * since 20.0.0 $includeShared isn't used anymore
 	 */
-	public function __construct(TagMapper $mapper, $user, $type, $defaultTags = [], $includeShared = false) {
+	public function __construct(TagMapper $mapper, $user, $type, $defaultTags = []) {
 		$this->mapper = $mapper;
 		$this->user = $user;
 		$this->type = $type;
-		$this->includeShared = $includeShared;
 		$this->owners = [$this->user];
-		if ($this->includeShared) {
-			$this->owners = array_merge($this->owners, \OC\Share\Share::getSharedItemsOwners($this->user, $this->type, true));
-			$this->backend = \OC\Share\Share::getBackend($this->type);
-		}
 		$this->tags = $this->mapper->loadTags($this->owners, $this->type);
 
 		if (count($defaultTags) > 0 && count($this->tags) === 0) {
@@ -289,6 +285,7 @@ class Tags implements ITags {
 			$stmt = \OC_DB::prepare($sql);
 			$result = $stmt->execute([$tagId]);
 			if ($result === null) {
+				$stmt->closeCursor();
 				\OCP\Util::writeLog('core', __METHOD__. 'DB error: ' . \OC::$server->getDatabaseConnection()->getError(), ILogger::ERROR);
 				return false;
 			}
@@ -303,23 +300,9 @@ class Tags implements ITags {
 
 		if (!is_null($result)) {
 			while ($row = $result->fetchRow()) {
-				$id = (int)$row['objid'];
-
-				if ($this->includeShared) {
-					// We have to check if we are really allowed to access the
-					// items that are tagged with $tag. To that end, we ask the
-					// corresponding sharing backend if the item identified by $id
-					// is owned by any of $this->owners.
-					foreach ($this->owners as $owner) {
-						if ($this->backend->isValidSource($id, $owner)) {
-							$ids[] = $id;
-							break;
-						}
-					}
-				} else {
-					$ids[] = $id;
-				}
+				$ids[] = (int)$row['objid'];
 			}
+			$result->closeCursor();
 		}
 
 		return $ids;
@@ -557,6 +540,7 @@ class Tags implements ITags {
 						]);
 					}
 				}
+				$result->closeCursor();
 			} catch (\Exception $e) {
 				\OC::$server->getLogger()->logException($e, [
 					'message' => __METHOD__,

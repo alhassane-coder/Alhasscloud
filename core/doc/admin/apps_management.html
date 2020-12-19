@@ -94,7 +94,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#managing-apps">Managing apps</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#using-private-api">Using private API</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#using-custom-app-directories">Using custom app directories</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#using-your-own-appstore">Using your own appstore</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#using-a-self-hosted-apps-store">Using a self hosted apps store</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="configuration_user/index.html">User management</a></li>
@@ -257,18 +257,26 @@ which will be used to store all other apps.</p>
 ],
 </pre></div>
 </div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Apps paths can be located outside the server root.  However, for any
+<strong>path</strong> outside the server root, you need to create a symlink in  the server
+root that points <strong>url</strong> to <strong>path</strong>.
+For instance, if <strong>path</strong> is <code class="docutils literal notranslate"><span class="pre">/var/local/lib/nextcloud/apps</span></code>, and <strong>url</strong>
+is <code class="docutils literal notranslate"><span class="pre">/apps2</span></code>, then you would do this in the server root:
+<code class="docutils literal notranslate"><span class="pre">ln</span> <span class="pre">-sf</span> <span class="pre">/var/local/lib/nextcloud/apps</span> <span class="pre">./apps2</span></code></p>
 </div>
-<div class="section" id="using-your-own-appstore">
-<h2>Using your own appstore<a class="headerlink" href="#using-your-own-appstore" title="Permalink to this headline">¶</a></h2>
-<p>You can enable the installation of apps from your own apps store. This requires that you
-can write to at least one of the configured apps directories.</p>
-<p>To enable installation from your own apps store:</p>
+</div>
+<div class="section" id="using-a-self-hosted-apps-store">
+<h2>Using a self hosted apps store<a class="headerlink" href="#using-a-self-hosted-apps-store" title="Permalink to this headline">¶</a></h2>
+<p>Enables the installation of apps from a self hosted apps store. Requires that at least one of the configured apps directories is writeable.</p>
+<p>To enable a self hosted apps store:</p>
 <ol class="arabic">
 <li><p>Set the <strong>appstoreenabled</strong> parameter to “true”.</p>
-<p>This parameter is used to enable your apps store in Nextcloud.</p>
+<p>This parameter is used to enable the apps store in Nextcloud.</p>
 </li>
 <li><p>Set the <strong>appstoreurl</strong> to the URL of your Nextcloud apps store.</p>
-<p>This parameter is used to set the http path to the Nextcloud apps store.</p>
+<p>This parameter is used to set the http path to your self hosted Nextcloud apps store.</p>
 </li>
 </ol>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;appstoreenabled&quot;</span> <span class="o">=&gt;</span> <span class="n">true</span><span class="p">,</span>
@@ -325,8 +333,6 @@ can write to at least one of the configured apps directories.</p>
     <div class="rst-other-versions">
       <dl>
         <dt>Versions</dt>
-        
-          <dd><a href="https://docs.nextcloud.com/server/16/admin_manual">16</a></dd>
         
           <dd><a href="https://docs.nextcloud.com/server/17/admin_manual">17</a></dd>
         

@@ -6,6 +6,7 @@ declare(strict_types=1);
  * @copyright 2019 Christoph Wurst <christoph@winzerhof-wurst.at>
  *
  * @author Christoph Wurst <christoph@winzerhof-wurst.at>
+ * @author Morris Jobke <hey@morrisjobke.de>
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -30,6 +31,8 @@ use OCP\EventDispatcher\Event;
 use OCP\IUser;
 
 /**
+ * Emitted before the user password is updated.
+ *
  * @since 18.0.0
  */
 class BeforePasswordUpdatedEvent extends Event {

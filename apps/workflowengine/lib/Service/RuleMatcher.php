@@ -240,10 +240,4 @@ class RuleMatcher implements IRuleMatcher {
 		}
 		return $checkInstance->executeCheck($check['operator'], $check['value']);
 	}
-
-	protected function logCandidate() {
-		$logContext = new LogContext();
-		$logContext
-			->setOperation();
-	}
 }

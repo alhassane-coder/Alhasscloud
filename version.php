@@ -1,17 +1,18 @@
 <?php 
-$OC_Version = array(19,0,6,2);
-$OC_VersionString = '19.0.6';
+$OC_Version = array(20,0,4,0);
+$OC_VersionString = '20.0.4';
 $OC_Edition = '';
 $OC_Channel = 'stable';
 $OC_VersionCanBeUpgradedFrom = array (
   'nextcloud' => 
   array (
-    '18.0' => true,
     '19.0' => true,
+    '20.0' => true,
   ),
   'owncloud' => 
   array (
+    '10.5' => true,
   ),
 );
-$OC_Build = '2020-12-09T19:47:19+00:00 83b20583671a8a4c6c3bda7afbfd4b7efb21a8a9';
+$OC_Build = '2020-12-15T20:53:34+00:00 7789d1db23b1b2312a83c988a65c4ed8149bbb61';
 $vendor = 'nextcloud';

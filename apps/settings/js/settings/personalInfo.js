@@ -134,6 +134,7 @@ function avatarResponseHandler (data) {
 		oc_userconfig.avatar.generated = false;
 		updateAvatar();
 	} else if (data.data === "notsquare") {
+		cleanCropper();
 		showAvatarCropper();
 	} else {
 		$warning.show();
@@ -141,7 +142,7 @@ function avatarResponseHandler (data) {
 	}
 }
 
-$(document).ready(function () {
+window.addEventListener('DOMContentLoaded', function () {
 	if($('#pass2').length) {
 		$('#pass2').showPassword().keyup();
 	}

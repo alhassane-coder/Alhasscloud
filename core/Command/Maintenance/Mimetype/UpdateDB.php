@@ -3,6 +3,7 @@
  * @copyright Copyright (c) 2016, ownCloud, Inc.
  *
  * @author Christoph Wurst <christoph@winzerhof-wurst.at>
+ * @author Joas Schilling <coding@schilljs.com>
  * @author Robin McCorkell <robin@mccorkell.me.uk>
  * @author Roeland Jago Douma <roeland@famdouma.nl>
  *
@@ -63,7 +64,7 @@ class UpdateDB extends Command {
 		;
 	}
 
-	protected function execute(InputInterface $input, OutputInterface $output) {
+	protected function execute(InputInterface $input, OutputInterface $output): int {
 		$mappings = $this->mimetypeDetector->getAllMappings();
 
 		$totalFilecacheUpdates = 0;
@@ -95,5 +96,6 @@ class UpdateDB extends Command {
 
 		$output->writeln('Added '.$totalNewMimetypes.' new mimetypes');
 		$output->writeln('Updated '.$totalFilecacheUpdates.' filecache rows');
+		return 0;
 	}
 }

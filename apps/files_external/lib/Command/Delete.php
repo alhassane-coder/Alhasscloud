@@ -5,7 +5,6 @@
  * @author Christoph Wurst <christoph@winzerhof-wurst.at>
  * @author Joas Schilling <coding@schilljs.com>
  * @author Robin Appelman <robin@icewind.nl>
- * @author Roeland Jago Douma <roeland@famdouma.nl>
  *
  * @license AGPL-3.0
  *
@@ -84,7 +83,7 @@ class Delete extends Base {
 		parent::configure();
 	}
 
-	protected function execute(InputInterface $input, OutputInterface $output) {
+	protected function execute(InputInterface $input, OutputInterface $output): int {
 		$mountId = $input->getArgument('mount_id');
 		try {
 			$mount = $this->globalService->getStorage($mountId);
@@ -105,10 +104,11 @@ class Delete extends Base {
 			$question = new ConfirmationQuestion('Delete this mount? [y/N] ', false);
 
 			if (!$questionHelper->ask($input, $output, $question)) {
-				return null;
+				return 1;
 			}
 		}
 
 		$this->globalService->removeStorage($mountId);
+		return 0;
 	}
 }

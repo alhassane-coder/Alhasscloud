@@ -6,6 +6,7 @@ declare(strict_types=1);
  * @copyright 2019 Christoph Wurst <christoph@winzerhof-wurst.at>
  *
  * @author Christoph Wurst <christoph@winzerhof-wurst.at>
+ * @author Morris Jobke <hey@morrisjobke.de>
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -29,6 +30,8 @@ namespace OCP\User\Events;
 use OCP\EventDispatcher\Event;
 
 /**
+ * Emitted before a new user is created on the back-end.
+ *
  * @since 18.0.0
  */
 class BeforeUserCreatedEvent extends Event {

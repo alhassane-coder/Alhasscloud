@@ -3,6 +3,7 @@
  * @copyright Copyright (c) 2016, ownCloud, Inc.
  *
  * @author Carla Schroder <carla@owncloud.com>
+ * @author Joas Schilling <coding@schilljs.com>
  * @author Robin Appelman <robin@icewind.nl>
  *
  * @license AGPL-3.0
@@ -50,9 +51,10 @@ class RemoveCertificate extends Base {
 			);
 	}
 
-	protected function execute(InputInterface $input, OutputInterface $output) {
+	protected function execute(InputInterface $input, OutputInterface $output): int {
 		$name = $input->getArgument('name');
 
 		$this->certificateManager->removeCertificate($name);
+		return 0;
 	}
 }

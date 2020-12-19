@@ -39,23 +39,28 @@ use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Driver;
 use Doctrine\DBAL\Exception\ConstraintViolationException;
+use Doctrine\DBAL\Exception\NotNullConstraintViolationException;
 use Doctrine\DBAL\Platforms\MySqlPlatform;
 use Doctrine\DBAL\Schema\Schema;
 use OC\DB\QueryBuilder\QueryBuilder;
+use OC\SystemConfig;
 use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\IDBConnection;
+use OCP\ILogger;
 use OCP\PreConditionNotMetException;
 
 class Connection extends ReconnectWrapper implements IDBConnection {
-	/**
-	 * @var string $tablePrefix
-	 */
+	/** @var string */
 	protected $tablePrefix;
 
-	/**
-	 * @var \OC\DB\Adapter $adapter
-	 */
+	/** @var \OC\DB\Adapter $adapter */
 	protected $adapter;
+
+	/** @var SystemConfig */
+	private $systemConfig;
+
+	/** @var ILogger */
+	private $logger;
 
 	protected $lockedTable = null;
 
@@ -76,8 +81,8 @@ class Connection extends ReconnectWrapper implements IDBConnection {
 	public function getQueryBuilder() {
 		return new QueryBuilder(
 			$this,
-			\OC::$server->getSystemConfig(),
-			\OC::$server->getLogger()
+			$this->systemConfig,
+			$this->logger
 		);
 	}
 
@@ -149,6 +154,9 @@ class Connection extends ReconnectWrapper implements IDBConnection {
 		parent::__construct($params, $driver, $config, $eventManager);
 		$this->adapter = new $params['adapter']($this);
 		$this->tablePrefix = $params['tablePrefix'];
+
+		$this->systemConfig = \OC::$server->getSystemConfig();
+		$this->logger = \OC::$server->getLogger();
 	}
 
 	/**
@@ -279,7 +287,6 @@ class Connection extends ReconnectWrapper implements IDBConnection {
 	 * @return int number of new rows
 	 * @throws \Doctrine\DBAL\DBALException
 	 * @throws PreConditionNotMetException
-	 * @suppress SqlInjectionChecker
 	 */
 	public function setValues($table, array $keys, array $values, array $updatePreconditionValues = []) {
 		try {
@@ -291,6 +298,8 @@ class Connection extends ReconnectWrapper implements IDBConnection {
 					}, array_merge($keys, $values))
 				);
 			return $insertQb->execute();
+		} catch (NotNullConstraintViolationException $e) {
+			throw $e;
 		} catch (ConstraintViolationException $e) {
 			// value already exists, try update
 			$updateQb = $this->getQueryBuilder();
@@ -301,11 +310,17 @@ class Connection extends ReconnectWrapper implements IDBConnection {
 			$where = $updateQb->expr()->andX();
 			$whereValues = array_merge($keys, $updatePreconditionValues);
 			foreach ($whereValues as $name => $value) {
-				$where->add($updateQb->expr()->eq(
-					$name,
-					$updateQb->createNamedParameter($value, $this->getType($value)),
-					$this->getType($value)
-				));
+				if ($value === '') {
+					$where->add($updateQb->expr()->emptyString(
+						$name
+					));
+				} else {
+					$where->add($updateQb->expr()->eq(
+						$name,
+						$updateQb->createNamedParameter($value, $this->getType($value)),
+						$this->getType($value)
+					));
+				}
 			}
 			$updateQb->where($where);
 			$affected = $updateQb->execute();

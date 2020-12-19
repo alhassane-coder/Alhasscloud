@@ -6,6 +6,7 @@ declare(strict_types=1);
  * @copyright 2020 Arne Hamann <github@arne.email>
  *
  * @author Arne Hamann <kontakt+github@arne.email>
+ * @author Morris Jobke <hey@morrisjobke.de>
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -30,6 +31,8 @@ use OCP\EventDispatcher\Event;
 use OCP\Mail\IMessage;
 
 /**
+ * Emitted before a system mail is sent. It can be used to alter the message.
+ *
  * @since 19.0.0
  */
 class BeforeMessageSent extends Event {

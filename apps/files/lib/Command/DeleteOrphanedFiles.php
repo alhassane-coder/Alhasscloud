@@ -4,6 +4,7 @@
  *
  * @author Christoph Wurst <christoph@winzerhof-wurst.at>
  * @author Joas Schilling <coding@schilljs.com>
+ * @author Julius Härtl <jus@bitgrid.net>
  * @author Morris Jobke <hey@morrisjobke.de>
  *
  * @license AGPL-3.0
@@ -51,7 +52,7 @@ class DeleteOrphanedFiles extends Command {
 			->setDescription('cleanup filecache');
 	}
 
-	public function execute(InputInterface $input, OutputInterface $output) {
+	public function execute(InputInterface $input, OutputInterface $output): int {
 		$deletedEntries = 0;
 
 		$query = $this->connection->getQueryBuilder();
@@ -78,5 +79,39 @@ class DeleteOrphanedFiles extends Command {
 		}
 
 		$output->writeln("$deletedEntries orphaned file cache entries deleted");
+
+		$deletedMounts = $this->cleanupOrphanedMounts();
+		$output->writeln("$deletedMounts orphaned mount entries deleted");
+		return 0;
+	}
+
+	private function cleanupOrphanedMounts() {
+		$deletedEntries = 0;
+
+		$query = $this->connection->getQueryBuilder();
+		$query->select('m.storage_id')
+			->from('mounts', 'm')
+			->where($query->expr()->isNull('s.numeric_id'))
+			->leftJoin('m', 'storages', 's', $query->expr()->eq('m.storage_id', 's.numeric_id'))
+			->groupBy('storage_id')
+			->setMaxResults(self::CHUNK_SIZE);
+
+		$deleteQuery = $this->connection->getQueryBuilder();
+		$deleteQuery->delete('mounts')
+			->where($deleteQuery->expr()->eq('storage_id', $deleteQuery->createParameter('storageid')));
+
+		$deletedInLastChunk = self::CHUNK_SIZE;
+		while ($deletedInLastChunk === self::CHUNK_SIZE) {
+			$deletedInLastChunk = 0;
+			$result = $query->execute();
+			while ($row = $result->fetch()) {
+				$deletedInLastChunk++;
+				$deletedEntries += $deleteQuery->setParameter('storageid', (int) $row['storage_id'])
+					->execute();
+			}
+			$result->closeCursor();
+		}
+
+		return $deletedEntries;
 	}
 }

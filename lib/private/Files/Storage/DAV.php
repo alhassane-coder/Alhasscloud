@@ -7,6 +7,7 @@
  * @author Björn Schießle <bjoern@schiessle.org>
  * @author Carlos Cerrillo <ccerrillo@gmail.com>
  * @author Christoph Wurst <christoph@winzerhof-wurst.at>
+ * @author Daniel Kesselberg <mail@danielkesselberg.de>
  * @author Joas Schilling <coding@schilljs.com>
  * @author Jörn Friedrich Dreyer <jfd@butonic.de>
  * @author Lukas Reschke <lukas@statuscode.ch>
@@ -858,7 +859,7 @@ class DAV extends Common {
 				return;
 			} elseif ($e->getHttpStatus() === Http::STATUS_FORBIDDEN) {
 				// The operation is forbidden. Fail somewhat gracefully
-				throw new ForbiddenException(get_class($e) . ':' . $e->getMessage());
+				throw new ForbiddenException(get_class($e) . ':' . $e->getMessage(), false);
 			}
 			throw new StorageNotAvailableException(get_class($e) . ': ' . $e->getMessage());
 		} elseif ($e instanceof ClientException) {

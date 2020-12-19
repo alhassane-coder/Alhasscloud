@@ -6,8 +6,8 @@ declare(strict_types=1);
  * @copyright Copyright (c) 2019 Morris Jobke <hey@morrisjobke.de>
  *
  * @author Christoph Wurst <christoph@winzerhof-wurst.at>
+ * @author Daniel Kesselberg <mail@danielkesselberg.de>
  * @author Morris Jobke <hey@morrisjobke.de>
- * @author Robin Appelman <robin@icewind.nl>
  * @author Roeland Jago Douma <roeland@famdouma.nl>
  *
  * @license GNU AGPL version 3 or any later version
@@ -30,7 +30,7 @@ declare(strict_types=1);
 namespace OC\Core\Migrations;
 
 use Closure;
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use OCP\DB\ISchemaWrapper;
 use OCP\Migration\IOutput;
 use OCP\Migration\SimpleMigrationStep;
@@ -48,26 +48,27 @@ class Version17000Date20190514105811 extends SimpleMigrationStep {
 		$schema = $schemaClosure();
 		if (!$schema->hasTable('filecache_extended')) {
 			$table = $schema->createTable('filecache_extended');
-			$table->addColumn('fileid', Type::BIGINT, [
+			$table->addColumn('fileid', Types::BIGINT, [
 				'notnull' => true,
 				'length' => 4,
 				'unsigned' => true,
 			]);
-			$table->addColumn('metadata_etag', Type::STRING, [
+			$table->addColumn('metadata_etag', Types::STRING, [
 				'notnull' => false,
 				'length' => 40,
 			]);
-			$table->addColumn('creation_time', Type::BIGINT, [
+			$table->addColumn('creation_time', Types::BIGINT, [
 				'notnull' => true,
 				'length' => 20,
 				'default' => 0,
 			]);
-			$table->addColumn('upload_time', Type::BIGINT, [
+			$table->addColumn('upload_time', Types::BIGINT, [
 				'notnull' => true,
 				'length' => 20,
 				'default' => 0,
 			]);
-			$table->addUniqueIndex(['fileid'], 'fce_fileid_idx');
+			$table->setPrimaryKey(['fileid'], 'fce_pk');
+//			$table->addUniqueIndex(['fileid'], 'fce_fileid_idx');
 			$table->addIndex(['creation_time'], 'fce_ctime_idx');
 			$table->addIndex(['upload_time'], 'fce_utime_idx');
 		}

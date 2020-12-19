@@ -12,7 +12,7 @@ $CONFIG = array (
   ),
   'datadirectory' => '/home/alhassane/Alhass/nextcloud/data',
   'dbtype' => 'mysql',
-  'version' => '19.0.6.2',
+  'version' => '20.0.4.0',
   'overwrite.cli.url' => 'http://localhost/alhasscloud',
   'dbname' => 'nextcloud',
   'dbhost' => 'localhost',
@@ -41,4 +41,6 @@ $CONFIG = array (
     5 => 'breezedark',
   ),
   'theme' => '',
+  'encryption.legacy_format_support' => true,
+  'encryption.key_storage_migrated' => false,
 );

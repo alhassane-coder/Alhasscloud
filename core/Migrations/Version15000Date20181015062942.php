@@ -45,7 +45,7 @@ class Version15000Date20181015062942 extends SimpleMigrationStep {
 
 		$table = $schema->getTable('share');
 		$table->addColumn('hide_download', 'smallint', [
-			'notnull' => true,
+			'notnull' => false,
 			'length' => 1,
 			'default' => 0,
 		]);

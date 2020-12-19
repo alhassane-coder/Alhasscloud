@@ -11,6 +11,7 @@
  * @author enoch <lanxenet@hotmail.com>
  * @author Johan Björk <johanimon@gmail.com>
  * @author Jörn Friedrich Dreyer <jfd@butonic.de>
+ * @author Julius Härtl <jus@bitgrid.net>
  * @author Martin Mattel <martin.mattel@diemattels.at>
  * @author Michael Gapczynski <GapczynskiM@gmail.com>
  * @author Morris Jobke <hey@morrisjobke.de>
@@ -563,9 +564,6 @@ class AmazonS3 extends \OC\Files\Storage\Common {
 	}
 
 	public function touch($path, $mtime = null) {
-		$path = $this->normalizePath($path);
-
-		$metadata = [];
 		if (is_null($mtime)) {
 			$mtime = time();
 		}
@@ -573,21 +571,8 @@ class AmazonS3 extends \OC\Files\Storage\Common {
 			'lastmodified' => gmdate(\DateTime::RFC1123, $mtime)
 		];
 
-		$fileType = $this->filetype($path);
 		try {
-			if ($fileType !== false) {
-				if ($fileType === 'dir' && !$this->isRoot($path)) {
-					$path .= '/';
-				}
-				$this->getConnection()->copyObject([
-					'Bucket' => $this->bucket,
-					'Key' => $this->cleanKey($path),
-					'Metadata' => $metadata,
-					'CopySource' => $this->bucket . '/' . $path,
-					'MetadataDirective' => 'REPLACE',
-				]);
-				$this->testTimeout();
-			} else {
+			if (!$this->file_exists($path)) {
 				$mimeType = \OC::$server->getMimeTypeDetector()->detectPath($path);
 				$this->getConnection()->putObject([
 					'Bucket' => $this->bucket,

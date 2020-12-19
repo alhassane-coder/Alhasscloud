@@ -57,6 +57,14 @@ function highlightInput($input) {
  * @param {int} userListLimit page size for result list
  */
 function addSelect2 ($elements, userListLimit) {
+	var escapeHTML = function (text) {
+		return text.toString()
+			.split('&').join('&amp;')
+			.split('<').join('&lt;')
+			.split('>').join('&gt;')
+			.split('"').join('&quot;')
+			.split('\'').join('&#039;');
+	};
 	if (!$elements.length) {
 		return;
 	}
@@ -171,7 +179,7 @@ var StorageConfig = function(id) {
 	this.id = id;
 	this.backendOptions = {};
 };
-// Keep this in sync with \OC_Mount_Config::STATUS_*
+// Keep this in sync with \OCA\Files_External\MountConfig::STATUS_*
 StorageConfig.Status = {
 	IN_PROGRESS: -1,
 	SUCCESS: 0,
@@ -1303,7 +1311,7 @@ MountConfigListView.prototype = _.extend({
 	}
 }, OC.Backbone.Events);
 
-$(document).ready(function() {
+window.addEventListener('DOMContentLoaded', function() {
 	var enabled = $('#files_external').attr('data-encryption-enabled');
 	var encryptionEnabled = (enabled ==='true')? true: false;
 	var mountConfigListView = new MountConfigListView($('#externalStorage'), {

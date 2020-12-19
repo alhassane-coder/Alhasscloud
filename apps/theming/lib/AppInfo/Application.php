@@ -2,6 +2,7 @@
 /**
  * @copyright Copyright (c) 2019 Robin Appelman <robin@icewind.nl>
  *
+ * @author Morris Jobke <hey@morrisjobke.de>
  * @author Robin Appelman <robin@icewind.nl>
  * @author Roeland Jago Douma <roeland@famdouma.nl>
  *
@@ -24,8 +25,26 @@
 
 namespace OCA\Theming\AppInfo;
 
-class Application extends \OCP\AppFramework\App {
+use OCA\Theming\Capabilities;
+use OCA\Theming\Listener\BeforeTemplateRenderedListener;
+use OCP\AppFramework\App;
+use OCP\AppFramework\Bootstrap\IBootContext;
+use OCP\AppFramework\Bootstrap\IBootstrap;
+use OCP\AppFramework\Bootstrap\IRegistrationContext;
+use OCP\AppFramework\Http\Events\BeforeTemplateRenderedEvent;
+
+class Application extends App implements IBootstrap {
+	public const APP_ID = 'theming';
+
 	public function __construct() {
-		parent::__construct('theming', []);
+		parent::__construct(self::APP_ID);
+	}
+
+	public function register(IRegistrationContext $context): void {
+		$context->registerCapability(Capabilities::class);
+		$context->registerEventListener(BeforeTemplateRenderedEvent::class, BeforeTemplateRenderedListener::class);
+	}
+
+	public function boot(IBootContext $context): void {
 	}
 }

@@ -67,6 +67,11 @@ use OCP\ILogger;
  * @property string[] ldapBaseGroups
  * @property string ldapGroupFilter
  * @property string ldapGroupDisplayName
+ * @property string ldapLoginFilter
+ * @property string ldapDynamicGroupMemberURL
+ * @property string ldapGidNumber
+ * @property int hasMemberOfFilterSupport
+ * @property int useMemberOfToDetectMembership
  * @property string ldapMatchingRuleInChainState
  */
 class Connection extends LDAPUtility {

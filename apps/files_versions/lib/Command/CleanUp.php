@@ -4,6 +4,7 @@
  *
  * @author Björn Schießle <bjoern@schiessle.org>
  * @author Christoph Wurst <christoph@winzerhof-wurst.at>
+ * @author Joas Schilling <coding@schilljs.com>
  *
  * @license AGPL-3.0
  *
@@ -61,7 +62,7 @@ class CleanUp extends Command {
 	}
 
 
-	protected function execute(InputInterface $input, OutputInterface $output) {
+	protected function execute(InputInterface $input, OutputInterface $output): int {
 		$users = $input->getArgument('user_id');
 		if (!empty($users)) {
 			foreach ($users as $user) {
@@ -70,6 +71,7 @@ class CleanUp extends Command {
 					$this->deleteVersions($user);
 				} else {
 					$output->writeln("<error>Unknown user $user</error>");
+					return 1;
 				}
 			}
 		} else {
@@ -95,6 +97,7 @@ class CleanUp extends Command {
 				} while (count($users) >= $limit);
 			}
 		}
+		return 0;
 	}
 
 

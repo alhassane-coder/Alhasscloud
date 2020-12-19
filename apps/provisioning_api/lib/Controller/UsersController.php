@@ -15,6 +15,7 @@ declare(strict_types=1);
  * @author Julius Härtl <jus@bitgrid.net>
  * @author Lukas Reschke <lukas@statuscode.ch>
  * @author michag86 <micha_g@arcor.de>
+ * @author Mikael Hammarin <mikael@try2.se>
  * @author Morris Jobke <hey@morrisjobke.de>
  * @author Robin Appelman <robin@icewind.nl>
  * @author Roeland Jago Douma <roeland@famdouma.nl>
@@ -43,7 +44,7 @@ namespace OCA\Provisioning_API\Controller;
 use OC\Accounts\AccountManager;
 use OC\Authentication\Token\RemoteWipe;
 use OC\HintException;
-use OCA\Provisioning_API\FederatedFileSharingFactory;
+use OCA\Provisioning_API\FederatedShareProviderFactory;
 use OCA\Settings\Mailer\NewUserMailHelper;
 use OCP\App\IAppManager;
 use OCP\AppFramework\Http\DataResponse;
@@ -59,6 +60,8 @@ use OCP\IUserManager;
 use OCP\IUserSession;
 use OCP\L10N\IFactory;
 use OCP\Security\ISecureRandom;
+use OCP\Security\Events\GenerateSecurePasswordEvent;
+use OCP\EventDispatcher\IEventDispatcher;
 
 class UsersController extends AUserData {
 
@@ -67,31 +70,18 @@ class UsersController extends AUserData {
 	/** @var ILogger */
 	private $logger;
 	/** @var IFactory */
-	private $l10nFactory;
+	protected $l10nFactory;
 	/** @var NewUserMailHelper */
 	private $newUserMailHelper;
-	/** @var FederatedFileSharingFactory */
-	private $federatedFileSharingFactory;
+	/** @var FederatedShareProviderFactory */
+	private $federatedShareProviderFactory;
 	/** @var ISecureRandom */
 	private $secureRandom;
 	/** @var RemoteWipe */
 	private $remoteWipe;
+	/** @var IEventDispatcher */
+	private $eventDispatcher;
 
-	/**
-	 * @param string $appName
-	 * @param IRequest $request
-	 * @param IUserManager $userManager
-	 * @param IConfig $config
-	 * @param IAppManager $appManager
-	 * @param IGroupManager $groupManager
-	 * @param IUserSession $userSession
-	 * @param AccountManager $accountManager
-	 * @param ILogger $logger
-	 * @param IFactory $l10nFactory
-	 * @param NewUserMailHelper $newUserMailHelper
-	 * @param FederatedFileSharingFactory $federatedFileSharingFactory
-	 * @param ISecureRandom $secureRandom
-	 */
 	public function __construct(string $appName,
 								IRequest $request,
 								IUserManager $userManager,
@@ -103,24 +93,27 @@ class UsersController extends AUserData {
 								ILogger $logger,
 								IFactory $l10nFactory,
 								NewUserMailHelper $newUserMailHelper,
-								FederatedFileSharingFactory $federatedFileSharingFactory,
+								FederatedShareProviderFactory $federatedShareProviderFactory,
 								ISecureRandom $secureRandom,
-								RemoteWipe $remoteWipe) {
+								RemoteWipe $remoteWipe,
+								IEventDispatcher $eventDispatcher) {
 		parent::__construct($appName,
 							$request,
 							$userManager,
 							$config,
 							$groupManager,
 							$userSession,
-							$accountManager);
+							$accountManager,
+							$l10nFactory);
 
 		$this->appManager = $appManager;
 		$this->logger = $logger;
 		$this->l10nFactory = $l10nFactory;
 		$this->newUserMailHelper = $newUserMailHelper;
-		$this->federatedFileSharingFactory = $federatedFileSharingFactory;
+		$this->federatedShareProviderFactory = $federatedShareProviderFactory;
 		$this->secureRandom = $secureRandom;
 		$this->remoteWipe = $remoteWipe;
+		$this->eventDispatcher = $eventDispatcher;
 	}
 
 	/**
@@ -300,9 +293,18 @@ class UsersController extends AUserData {
 				throw new OCSException('To send a password link to the user an email address is required.', 108);
 			}
 
-			$password = $this->secureRandom->generate(10);
-			// Make sure we pass the password_policy
-			$password .= $this->secureRandom->generate(2, '$!.,;:-~+*[]{}()');
+			$passwordEvent = new GenerateSecurePasswordEvent();
+			$this->eventDispatcher->dispatchTyped($passwordEvent);
+
+			$password = $passwordEvent->getPassword();
+			if ($password === null) {
+				// Fallback: ensure to pass password_policy in any case
+				$password = $this->secureRandom->generate(10)
+					. $this->secureRandom->generate(1, ISecureRandom::CHAR_UPPER)
+					. $this->secureRandom->generate(1, ISecureRandom::CHAR_LOWER)
+					. $this->secureRandom->generate(1, ISecureRandom::CHAR_DIGITS)
+					. $this->secureRandom->generate(1, ISecureRandom::CHAR_SYMBOLS);
+			}
 			$generatePasswordResetToken = true;
 		}
 
@@ -434,8 +436,7 @@ class UsersController extends AUserData {
 		}
 
 		if ($this->appManager->isEnabledForUser('federatedfilesharing')) {
-			$federatedFileSharing = $this->federatedFileSharingFactory->get();
-			$shareProvider = $federatedFileSharing->getFederatedShareProvider();
+			$shareProvider = $this->federatedShareProviderFactory->get();
 			if ($shareProvider->isLookupServerUploadEnabled()) {
 				$permittedFields[] = AccountManager::PROPERTY_PHONE;
 				$permittedFields[] = AccountManager::PROPERTY_ADDRESS;
@@ -489,8 +490,7 @@ class UsersController extends AUserData {
 			}
 
 			if ($this->appManager->isEnabledForUser('federatedfilesharing')) {
-				$federatedFileSharing = \OC::$server->query(\OCA\FederatedFileSharing\AppInfo\Application::class);
-				$shareProvider = $federatedFileSharing->getFederatedShareProvider();
+				$shareProvider = $this->federatedShareProviderFactory->get();
 				if ($shareProvider->isLookupServerUploadEnabled()) {
 					$permittedFields[] = AccountManager::PROPERTY_PHONE;
 					$permittedFields[] = AccountManager::PROPERTY_ADDRESS;

@@ -5,6 +5,7 @@
  * @author Björn Schießle <bjoern@schiessle.org>
  * @author Christoph Wurst <christoph@winzerhof-wurst.at>
  * @author Morris Jobke <hey@morrisjobke.de>
+ * @author Robin Appelman <robin@icewind.nl>
  * @author Thomas Müller <thomas.mueller@tmit.eu>
  *
  * @license AGPL-3.0
@@ -33,6 +34,7 @@ namespace OCP\Activity;
 interface IExtension {
 	public const METHOD_STREAM = 'stream';
 	public const METHOD_MAIL = 'email';
+	public const METHOD_NOTIFICATION = 'notification';
 
 	public const PRIORITY_VERYLOW 	= 10;
 	public const PRIORITY_LOW	= 20;

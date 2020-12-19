@@ -32,7 +32,7 @@
 namespace OCA\Settings\Settings\Personal;
 
 use OC\Accounts\AccountManager;
-use OCA\FederatedFileSharing\AppInfo\Application;
+use OCA\FederatedFileSharing\FederatedShareProvider;
 use OCP\App\IAppManager;
 use OCP\AppFramework\Http\TemplateResponse;
 use OCP\Files\FileInfo;
@@ -96,14 +96,17 @@ class PersonalInfo implements ISettings {
 		$federatedFileSharingEnabled = $this->appManager->isEnabledForUser('federatedfilesharing');
 		$lookupServerUploadEnabled = false;
 		if ($federatedFileSharingEnabled) {
-			$federatedFileSharing = \OC::$server->query(Application::class);
-			$shareProvider = $federatedFileSharing->getFederatedShareProvider();
+			/** @var FederatedShareProvider $shareProvider */
+			$shareProvider = \OC::$server->query(FederatedShareProvider::class);
 			$lookupServerUploadEnabled = $shareProvider->isLookupServerUploadEnabled();
 		}
 
 		$uid = \OC_User::getUser();
 		$user = $this->userManager->get($uid);
 		$userData = $this->accountManager->getUser($user);
+
+		// make sure FS is setup before querying storage related stuff...
+		\OC_Util::setupFS($user->getUID());
 
 		$storageInfo = \OC_Helper::getStorageInfo('/');
 		if ($storageInfo['quota'] === FileInfo::SPACE_UNLIMITED) {

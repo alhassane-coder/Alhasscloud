@@ -31,7 +31,6 @@
 namespace OC\Core\Controller;
 
 use OC\AppFramework\Utility\TimeFactory;
-use OCP\Accounts\IAccountManager;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\DataDisplayResponse;
@@ -80,8 +79,6 @@ class AvatarController extends Controller {
 
 	/** @var TimeFactory */
 	protected $timeFactory;
-	/** @var IAccountManager */
-	private $accountManager;
 
 	public function __construct($appName,
 								IRequest $request,
@@ -92,8 +89,7 @@ class AvatarController extends Controller {
 								IRootFolder $rootFolder,
 								ILogger $logger,
 								$userId,
-								TimeFactory $timeFactory,
-								IAccountManager $accountManager) {
+								TimeFactory $timeFactory) {
 		parent::__construct($appName, $request);
 
 		$this->avatarManager = $avatarManager;
@@ -104,7 +100,6 @@ class AvatarController extends Controller {
 		$this->logger = $logger;
 		$this->userId = $userId;
 		$this->timeFactory = $timeFactory;
-		$this->accountManager = $accountManager;
 	}
 
 
@@ -126,21 +121,6 @@ class AvatarController extends Controller {
 			$size = 64;
 		}
 
-		$user = $this->userManager->get($userId);
-		if ($user === null) {
-			return new JSONResponse([], Http::STATUS_NOT_FOUND);
-		}
-
-		$account = $this->accountManager->getAccount($user);
-		$scope = $account->getProperty(IAccountManager::PROPERTY_AVATAR)->getScope();
-
-		if ($scope !== IAccountManager::VISIBILITY_PUBLIC && $this->userId === null) {
-			// Public avatar access is not allowed
-			$response = new JSONResponse([], Http::STATUS_NOT_FOUND);
-			$response->cacheFor(1800);
-			return $response;
-		}
-
 		try {
 			$avatar = $this->avatarManager->getAvatar($userId);
 			$avatarFile = $avatar->getFile($size);
@@ -153,8 +133,8 @@ class AvatarController extends Controller {
 			return new JSONResponse([], Http::STATUS_NOT_FOUND);
 		}
 
-		// Cache for 30 minutes
-		$response->cacheFor(1800);
+		// Cache for 1 day
+		$response->cacheFor(60*60*24);
 		return $response;
 	}
 

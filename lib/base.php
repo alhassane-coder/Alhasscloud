@@ -61,6 +61,7 @@
  *
  */
 
+use OCP\EventDispatcher\IEventDispatcher;
 use OCP\Group\Events\UserRemovedEvent;
 use OCP\ILogger;
 use OCP\Share;
@@ -419,14 +420,8 @@ class OC {
 		$sessionName = OC_Util::getInstanceId();
 
 		try {
-			// Allow session apps to create a custom session object
-			$useCustomSession = false;
-			$session = self::$server->getSession();
-			OC_Hook::emit('OC', 'initSession', ['session' => &$session, 'sessionName' => &$sessionName, 'useCustomSession' => &$useCustomSession]);
-			if (!$useCustomSession) {
-				// set the session name to the instance id - which is unique
-				$session = new \OC\Session\Internal($sessionName);
-			}
+			// set the session name to the instance id - which is unique
+			$session = new \OC\Session\Internal($sessionName);
 
 			$cryptoWrapper = \OC::$server->getSessionCryptoWrapper();
 			$session = $cryptoWrapper->wrapSession($session);
@@ -597,6 +592,7 @@ class OC {
 
 		// setup the basic server
 		self::$server = new \OC\Server(\OC::$WEBROOT, self::$config);
+		self::$server->boot();
 		\OC::$server->getEventLogger()->log('autoloader', 'Autoloader', $loaderStart, $loaderEnd);
 		\OC::$server->getEventLogger()->start('boot', 'Initialize');
 
@@ -642,6 +638,10 @@ class OC {
 			$debug = \OC::$server->getConfig()->getSystemValue('debug', false);
 			OC\Log\ErrorHandler::register($debug);
 		}
+
+		/** @var \OC\AppFramework\Bootstrap\Coordinator $bootstrapCoordinator */
+		$bootstrapCoordinator = \OC::$server->query(\OC\AppFramework\Bootstrap\Coordinator::class);
+		$bootstrapCoordinator->runRegistration();
 
 		\OC::$server->getEventLogger()->start('init_session', 'Initialize session');
 		OC_App::loadApps(['session']);
@@ -734,8 +734,6 @@ class OC {
 		// Make sure that the application class is not loaded before the database is setup
 		if ($systemConfig->getValue("installed", false)) {
 			OC_App::loadApp('settings');
-			$settings = \OC::$server->query(\OCA\Settings\AppInfo\Application::class);
-			$settings->register();
 		}
 
 		//make sure temporary files are cleaned up
@@ -902,8 +900,8 @@ class OC {
 			OC_Hook::connect('OC_User', 'post_deleteUser', Hooks::class, 'post_deleteUser');
 			OC_Hook::connect('OC_User', 'post_deleteGroup', Hooks::class, 'post_deleteGroup');
 
-			/** @var \OCP\EventDispatcher\IEventDispatcher $dispatcher */
-			$dispatcher = \OC::$server->query(\OCP\EventDispatcher\IEventDispatcher::class);
+			/** @var IEventDispatcher $dispatcher */
+			$dispatcher = \OC::$server->get(IEventDispatcher::class);
 			$dispatcher->addServiceListener(UserRemovedEvent::class, \OC\Share20\UserRemovedListener::class);
 		}
 	}
@@ -937,7 +935,7 @@ class OC {
 			\OC::$server->getSession()->clear();
 			$setupHelper = new OC\Setup(
 				$systemConfig,
-				\OC::$server->getIniWrapper(),
+				\OC::$server->get(\bantu\IniGetWrapper\IniGetWrapper::class),
 				\OC::$server->getL10N('lib'),
 				\OC::$server->query(\OCP\Defaults::class),
 				\OC::$server->getLogger(),

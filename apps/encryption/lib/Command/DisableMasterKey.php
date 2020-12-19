@@ -4,6 +4,7 @@
  *
  * @author Bjoern Schiessle <bjoern@schiessle.org>
  * @author Christoph Wurst <christoph@winzerhof-wurst.at>
+ * @author Joas Schilling <coding@schilljs.com>
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -63,7 +64,7 @@ class DisableMasterKey extends Command {
 			->setDescription('Disable the master key and use per-user keys instead. Only available for fresh installations with no existing encrypted data! There is no way to enable it again.');
 	}
 
-	protected function execute(InputInterface $input, OutputInterface $output) {
+	protected function execute(InputInterface $input, OutputInterface $output): int {
 		$isMasterKeyEnabled = $this->util->isMasterKeyEnabled();
 
 		if (!$isMasterKeyEnabled) {
@@ -80,7 +81,9 @@ class DisableMasterKey extends Command {
 				$output->writeln('Master key successfully disabled.');
 			} else {
 				$output->writeln('aborted.');
+				return 1;
 			}
 		}
+		return 0;
 	}
 }

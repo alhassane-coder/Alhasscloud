@@ -1,11 +1,15 @@
 <?php
+
+declare(strict_types=1);
+
 /**
  * @copyright Copyright (c) 2016 Lukas Reschke <lukas@statuscode.ch>
  *
  * @author Bjoern Schiessle <bjoern@schiessle.org>
  * @author Christoph Wurst <christoph@winzerhof-wurst.at>
+ * @author Joas Schilling <coding@schilljs.com>
+ * @author Johannes Riedel <joeried@users.noreply.github.com>
  * @author Lukas Reschke <lukas@statuscode.ch>
- * @author Mark Berezovsky <xpnf@yandex.ru>
  * @author Morris Jobke <hey@morrisjobke.de>
  * @author Robin Appelman <robin@icewind.nl>
  * @author Roeland Jago Douma <roeland@famdouma.nl>
@@ -34,6 +38,7 @@ use OCP\AppFramework\Utility\ITimeFactory;
 use OCP\IConfig;
 use OCP\IDBConnection;
 use OCP\ILogger;
+use OCP\Security\Bruteforce\MaxDelayReached;
 
 /**
  * Class Throttler implements the bruteforce protection for security actions in
@@ -50,6 +55,9 @@ use OCP\ILogger;
  */
 class Throttler {
 	public const LOGIN_ACTION = 'login';
+	public const MAX_DELAY = 25;
+	public const MAX_DELAY_MS = 25000; // in milliseconds
+	public const MAX_ATTEMPTS = 10;
 
 	/** @var IDBConnection */
 	private $db;
@@ -82,11 +90,23 @@ class Throttler {
 	 * @param int $expire
 	 * @return \DateInterval
 	 */
-	private function getCutoff($expire) {
+	private function getCutoff(int $expire): \DateInterval {
 		$d1 = new \DateTime();
 		$d2 = clone $d1;
 		$d2->sub(new \DateInterval('PT' . $expire . 'S'));
 		return $d2->diff($d1);
+	}
+
+	/**
+	 *  Calculate the cut off timestamp
+	 *
+	 * @param float $maxAgeHours
+	 * @return int
+	 */
+	private function getCutoffTimestamp(float $maxAgeHours = 12.0): int {
+		return (new \DateTime())
+			->sub($this->getCutoff((int) ($maxAgeHours * 3600)))
+			->getTimestamp();
 	}
 
 	/**
@@ -95,11 +115,10 @@ class Throttler {
 	 * @param string $action
 	 * @param string $ip
 	 * @param array $metadata Optional metadata logged to the database
-	 * @suppress SqlInjectionChecker
 	 */
-	public function registerAttempt($action,
-									$ip,
-									array $metadata = []) {
+	public function registerAttempt(string $action,
+									string $ip,
+									array $metadata = []): void {
 		// No need to log if the bruteforce protection is disabled
 		if ($this->config->getSystemValue('auth.bruteforce.protection.enabled', true) === false) {
 			return;
@@ -139,15 +158,14 @@ class Throttler {
 	 * @param string $ip
 	 * @return bool
 	 */
-	private function isIPWhitelisted($ip) {
+	private function isIPWhitelisted(string $ip): bool {
 		if ($this->config->getSystemValue('auth.bruteforce.protection.enabled', true) === false) {
 			return true;
 		}
 
 		$keys = $this->config->getAppKeys('bruteForce');
 		$keys = array_filter($keys, function ($key) {
-			$regex = '/^whitelist_/S';
-			return preg_match($regex, $key) === 1;
+			return 0 === strpos($key, 'whitelist_');
 		});
 
 		if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
@@ -204,20 +222,23 @@ class Throttler {
 	 *
 	 * @param string $ip
 	 * @param string $action optionally filter by action
+	 * @param float $maxAgeHours
 	 * @return int
 	 */
-	public function getDelay($ip, $action = '') {
+	public function getAttempts(string $ip, string $action = '', float $maxAgeHours = 12): int {
+		if ($ip === '') {
+			return 0;
+		}
+
 		$ipAddress = new IpAddress($ip);
 		if ($this->isIPWhitelisted((string)$ipAddress)) {
 			return 0;
 		}
 
-		$cutoffTime = (new \DateTime())
-			->sub($this->getCutoff(43200))
-			->getTimestamp();
+		$cutoffTime = $this->getCutoffTimestamp($maxAgeHours);
 
 		$qb = $this->db->getQueryBuilder();
-		$qb->select('*')
+		$qb->select($qb->func()->count('*', 'attempts'))
 			->from('bruteforce_attempts')
 			->where($qb->expr()->gt('occurred', $qb->createNamedParameter($cutoffTime)))
 			->andWhere($qb->expr()->eq('subnet', $qb->createNamedParameter($ipAddress->getSubnet())));
@@ -226,24 +247,37 @@ class Throttler {
 			$qb->andWhere($qb->expr()->eq('action', $qb->createNamedParameter($action)));
 		}
 
-		$attempts = count($qb->execute()->fetchAll());
+		$result = $qb->execute();
+		$row = $result->fetch();
+		$result->closeCursor();
 
+		return (int) $row['attempts'];
+	}
+
+	/**
+	 * Get the throttling delay (in milliseconds)
+	 *
+	 * @param string $ip
+	 * @param string $action optionally filter by action
+	 * @return int
+	 */
+	public function getDelay(string $ip, string $action = ''): int {
+		$attempts = $this->getAttempts($ip, $action);
 		if ($attempts === 0) {
 			return 0;
 		}
 
-		$maxDelay = 25;
 		$firstDelay = 0.1;
-		if ($attempts > (8 * PHP_INT_SIZE - 1)) {
+		if ($attempts > self::MAX_ATTEMPTS) {
 			// Don't ever overflow. Just assume the maxDelay time:s
-			$firstDelay = $maxDelay;
-		} else {
-			$firstDelay *= pow(2, $attempts);
-			if ($firstDelay > $maxDelay) {
-				$firstDelay = $maxDelay;
-			}
+			return self::MAX_DELAY_MS;
 		}
-		return (int) \ceil($firstDelay * 1000);
+
+		$delay = $firstDelay * 2**$attempts;
+		if ($delay > self::MAX_DELAY) {
+			return self::MAX_DELAY_MS;
+		}
+		return (int) \ceil($delay * 1000);
 	}
 
 	/**
@@ -251,17 +285,15 @@ class Throttler {
 	 *
 	 * @param string $ip
 	 * @param string $action
-	 * @param string $metadata
+	 * @param array $metadata
 	 */
-	public function resetDelay($ip, $action, $metadata) {
+	public function resetDelay(string $ip, string $action, array $metadata): void {
 		$ipAddress = new IpAddress($ip);
 		if ($this->isIPWhitelisted((string)$ipAddress)) {
 			return;
 		}
 
-		$cutoffTime = (new \DateTime())
-			->sub($this->getCutoff(43200))
-			->getTimestamp();
+		$cutoffTime = $this->getCutoffTimestamp();
 
 		$qb = $this->db->getQueryBuilder();
 		$qb->delete('bruteforce_attempts')
@@ -274,14 +306,49 @@ class Throttler {
 	}
 
 	/**
+	 * Reset the throttling delay for an IP address
+	 *
+	 * @param string $ip
+	 */
+	public function resetDelayForIP($ip) {
+		$cutoffTime = $this->getCutoffTimestamp();
+
+		$qb = $this->db->getQueryBuilder();
+		$qb->delete('bruteforce_attempts')
+			->where($qb->expr()->gt('occurred', $qb->createNamedParameter($cutoffTime)))
+			->andWhere($qb->expr()->eq('ip', $qb->createNamedParameter($ip)));
+
+		$qb->execute();
+	}
+
+	/**
 	 * Will sleep for the defined amount of time
 	 *
 	 * @param string $ip
 	 * @param string $action optionally filter by action
 	 * @return int the time spent sleeping
 	 */
-	public function sleepDelay($ip, $action = '') {
+	public function sleepDelay(string $ip, string $action = ''): int {
 		$delay = $this->getDelay($ip, $action);
+		usleep($delay * 1000);
+		return $delay;
+	}
+
+	/**
+	 * Will sleep for the defined amount of time unless maximum was reached in the last 30 minutes
+	 * In this case a "429 Too Many Request" exception is thrown
+	 *
+	 * @param string $ip
+	 * @param string $action optionally filter by action
+	 * @return int the time spent sleeping
+	 * @throws MaxDelayReached when reached the maximum
+	 */
+	public function sleepDelayOrThrowOnMax(string $ip, string $action = ''): int {
+		$delay = $this->getDelay($ip, $action);
+		if (($delay === self::MAX_DELAY_MS) && $this->getAttempts($ip, $action, 0.5) > self::MAX_ATTEMPTS) {
+			// If the ip made too many attempts within the last 30 mins we don't execute anymore
+			throw new MaxDelayReached('Reached maximum delay');
+		}
 		usleep($delay * 1000);
 		return $delay;
 	}

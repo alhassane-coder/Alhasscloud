@@ -6,6 +6,7 @@ declare(strict_types=1);
  * @copyright 2018, Maxence Lange <maxence@artificial-owl.com>
  *
  * @author Christoph Wurst <christoph@winzerhof-wurst.at>
+ * @author Julius Härtl <jus@bitgrid.net>
  * @author Maxence Lange <maxence@artificial-owl.com>
  *
  * @license GNU AGPL version 3 or any later version
@@ -38,6 +39,7 @@ use JsonSerializable;
  * @see IDashboardWidget::getWidgetSetup
  *
  * @since 15.0.0
+ * @deprecated 20.0.0
  *
  */
 final class WidgetSetup implements JsonSerializable {
@@ -72,6 +74,7 @@ final class WidgetSetup implements JsonSerializable {
 	 *
 	 *
 	 * @since 15.0.0
+	 * @deprecated 20.0.0
 	 *
 	 * @param string $type
 	 *
@@ -89,6 +92,7 @@ final class WidgetSetup implements JsonSerializable {
 	 * Returns all sizes defined for the widget.
 	 *
 	 * @since 15.0.0
+	 * @deprecated 20.0.0
 	 *
 	 * @return array
 	 */
@@ -100,6 +104,7 @@ final class WidgetSetup implements JsonSerializable {
 	 * Add a new size to the setup.
 	 *
 	 * @since 15.0.0
+	 * @deprecated 20.0.0
 	 *
 	 * @param string $type
 	 * @param int $width
@@ -120,6 +125,7 @@ final class WidgetSetup implements JsonSerializable {
 	 * Returns menu entries.
 	 *
 	 * @since 15.0.0
+	 * @deprecated 20.0.0
 	 *
 	 * @return array
 	 */
@@ -135,6 +141,7 @@ final class WidgetSetup implements JsonSerializable {
 	 * $text is the display name of the menu entry.
 	 *
 	 * @since 15.0.0
+	 * @deprecated 20.0.0
 	 *
 	 * @param string $function
 	 * @param string $icon
@@ -160,6 +167,7 @@ final class WidgetSetup implements JsonSerializable {
 	 * $delay is the time in seconds between each call.
 	 *
 	 * @since 15.0.0
+	 * @deprecated 20.0.0
 	 *
 	 * @param string $function
 	 * @param int $delay
@@ -179,6 +187,7 @@ final class WidgetSetup implements JsonSerializable {
 	 * Get delayed jobs.
 	 *
 	 * @since 15.0.0
+	 * @deprecated 20.0.0
 	 *
 	 * @return array
 	 */
@@ -191,6 +200,7 @@ final class WidgetSetup implements JsonSerializable {
 	 * Get the push function, called when an event is send to the front-end
 	 *
 	 * @since 15.0.0
+	 * @deprecated 20.0.0
 	 *
 	 * @return string
 	 */
@@ -203,6 +213,7 @@ final class WidgetSetup implements JsonSerializable {
 	 * frontend.
 	 *
 	 * @since 15.0.0
+	 * @deprecated 20.0.0
 	 *
 	 * @param string $function
 	 *
@@ -219,6 +230,7 @@ final class WidgetSetup implements JsonSerializable {
 	 * Returns the default settings for a widget.
 	 *
 	 * @since 15.0.0
+	 * @deprecated 20.0.0
 	 *
 	 * @return array
 	 */
@@ -234,6 +246,7 @@ final class WidgetSetup implements JsonSerializable {
 	 * @see WidgetSetting
 	 *
 	 * @since 15.0.0
+	 * @deprecated 20.0.0
 	 *
 	 * @param array $settings
 	 *
@@ -248,6 +261,7 @@ final class WidgetSetup implements JsonSerializable {
 
 	/**
 	 * @since 15.0.0
+	 * @deprecated 20.0.0
 	 *
 	 * @return array
 	 */

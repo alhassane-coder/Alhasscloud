@@ -357,6 +357,21 @@
 							type: OC.SetupChecks.MESSAGE_TYPE_INFO
 						})
 					}
+					if (data.missingPrimaryKeys.length > 0) {
+						var listOfMissingPrimaryKeys = "";
+						data.missingPrimaryKeys.forEach(function(element){
+							listOfMissingPrimaryKeys += "<li>";
+							listOfMissingPrimaryKeys += t('core', 'Missing primary key on table "{tableName}".', element);
+							listOfMissingPrimaryKeys += "</li>";
+						});
+						messages.push({
+							msg: t(
+								'core',
+								'The database is missing some primary keys. Due to the fact that adding primary keys on big tables could take some time they were not added automatically. By running "occ db:add-missing-primary-keys" those missing primary keys could be added manually while the instance keeps running.'
+							) + "<ul>" + listOfMissingPrimaryKeys + "</ul>",
+							type: OC.SetupChecks.MESSAGE_TYPE_INFO
+						})
+					}
 					if (data.missingColumns.length > 0) {
 						var listOfMissingColumns = "";
 						data.missingColumns.forEach(function(element){
@@ -488,6 +503,10 @@
 						})
 					}
 
+					OC.SetupChecks.addGenericSetupCheck(data, 'OCA\\Settings\\SetupChecks\\PhpDefaultCharset', messages)
+					OC.SetupChecks.addGenericSetupCheck(data, 'OCA\\Settings\\SetupChecks\\PhpOutputBuffering', messages)
+					OC.SetupChecks.addGenericSetupCheck(data, 'OCA\\Settings\\SetupChecks\\LegacySSEKeyFormat', messages)
+
 				} else {
 					messages.push({
 						msg: t('core', 'Error occurred while checking server setup'),
@@ -503,6 +522,29 @@
 				allowAuthErrors: true
 			}).then(afterCall, afterCall);
 			return deferred.promise();
+		},
+
+		addGenericSetupCheck: function(data, check, messages) {
+			var setupCheck = data[check] || { pass: true, description: '', severity: 'info', linkToDocumentation: null}
+
+			var type = OC.SetupChecks.MESSAGE_TYPE_INFO
+			if (setupCheck.severity === 'warning') {
+				type = OC.SetupChecks.MESSAGE_TYPE_WARNING
+			} else if (setupCheck.severity === 'error') {
+				type = OC.SetupChecks.MESSAGE_TYPE_ERROR
+			}
+
+			var message = setupCheck.description;
+			if (setupCheck.linkToDocumentation) {
+				message += ' ' + t('core', 'For more details see the <a target="_blank" rel="noreferrer noopener" href="{docLink}">documentation</a>.', {docLink: setupCheck.linkToDocumentation});
+			}
+
+			if (!setupCheck.pass) {
+				messages.push({
+					msg: message,
+					type: type,
+				})
+			}
 		},
 
 		/**

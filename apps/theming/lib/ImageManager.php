@@ -241,7 +241,7 @@ class ImageManager {
 			imagepng($outputImage, $tmpFile, 8);
 			imagedestroy($outputImage);
 
-			$target->putContent(file_get_contents($tmpFile, 'r'));
+			$target->putContent(file_get_contents($tmpFile));
 		} else {
 			$target->putContent(file_get_contents($tmpFile));
 		}

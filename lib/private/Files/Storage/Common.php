@@ -4,7 +4,6 @@
  *
  * @author Arthur Schiwon <blizzz@arthur-schiwon.de>
  * @author Bart Visscher <bartv@thisnet.nl>
- * @author Björn Schießle <bjoern@schiessle.org>
  * @author Christoph Wurst <christoph@winzerhof-wurst.at>
  * @author Greta Doci <gretadoci@gmail.com>
  * @author hkjolhede <hkjolhede@gmail.com>
@@ -462,8 +461,8 @@ abstract class Common implements Storage, ILockingStorage, IWriteStreamStorage {
 			\OC::$server->getLogger()->info("External storage not available: stat() failed");
 			return false;
 		} catch (\Exception $e) {
-			\OC::$server->getLogger()->info("External storage not available: " . $e->getMessage());
-			\OC::$server->getLogger()->logException($e, ['level' => ILogger::DEBUG]);
+			\OC::$server->getLogger()->warning("External storage not available: " . $e->getMessage());
+			\OC::$server->getLogger()->logException($e, ['level' => ILogger::WARN]);
 			return false;
 		}
 	}
@@ -749,7 +748,7 @@ abstract class Common implements Storage, ILockingStorage, IWriteStreamStorage {
 			);
 		}
 		try {
-			$provider->acquireLock('files/' . md5($this->getId() . '::' . trim($path, '/')), $type);
+			$provider->acquireLock('files/' . md5($this->getId() . '::' . trim($path, '/')), $type, $this->getId() . '::' . $path);
 		} catch (LockedException $e) {
 			if ($logger) {
 				$logger->logException($e, ['level' => ILogger::INFO]);
@@ -881,7 +880,10 @@ abstract class Common implements Storage, ILockingStorage, IWriteStreamStorage {
 			while (($file = readdir($dh)) !== false) {
 				if (!Filesystem::isIgnoredDir($file) && !Filesystem::isFileBlacklisted($file)) {
 					$childPath = $basePath . '/' . trim($file, '/');
-					yield $this->getMetaData($childPath);
+					$metadata = $this->getMetaData($childPath);
+					if ($metadata !== null) {
+						yield $metadata;
+					}
 				}
 			}
 		}

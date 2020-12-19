@@ -3,7 +3,6 @@
  * @copyright Copyright (c) 2016, ownCloud, Inc.
  *
  * @author Christoph Wurst <christoph@winzerhof-wurst.at>
- * @author Daniel Calviño Sánchez <danxuliu@gmail.com>
  * @author Joas Schilling <coding@schilljs.com>
  * @author Maxence Lange <maxence@nextcloud.com>
  * @author Morris Jobke <hey@morrisjobke.de>
@@ -71,14 +70,14 @@ class MountProvider implements IMountProvider {
 	 * Get all mountpoints applicable for the user and check for shares where we need to update the etags
 	 *
 	 * @param \OCP\IUser $user
-	 * @param \OCP\Files\Storage\IStorageFactory $storageFactory
+	 * @param \OCP\Files\Storage\IStorageFactory $loader
 	 * @return \OCP\Files\Mount\IMountPoint[]
 	 */
-	public function getMountsForUser(IUser $user, IStorageFactory $storageFactory) {
-		$shares = $this->shareManager->getSharedWith($user->getUID(), \OCP\Share::SHARE_TYPE_USER, null, -1);
-		$shares = array_merge($shares, $this->shareManager->getSharedWith($user->getUID(), \OCP\Share::SHARE_TYPE_GROUP, null, -1));
-		$shares = array_merge($shares, $this->shareManager->getSharedWith($user->getUID(), \OCP\Share::SHARE_TYPE_CIRCLE, null, -1));
-		$shares = array_merge($shares, $this->shareManager->getSharedWith($user->getUID(), \OCP\Share::SHARE_TYPE_ROOM, null, -1));
+	public function getMountsForUser(IUser $user, IStorageFactory $loader) {
+		$shares = $this->shareManager->getSharedWith($user->getUID(), IShare::TYPE_USER, null, -1);
+		$shares = array_merge($shares, $this->shareManager->getSharedWith($user->getUID(), IShare::TYPE_GROUP, null, -1));
+		$shares = array_merge($shares, $this->shareManager->getSharedWith($user->getUID(), IShare::TYPE_CIRCLE, null, -1));
+		$shares = array_merge($shares, $this->shareManager->getSharedWith($user->getUID(), IShare::TYPE_ROOM, null, -1));
 
 		// filter out excluded shares and group shares that includes self
 		$shares = array_filter($shares, function (\OCP\Share\IShare $share) use ($user) {
@@ -120,7 +119,7 @@ class MountProvider implements IMountProvider {
 						'ownerView' => $ownerViews[$owner],
 						'sharingDisabledForUser' => $sharingDisabledForUser
 					],
-					$storageFactory,
+					$loader,
 					$view,
 					$foldersExistCache
 				);

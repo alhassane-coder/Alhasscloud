@@ -88,9 +88,8 @@ ul {
 body {
 	background-color: var(--color-main-background);
 	font-weight: normal;
-	/* bring the default font size up to 14px */
-	font-size: .875em;
-	line-height: 1.6em;
+	font-size: var(--default-font-size);
+	line-height: var(--default-line-height);
 	font-family: var(--font-face);
 	color: var(--color-main-text);
 }
@@ -467,7 +466,9 @@ tr .action:not(.permanent), .selectedActions a {
 }
 
 tr {
-	&:hover .action, &:focus .action, .action.permanent {
+	&:hover .action:not(.menuitem),
+	&:focus .action:not(.menuitem),
+	.action.permanent:not(.menuitem) {
 		opacity: .5;
 	}
 }

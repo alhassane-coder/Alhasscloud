@@ -3,6 +3,7 @@
  * @copyright Copyright (c) 2016, ownCloud, Inc.
  *
  * @author Björn Schießle <bjoern@schiessle.org>
+ * @author Daniel Kesselberg <mail@danielkesselberg.de>
  * @author Frédéric Fortier <frederic.fortier@oronospolytechnique.com>
  * @author Joas Schilling <coding@schilljs.com>
  * @author Morris Jobke <hey@morrisjobke.de>
@@ -215,7 +216,7 @@ class SharedMount extends MountPoint implements MoveableMount {
 	 */
 	public function removeMount() {
 		$mountManager = \OC\Files\Filesystem::getMountManager();
-		/** @var $storage \OCA\Files_Sharing\SharedStorage */
+		/** @var \OCA\Files_Sharing\SharedStorage $storage */
 		$storage = $this->getStorage();
 		$result = $storage->unshareStorage();
 		$mountManager->removeMount($this->mountPoint);

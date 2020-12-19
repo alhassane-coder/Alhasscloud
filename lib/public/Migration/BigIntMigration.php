@@ -2,6 +2,7 @@
 /**
  * @copyright Copyright (c) 2017 Joas Schilling <coding@schilljs.com>
  *
+ * @author Daniel Kesselberg <mail@danielkesselberg.de>
  * @author Joas Schilling <coding@schilljs.com>
  *
  * @license GNU AGPL version 3 or any later version
@@ -24,6 +25,7 @@
 namespace OCP\Migration;
 
 use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use OCP\DB\ISchemaWrapper;
 
 /**
@@ -56,8 +58,8 @@ abstract class BigIntMigration extends SimpleMigrationStep {
 
 			foreach ($columns as $columnName) {
 				$column = $table->getColumn($columnName);
-				if ($column->getType()->getName() !== Type::BIGINT) {
-					$column->setType(Type::getType(Type::BIGINT));
+				if ($column->getType()->getName() !== Types::BIGINT) {
+					$column->setType(Type::getType(Types::BIGINT));
 					$column->setOptions(['length' => 20]);
 				}
 			}

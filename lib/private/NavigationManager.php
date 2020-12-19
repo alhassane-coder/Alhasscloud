@@ -6,6 +6,7 @@
  * @author Bart Visscher <bartv@thisnet.nl>
  * @author Christoph Wurst <christoph@winzerhof-wurst.at>
  * @author Daniel Kesselberg <mail@danielkesselberg.de>
+ * @author Georg Ehrke <oc.list@georgehrke.com>
  * @author Joas Schilling <coding@schilljs.com>
  * @author John Molakvoæ (skjnldsv) <skjnldsv@protonmail.com>
  * @author Julius Härtl <jus@bitgrid.net>
@@ -79,12 +80,7 @@ class NavigationManager implements INavigationManager {
 	}
 
 	/**
-	 * Creates a new navigation entry
-	 *
-	 * @param array|\Closure $entry Array containing: id, name, order, icon and href key
-	 *					The use of a closure is preferred, because it will avoid
-	 * 					loading the routing of your app, unless required.
-	 * @return void
+	 * @inheritDoc
 	 */
 	public function add($entry) {
 		if ($entry instanceof \Closure) {
@@ -106,10 +102,7 @@ class NavigationManager implements INavigationManager {
 	}
 
 	/**
-	 * Get a list of navigation entries
-	 *
-	 * @param string $type type of the navigation entries
-	 * @return array
+	 * @inheritDoc
 	 */
 	public function getAll(string $type = 'link'): array {
 		$this->init();
@@ -171,19 +164,14 @@ class NavigationManager implements INavigationManager {
 	}
 
 	/**
-	 * Sets the current navigation entry of the currently running app
-	 * @param string $id of the app entry to activate (from added $entry)
+	 * @inheritDoc
 	 */
 	public function setActiveEntry($id) {
 		$this->activeEntry = $id;
 	}
 
 	/**
-	 * gets the active Menu entry
-	 * @return string id or empty string
-	 *
-	 * This function returns the id of the active navigation entry (set by
-	 * setActiveEntry
+	 * @inheritDoc
 	 */
 	public function getActiveEntry() {
 		return $this->activeEntry;
@@ -200,7 +188,7 @@ class NavigationManager implements INavigationManager {
 			$this->add([
 				'type' => 'settings',
 				'id' => 'help',
-				'order' => 5,
+				'order' => 6,
 				'href' => $this->urlGenerator->linkToRoute('settings.Help.help'),
 				'name' => $l->t('Help'),
 				'icon' => $this->urlGenerator->imagePath('settings', 'help.svg'),
@@ -213,7 +201,7 @@ class NavigationManager implements INavigationManager {
 				$this->add([
 					'type' => 'settings',
 					'id' => 'core_apps',
-					'order' => 3,
+					'order' => 4,
 					'href' => $this->urlGenerator->linkToRoute('settings.AppSettings.viewApps'),
 					'icon' => $this->urlGenerator->imagePath('settings', 'apps.svg'),
 					'name' => $l->t('Apps'),
@@ -224,7 +212,7 @@ class NavigationManager implements INavigationManager {
 			$this->add([
 				'type' => 'settings',
 				'id' => 'settings',
-				'order' => 1,
+				'order' => 2,
 				'href' => $this->urlGenerator->linkToRoute('settings.PersonalSettings.index'),
 				'name' => $l->t('Settings'),
 				'icon' => $this->urlGenerator->imagePath('settings', 'admin.svg'),
@@ -248,7 +236,7 @@ class NavigationManager implements INavigationManager {
 				$this->add([
 					'type' => 'settings',
 					'id' => 'core_users',
-					'order' => 4,
+					'order' => 5,
 					'href' => $this->urlGenerator->linkToRoute('settings.Users.usersList'),
 					'name' => $l->t('Users'),
 					'icon' => $this->urlGenerator->imagePath('settings', 'users.svg'),

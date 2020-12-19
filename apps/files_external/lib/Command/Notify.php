@@ -4,6 +4,7 @@
  *
  * @author Ari Selseng <ari@selseng.net>
  * @author Christoph Wurst <christoph@winzerhof-wurst.at>
+ * @author Joas Schilling <coding@schilljs.com>
  * @author Robin Appelman <robin@icewind.nl>
  * @author Roeland Jago Douma <roeland@famdouma.nl>
  *
@@ -126,7 +127,7 @@ class Notify extends Base {
 		}
 	}
 
-	protected function execute(InputInterface $input, OutputInterface $output) {
+	protected function execute(InputInterface $input, OutputInterface $output): int {
 		$mount = $this->globalService->getStorage($input->getArgument('mount_id'));
 		if (is_null($mount)) {
 			$output->writeln('<error>Mount not found</error>');
@@ -198,6 +199,7 @@ class Notify extends Base {
 			}
 			$this->markParentAsOutdated($mount->getId(), $change->getPath(), $output);
 		});
+		return 0;
 	}
 
 	private function createStorage(StorageConfig $mount) {

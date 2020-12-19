@@ -4,6 +4,7 @@
  *
  * @author Bart Visscher <bartv@thisnet.nl>
  * @author Daniel Kesselberg <mail@danielkesselberg.de>
+ * @author Georg Ehrke <oc.list@georgehrke.com>
  * @author John Molakvoæ (skjnldsv) <skjnldsv@protonmail.com>
  * @author Julius Härtl <jus@bitgrid.net>
  * @author Morris Jobke <hey@morrisjobke.de>
@@ -106,5 +107,20 @@ namespace OCP {
 		 * @since 5.0.0
 		 */
 		public function delete($id);
+
+		/**
+		 * Returns true if this address-book is not owned by the current user,
+		 * but shared with them.
+		 *
+		 * @return bool
+		 * @since 20.0.0
+		 */
+		public function isShared(): bool;
+
+		/**
+		 * @return bool
+		 * @since 20.0.0
+		 */
+		public function isSystemAddressBook(): bool;
 	}
 }

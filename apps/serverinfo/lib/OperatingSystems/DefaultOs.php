@@ -20,12 +20,10 @@
 
 namespace OCA\ServerInfo\OperatingSystems;
 
-/**
- * Class Ubuntu
- *
- * @package OCA\ServerInfo\OperatingSystems
- */
-class DefaultOs {
+use OCA\ServerInfo\Resources\Disk;
+use OCA\ServerInfo\Resources\Memory;
+
+class DefaultOs implements IOperatingSystem {
 
 	/**
 	 * @return bool
@@ -34,14 +32,8 @@ class DefaultOs {
 		return true;
 	}
 
-	/**
-	 * Get memory will return a list key => value where all values are in bytes.
-	 * [MemTotal => 0, MemFree => 0, MemAvailable => 0, SwapTotal => 0, SwapFree => 0].
-	 *
-	 * @return array
-	 */
-	public function getMemory(): array {
-		$data = ['MemTotal' => -1, 'MemFree' => -1, 'MemAvailable' => -1, 'SwapTotal' => -1, 'SwapFree' => -1];
+	public function getMemory(): Memory {
+		$data = new Memory();
 
 		try {
 			$meminfo = $this->readContent('/proc/meminfo');
@@ -58,25 +50,32 @@ class DefaultOs {
 		}
 
 		foreach ($matches['Key'] as $i => $key) {
-			$value = (int)$matches['Value'][$i];
-			$unit = $matches['Unit'][$i];
+			// Value is always in KB: https://github.com/torvalds/linux/blob/c70672d8d316ebd46ea447effadfe57ab7a30a50/fs/proc/meminfo.c#L58-L60
+			$value = (int)($matches['Value'][$i] / 1024);
 
-			if ($unit === 'kB') {
-				$value *= 1024;
+			switch ($key) {
+				case 'MemTotal':
+					$data->setMemTotal($value);
+					break;
+				case 'MemFree':
+					$data->setMemFree($value);
+					break;
+				case 'MemAvailable':
+					$data->setMemAvailable($value);
+					break;
+				case 'SwapTotal':
+					$data->setSwapTotal($value);
+					break;
+				case 'SwapFree':
+					$data->setSwapFree($value);
+					break;
 			}
-
-			$data[$key] = $value;
 		}
 
 		return $data;
 	}
 
-	/**
-	 * Get name of the processor
-	 *
-	 * @return string
-	 */
-	public function getCPUName(): string {
+	public function getCpuName(): string {
 		$data = 'Unknown Processor';
 
 		try {
@@ -113,11 +112,6 @@ class DefaultOs {
 		return $uptime;
 	}
 
-	/**
-	 * Get the total number of seconds the system has been up or -1 on failure.
-	 *
-	 * @return int
-	 */
 	public function getUptime(): int {
 		$data = -1;
 
@@ -193,20 +187,11 @@ class DefaultOs {
 		return $result;
 	}
 
-	/**
-	 * Get diskInfo will return a list of disks. Used and Available in bytes.
-	 *
-	 * [
-	 * 	[device => /dev/mapper/homestead--vg-root, fs => ext4, used => 6205468, available => 47321220, percent => 12%, mount => /]
-	 * ]
-	 *
-	 * @return array
-	 */
 	public function getDiskInfo(): array {
 		$data = [];
 
 		try {
-			$disks = $this->executeCommand('df -TP');
+			$disks = $this->executeCommand('df -TPk');
 		} catch (\RuntimeException $e) {
 			return $data;
 		}
@@ -224,14 +209,15 @@ class DefaultOs {
 				continue;
 			}
 
-			$data[] = [
-				'device' => $filesystem,
-				'fs' => $matches['Type'][$i],
-				'used' => (int)$matches['Used'][$i] * 1024,
-				'available' => (int)$matches['Available'][$i] * 1024,
-				'percent' => $matches['Capacity'][$i],
-				'mount' => $matches['Mounted'][$i],
-			];
+			$disk = new Disk();
+			$disk->setDevice($filesystem);
+			$disk->setFs($matches['Type'][$i]);
+			$disk->setUsed((int)($matches['Used'][$i] / 1024));
+			$disk->setAvailable((int)($matches['Available'][$i] / 1024));
+			$disk->setPercent($matches['Capacity'][$i]);
+			$disk->setMount($matches['Mounted'][$i]);
+
+			$data[] = $disk;
 		}
 
 		return $data;

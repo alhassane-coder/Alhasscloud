@@ -25,8 +25,8 @@ script('serverinfo', 'Chart.min');
 
 style('serverinfo', 'style');
 
-function FormatBytes($byte) {
-	$unim = ['B', 'KB', 'MB', 'GB', 'TB', 'PB'];
+function FormatMegabytes($byte) {
+	$unim = ['MB', 'GB', 'TB', 'PB'];
 	$count = 0;
 	while ($byte >= 1024) {
 		$count++;
@@ -35,6 +35,10 @@ function FormatBytes($byte) {
 	return number_format($byte, 2, '.', '.') . ' ' . $unim[$count];
 }
 
+/** @var \OCA\ServerInfo\Resources\Memory $memory */
+$memory = $_['memory'];
+/** @var \OCA\ServerInfo\Resources\Disk[] $disks */
+$disks = $_['diskinfo'];
 ?>
 
 <div class="server-info-wrapper">
@@ -62,7 +66,7 @@ function FormatBytes($byte) {
 						</tr>
 						<tr>
 							<td><?php p($l->t('Memory')); ?>:</td>
-							<td><?php p(FormatBytes($_['memory']['MemTotal'])) ?></td>
+							<td><?php p(FormatMegabytes($memory->getMemTotal())) ?></td>
 						</tr>
 						<tr>
 							<td><?php p($l->t('Server time')); ?>:</td>
@@ -86,7 +90,7 @@ function FormatBytes($byte) {
 					<img class="infoicon" src="<?php p(image_path('core', 'actions/screen.svg')); ?>">
 					<?php p($l->t('Load')); ?>
 				</h2>
-				<div class="infobox" id="cpuSection">
+				<div id="cpuSection" class="infobox">
 					<div class="cpu-wrapper">
 						<canvas id="cpuloadcanvas" style="width:100%; height:200px" width="600" height="200"></canvas>
 					</div>
@@ -99,7 +103,7 @@ function FormatBytes($byte) {
 					<img class="infoicon" src="<?php p(image_path('core', 'actions/quota.svg')); ?>">
 					<?php p($l->t('Memory')); ?>
 				</h2>
-				<div class="infobox">
+				<div id="memorySection" class="infobox">
 					<div class="memory-wrapper">
 						<canvas id="memorycanvas" style="width:100%; height:200px" width="600" height="200"></canvas>
 					</div>
@@ -120,7 +124,7 @@ function FormatBytes($byte) {
 					<?php p($l->t('Disk')); ?>
 				</h2>
 			</div>
-			<?php foreach ($_['diskinfo'] as $disk): ?>
+			<?php foreach ($disks as $disk): ?>
 				<div class="col col-4 col-xl-6 col-m-12">
 					<div class="infobox">
 						<div class="diskchart-container">
@@ -128,17 +132,17 @@ function FormatBytes($byte) {
 									height="200"></canvas>
 						</div>
 						<div class="diskinfo-container">
-							<h3><?php p(basename($disk['device'])); ?></h3>
-							<?php p($l->t('Mount')); ?> :
-							<span class="info"><?php p($disk['mount']); ?></span><br>
-							<?php p($l->t('Filesystem')); ?> :
-							<span class="info"><?php p($disk['fs']); ?></span><br>
-							<?php p($l->t('Size')); ?> :
-							<span class="info"><?php p(FormatBytes($disk['used'] + $disk['available'])); ?></span><br>
-							<?php p($l->t('Available')); ?> :
-							<span class="info"><?php p(FormatBytes($disk['available'])); ?></span><br>
-							<?php p($l->t('Used')); ?> :
-							<span class="info"><?php p($disk['percent']); ?></span><br>
+							<h3><?php p(basename($disk->getDevice())); ?></h3>
+							<?php p($l->t('Mount')); ?>:
+							<span class="info"><?php p($disk->getMount()); ?></span><br>
+							<?php p($l->t('Filesystem')); ?>:
+							<span class="info"><?php p($disk->getFs()); ?></span><br>
+							<?php p($l->t('Size')); ?>:
+							<span class="info"><?php p(FormatMegabytes($disk->getUsed() + $disk->getAvailable())); ?></span><br>
+							<?php p($l->t('Available')); ?>:
+							<span class="info"><?php p(FormatMegabytes($disk->getAvailable())); ?></span><br>
+							<?php p($l->t('Used')); ?>:
+							<span class="info"><?php p($disk->getPercent()); ?></span><br>
 						</div>
 					</div>
 				</div>
@@ -149,9 +153,9 @@ function FormatBytes($byte) {
 			<?php p($l->t('You will get a notification once one of your disks is nearly full.')); ?>
 		</div>
 
-		<p><?php p($l->t('Files:')); ?> <em id="numFilesStorage"><?php p($_['storage']['num_files']); ?></em></p>
-		<p><?php p($l->t('Storages:')); ?> <em id="numFilesStorages"><?php p($_['storage']['num_storages']); ?></em></p>
-		<p><?php p($l->t('Free Space:')); ?> <em id="systemDiskFreeSpace"><?php p($_['system']['freespace']); ?></em>
+		<p><?php p($l->t('Files:')); ?> <strong id="numFilesStorage"><?php p($_['storage']['num_files']); ?></strong></p>
+		<p><?php p($l->t('Storages:')); ?> <strong id="numFilesStorages"><?php p($_['storage']['num_storages']); ?></strong></p>
+		<p><?php p($l->t('Free Space:')); ?> <strong id="systemDiskFreeSpace"><?php p($_['system']['freespace']); ?></strong>
 		</p>
 	</div>
 

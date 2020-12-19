@@ -926,6 +926,14 @@ $CONFIG = [
 'appstoreenabled' => true,
 
 /**
+ * Enables the installation of apps from a self hosted apps store.
+ * Requires that at least one of the configured apps directories is writeable.
+ *
+ * Defaults to ``https://apps.nextcloud.com/api/v1``
+ */
+'appstoreurl' => 'https://apps.nextcloud.com/api/v1',
+
+/**
  * Use the ``apps_paths`` parameter to set the location of the Apps directory,
  * which should be scanned for available apps, and where user-specific apps
  * should be installed from the Apps store. The ``path`` defines the absolute
@@ -1357,6 +1365,23 @@ $CONFIG = [
 		'bucket' => 'nextcloud',
 	],
 ],
+
+/**
+ * If this is set to true and a multibucket object store is configured then
+ * newly created previews are put into 256 dedicated buckets.
+ *
+ * Those buckets are named like the mulibucket version but with the postfix
+ * ``-preview-NUMBER`` where NUMBER is between 0 and 255.
+ *
+ * Keep in mind that only previews of files are put in there that don't have
+ * some already. Otherwise the old bucket will be used.
+ *
+ * To migrate existing previews to this new multibucket distribution of previews
+ * use the occ command ``preview:repair``. For now this will only migrate
+ * previews that were generated before Nextcloud 19 in the flat
+ * ``appdata_INSTANCEID/previews/FILEID`` folder structure.
+ */
+'objectstore.multibucket.preview-distribution' => false,
 
 
 /**

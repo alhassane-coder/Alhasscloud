@@ -17,6 +17,7 @@
  * @author Robin McCorkell <robin@mccorkell.me.uk>
  * @author Roeland Jago Douma <roeland@famdouma.nl>
  * @author Stefan Weil <sw@weilnetz.de>
+ * @author Tobias Perschon <tobias@perschon.at>
  * @author Victor Dubiniuk <dubiniuk@owncloud.com>
  * @author Xuanwo <xuanwo@yunify.com>
  *
@@ -794,7 +795,7 @@ class Wizard extends LDAPUtility {
 	 * @throws \Exception
 	 */
 	private function detectGroupMemberAssoc() {
-		$possibleAttrs = ['uniqueMember', 'memberUid', 'member', 'gidNumber'];
+		$possibleAttrs = ['uniqueMember', 'memberUid', 'member', 'gidNumber', 'zimbraMailForwardingAddress'];
 		$filter = $this->configuration->ldapGroupFilter;
 		if (empty($filter)) {
 			return false;

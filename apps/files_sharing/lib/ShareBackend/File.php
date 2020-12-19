@@ -35,6 +35,7 @@
 namespace OCA\Files_Sharing\ShareBackend;
 
 use OCA\FederatedFileSharing\FederatedShareProvider;
+use OCP\Share\IShare;
 
 class File implements \OCP\Share_Backend_File_Dependent {
 	public const FORMAT_SHARED_STORAGE = 0;
@@ -54,8 +55,7 @@ class File implements \OCP\Share_Backend_File_Dependent {
 		if ($federatedShareProvider) {
 			$this->federatedShareProvider = $federatedShareProvider;
 		} else {
-			$federatedSharingApp = new \OCA\FederatedFileSharing\AppInfo\Application();
-			$this->federatedShareProvider = $federatedSharingApp->getFederatedShareProvider();
+			$this->federatedShareProvider = \OC::$server->query(FederatedShareProvider::class);
 		}
 	}
 
@@ -89,14 +89,15 @@ class File implements \OCP\Share_Backend_File_Dependent {
 
 	/**
 	 * create unique target
-	 * @param string $filePath
+	 *
+	 * @param string $itemSource
 	 * @param string $shareWith
 	 * @param array $exclude (optional)
 	 * @return string
 	 */
-	public function generateTarget($filePath, $shareWith, $exclude = null) {
+	public function generateTarget($itemSource, $shareWith, $exclude = null) {
 		$shareFolder = \OCA\Files_Sharing\Helper::getShareFolder();
-		$target = \OC\Files\Filesystem::normalizePath($shareFolder . '/' . basename($filePath));
+		$target = \OC\Files\Filesystem::normalizePath($shareFolder . '/' . basename($itemSource));
 
 		// for group shares we return the target right away
 		if ($shareWith === false) {
@@ -191,11 +192,11 @@ class File implements \OCP\Share_Backend_File_Dependent {
 	 * @return boolean
 	 */
 	public function isShareTypeAllowed($shareType) {
-		if ($shareType === \OCP\Share::SHARE_TYPE_REMOTE) {
+		if ($shareType === IShare::TYPE_REMOTE) {
 			return $this->federatedShareProvider->isOutgoingServer2serverShareEnabled();
 		}
 
-		if ($shareType === \OCP\Share::SHARE_TYPE_REMOTE_GROUP) {
+		if ($shareType === IShare::TYPE_REMOTE_GROUP) {
 			return $this->federatedShareProvider->isOutgoingServer2serverGroupShareEnabled();
 		}
 

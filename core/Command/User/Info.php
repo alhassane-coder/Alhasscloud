@@ -2,6 +2,7 @@
 /**
  * @copyright Copyright (c) 2016 Robin Appelman <robin@icewind.nl>
  *
+ * @author Joas Schilling <coding@schilljs.com>
  * @author Morris Jobke <hey@morrisjobke.de>
  * @author Robin Appelman <robin@icewind.nl>
  *
@@ -65,7 +66,7 @@ class Info extends Base {
 			);
 	}
 
-	protected function execute(InputInterface $input, OutputInterface $output) {
+	protected function execute(InputInterface $input, OutputInterface $output): int {
 		$user = $this->userManager->get($input->getArgument('user'));
 		if (is_null($user)) {
 			$output->writeln('<error>user not found</error>');
@@ -85,5 +86,6 @@ class Info extends Base {
 			'backend' => $user->getBackendClassName()
 		];
 		$this->writeArrayInOutputFormat($input, $output, $data);
+		return 0;
 	}
 }

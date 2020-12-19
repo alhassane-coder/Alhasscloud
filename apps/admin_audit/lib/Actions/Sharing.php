@@ -5,7 +5,6 @@ declare(strict_types=1);
 /**
  * @copyright Copyright (c) 2016 Lukas Reschke <lukas@statuscode.ch>
  *
- * @author Christoph Wurst <christoph@winzerhof-wurst.at>
  * @author Daniel Calviño Sánchez <danxuliu@gmail.com>
  * @author Joas Schilling <coding@schilljs.com>
  * @author Lukas Reschke <lukas@statuscode.ch>
@@ -30,7 +29,7 @@ declare(strict_types=1);
 
 namespace OCA\AdminAudit\Actions;
 
-use OCP\Share;
+use OCP\Share\IShare;
 
 /**
  * Class Sharing logs the sharing actions
@@ -44,7 +43,7 @@ class Sharing extends Action {
 	 * @param array $params
 	 */
 	public function shared(array $params) {
-		if ($params['shareType'] === Share::SHARE_TYPE_LINK) {
+		if ($params['shareType'] === IShare::TYPE_LINK) {
 			$this->log(
 				'The %s "%s" with ID "%s" has been shared via link with permissions "%s" (Share ID: %s)',
 				$params,
@@ -56,7 +55,7 @@ class Sharing extends Action {
 					'id',
 				]
 			);
-		} elseif ($params['shareType'] === Share::SHARE_TYPE_USER) {
+		} elseif ($params['shareType'] === IShare::TYPE_USER) {
 			$this->log(
 				'The %s "%s" with ID "%s" has been shared to the user "%s" with permissions "%s"  (Share ID: %s)',
 				$params,
@@ -69,7 +68,7 @@ class Sharing extends Action {
 					'id',
 				]
 			);
-		} elseif ($params['shareType'] === Share::SHARE_TYPE_GROUP) {
+		} elseif ($params['shareType'] === IShare::TYPE_GROUP) {
 			$this->log(
 				'The %s "%s" with ID "%s" has been shared to the group "%s" with permissions "%s"  (Share ID: %s)',
 				$params,
@@ -82,7 +81,7 @@ class Sharing extends Action {
 					'id',
 				]
 			);
-		} elseif ($params['shareType'] === Share::SHARE_TYPE_ROOM) {
+		} elseif ($params['shareType'] === IShare::TYPE_ROOM) {
 			$this->log(
 				'The %s "%s" with ID "%s" has been shared to the room "%s" with permissions "%s" (Share ID: %s)',
 				$params,
@@ -95,7 +94,7 @@ class Sharing extends Action {
 					'id',
 				]
 			);
-		} elseif ($params['shareType'] === Share::SHARE_TYPE_EMAIL) {
+		} elseif ($params['shareType'] === IShare::TYPE_EMAIL) {
 			$this->log(
 				'The %s "%s" with ID "%s" has been shared to the email recipient "%s" with permissions "%s" (Share ID: %s)',
 				$params,
@@ -108,7 +107,7 @@ class Sharing extends Action {
 					'id',
 				]
 			);
-		} elseif ($params['shareType'] === Share::SHARE_TYPE_CIRCLE) {
+		} elseif ($params['shareType'] === IShare::TYPE_CIRCLE) {
 			$this->log(
 				'The %s "%s" with ID "%s" has been shared to the circle "%s" with permissions "%s" (Share ID: %s)',
 				$params,
@@ -121,7 +120,7 @@ class Sharing extends Action {
 					'id',
 				]
 			);
-		} elseif ($params['shareType'] === Share::SHARE_TYPE_REMOTE) {
+		} elseif ($params['shareType'] === IShare::TYPE_REMOTE) {
 			$this->log(
 				'The %s "%s" with ID "%s" has been shared to the remote user "%s" with permissions "%s" (Share ID: %s)',
 				$params,
@@ -134,7 +133,7 @@ class Sharing extends Action {
 					'id',
 				]
 			);
-		} elseif ($params['shareType'] === Share::SHARE_TYPE_REMOTE_GROUP) {
+		} elseif ($params['shareType'] === IShare::TYPE_REMOTE_GROUP) {
 			$this->log(
 				'The %s "%s" with ID "%s" has been shared to the remote group "%s" with permissions "%s" (Share ID: %s)',
 				$params,
@@ -156,7 +155,7 @@ class Sharing extends Action {
 	 * @param array $params
 	 */
 	public function unshare(array $params) {
-		if ($params['shareType'] === Share::SHARE_TYPE_LINK) {
+		if ($params['shareType'] === IShare::TYPE_LINK) {
 			$this->log(
 				'The %s "%s" with ID "%s" has been unshared (Share ID: %s)',
 				$params,
@@ -167,7 +166,7 @@ class Sharing extends Action {
 					'id',
 				]
 			);
-		} elseif ($params['shareType'] === Share::SHARE_TYPE_USER) {
+		} elseif ($params['shareType'] === IShare::TYPE_USER) {
 			$this->log(
 				'The %s "%s" with ID "%s" has been unshared from the user "%s" (Share ID: %s)',
 				$params,
@@ -179,7 +178,7 @@ class Sharing extends Action {
 					'id',
 				]
 			);
-		} elseif ($params['shareType'] === Share::SHARE_TYPE_GROUP) {
+		} elseif ($params['shareType'] === IShare::TYPE_GROUP) {
 			$this->log(
 				'The %s "%s" with ID "%s" has been unshared from the group "%s" (Share ID: %s)',
 				$params,
@@ -191,7 +190,7 @@ class Sharing extends Action {
 					'id',
 				]
 			);
-		} elseif ($params['shareType'] === Share::SHARE_TYPE_ROOM) {
+		} elseif ($params['shareType'] === IShare::TYPE_ROOM) {
 			$this->log(
 				'The %s "%s" with ID "%s" has been unshared from the room "%s" (Share ID: %s)',
 				$params,
@@ -203,7 +202,7 @@ class Sharing extends Action {
 					'id',
 				]
 			);
-		} elseif ($params['shareType'] === Share::SHARE_TYPE_EMAIL) {
+		} elseif ($params['shareType'] === IShare::TYPE_EMAIL) {
 			$this->log(
 				'The %s "%s" with ID "%s" has been unshared from the email recipient "%s" (Share ID: %s)',
 				$params,
@@ -215,7 +214,7 @@ class Sharing extends Action {
 					'id',
 				]
 			);
-		} elseif ($params['shareType'] === Share::SHARE_TYPE_CIRCLE) {
+		} elseif ($params['shareType'] === IShare::TYPE_CIRCLE) {
 			$this->log(
 				'The %s "%s" with ID "%s" has been unshared from the circle "%s" (Share ID: %s)',
 				$params,
@@ -227,7 +226,7 @@ class Sharing extends Action {
 					'id',
 				]
 			);
-		} elseif ($params['shareType'] === Share::SHARE_TYPE_REMOTE) {
+		} elseif ($params['shareType'] === IShare::TYPE_REMOTE) {
 			$this->log(
 				'The %s "%s" with ID "%s" has been unshared from the remote user "%s" (Share ID: %s)',
 				$params,
@@ -239,7 +238,7 @@ class Sharing extends Action {
 					'id',
 				]
 			);
-		} elseif ($params['shareType'] === Share::SHARE_TYPE_REMOTE_GROUP) {
+		} elseif ($params['shareType'] === IShare::TYPE_REMOTE_GROUP) {
 			$this->log(
 				'The %s "%s" with ID "%s" has been unshared from the remote group "%s" (Share ID: %s)',
 				$params,

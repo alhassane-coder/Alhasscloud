@@ -8,6 +8,7 @@ declare(strict_types=1);
  *
  * @author Christoph Wurst <christoph@winzerhof-wurst.at>
  * @author Georg Ehrke <oc.list@georgehrke.com>
+ * @author Joas Schilling <coding@schilljs.com>
  * @author Roeland Jago Douma <roeland@famdouma.nl>
  *
  * @license GNU AGPL version 3 or any later version
@@ -54,7 +55,7 @@ abstract class AbstractProvider implements INotificationProvider {
 	protected $logger;
 
 	/** @var L10NFactory */
-	private $l10nFactory;
+	protected $l10nFactory;
 
 	/** @var IL10N[] */
 	private $l10ns;

@@ -4,6 +4,7 @@
  *
  * @author Christoph Wurst <christoph@winzerhof-wurst.at>
  * @author Daniel Kesselberg <mail@danielkesselberg.de>
+ * @author Joas Schilling <coding@schilljs.com>
  * @author Joel S <joel.devbox@protonmail.com>
  * @author Morris Jobke <hey@morrisjobke.de>
  * @author Roeland Jago Douma <roeland@famdouma.nl>
@@ -149,7 +150,7 @@ class ScanAppData extends Base {
 	}
 
 
-	protected function execute(InputInterface $input, OutputInterface $output) {
+	protected function execute(InputInterface $input, OutputInterface $output): int {
 		# restrict the verbosity level to VERBOSITY_VERBOSE
 		if ($output->getVerbosity() > OutputInterface::VERBOSITY_VERBOSE) {
 			$output->setVerbosity(OutputInterface::VERBOSITY_VERBOSE);

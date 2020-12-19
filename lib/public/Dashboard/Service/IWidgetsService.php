@@ -5,6 +5,7 @@ declare(strict_types=1);
 /**
  * @copyright 2018, Maxence Lange <maxence@artificial-owl.com>
  *
+ * @author Julius Härtl <jus@bitgrid.net>
  * @author Maxence Lange <maxence@artificial-owl.com>
  *
  * @license GNU AGPL version 3 or any later version
@@ -36,6 +37,7 @@ use OCP\Dashboard\Model\IWidgetConfig;
  * configuration of a widget for a user.
  *
  * @since 15.0.0
+ * @deprecated 20.0.0
  *
  */
 interface IWidgetsService {
@@ -44,6 +46,7 @@ interface IWidgetsService {
 	 * Returns the IWidgetConfig for a widgetId and userId
 	 *
 	 * @since 15.0.0
+	 * @deprecated 20.0.0
 	 *
 	 * @param string $widgetId
 	 * @param string $userId

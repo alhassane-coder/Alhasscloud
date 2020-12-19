@@ -2,6 +2,7 @@
 /**
  * @copyright Copyright (c) 2016 Robin Appelman <robin@icewind.nl>
  *
+ * @author Joas Schilling <coding@schilljs.com>
  * @author John Molakvoæ (skjnldsv) <skjnldsv@protonmail.com>
  * @author Robin Appelman <robin@icewind.nl>
  *
@@ -81,10 +82,11 @@ class ListCommand extends Base {
 			);
 	}
 
-	protected function execute(InputInterface $input, OutputInterface $output) {
+	protected function execute(InputInterface $input, OutputInterface $output): int {
 		$users = $this->userManager->search('', (int) $input->getOption('limit'), (int) $input->getOption('offset'));
 
 		$this->writeArrayInOutputFormat($input, $output, $this->formatUsers($users, (bool)$input->getOption('info')));
+		return 0;
 	}
 
 	/**
@@ -96,7 +98,7 @@ class ListCommand extends Base {
 		$keys = array_map(function (IUser $user) {
 			return $user->getUID();
 		}, $users);
-	
+
 		$values = array_map(function (IUser $user) use ($detailed) {
 			if ($detailed) {
 				$groups = $this->groupManager->getUserGroupIds($user);

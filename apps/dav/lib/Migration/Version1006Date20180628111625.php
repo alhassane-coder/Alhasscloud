@@ -5,6 +5,7 @@ declare(strict_types=1);
 /**
  * @copyright 2018 Georg Ehrke <oc.list@georgehrke.com>
  *
+ * @author Daniel Kesselberg <mail@danielkesselberg.de>
  * @author Georg Ehrke <oc.list@georgehrke.com>
  * @author Joas Schilling <coding@schilljs.com>
  * @author Roeland Jago Douma <roeland@famdouma.nl>
@@ -28,7 +29,7 @@ declare(strict_types=1);
 
 namespace OCA\DAV\Migration;
 
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use OCP\DB\ISchemaWrapper;
 use OCP\Migration\IOutput;
 use OCP\Migration\SimpleMigrationStep;
@@ -47,7 +48,7 @@ class Version1006Date20180628111625 extends SimpleMigrationStep {
 
 		if ($schema->hasTable('calendarchanges')) {
 			$calendarChangesTable = $schema->getTable('calendarchanges');
-			$calendarChangesTable->addColumn('calendartype', Type::INTEGER, [
+			$calendarChangesTable->addColumn('calendartype', Types::INTEGER, [
 				'notnull' => true,
 				'default' => 0,
 			]);
@@ -60,7 +61,7 @@ class Version1006Date20180628111625 extends SimpleMigrationStep {
 
 		if ($schema->hasTable('calendarobjects')) {
 			$calendarObjectsTable = $schema->getTable('calendarobjects');
-			$calendarObjectsTable->addColumn('calendartype', Type::INTEGER, [
+			$calendarObjectsTable->addColumn('calendartype', Types::INTEGER, [
 				'notnull' => true,
 				'default' => 0,
 			]);
@@ -73,7 +74,7 @@ class Version1006Date20180628111625 extends SimpleMigrationStep {
 
 		if ($schema->hasTable('calendarobjects_props')) {
 			$calendarObjectsPropsTable = $schema->getTable('calendarobjects_props');
-			$calendarObjectsPropsTable->addColumn('calendartype', Type::INTEGER, [
+			$calendarObjectsPropsTable->addColumn('calendartype', Types::INTEGER, [
 				'notnull' => true,
 				'default' => 0,
 			]);

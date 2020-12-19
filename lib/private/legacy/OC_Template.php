@@ -39,6 +39,7 @@
  */
 
 use OC\TemplateLayout;
+use OCP\AppFramework\Http\TemplateResponse;
 
 require_once __DIR__.'/template/functions.php';
 
@@ -72,7 +73,7 @@ class OC_Template extends \OC\Template\Base {
 	 *                         "admin".
 	 * @param bool $registerCall = true
 	 */
-	public function __construct($app, $name, $renderAs = "", $registerCall = true) {
+	public function __construct($app, $name, $renderAs = TemplateResponse::RENDER_AS_BLANK, $registerCall = true) {
 		// Read the selected theme from the config file
 		self::initTemplateEngine($renderAs);
 
@@ -104,7 +105,7 @@ class OC_Template extends \OC\Template\Base {
 			//apps that started before the template initialization can load their own scripts/styles
 			//so to make sure this scripts/styles here are loaded first we use OC_Util::addScript() with $prepend=true
 			//meaning the last script/style in this list will be loaded first
-			if (\OC::$server->getSystemConfig()->getValue('installed', false) && $renderAs !== 'error' && !\OCP\Util::needUpgrade()) {
+			if (\OC::$server->getSystemConfig()->getValue('installed', false) && $renderAs !== TemplateResponse::RENDER_AS_ERROR && !\OCP\Util::needUpgrade()) {
 				if (\OC::$server->getConfig()->getAppValue('core', 'backgroundjobs_mode', 'ajax') == 'ajax') {
 					OC_Util::addScript('backgroundjobs', null, true);
 				}
@@ -113,19 +114,16 @@ class OC_Template extends \OC\Template\Base {
 			OC_Util::addStyle('server', null, true);
 			OC_Util::addTranslations('core', null, true);
 
-			if (\OC::$server->getSystemConfig()->getValue('installed', false)) {
-				OC_Util::addStyle('search', 'results');
-				OC_Util::addScript('search', 'search', true);
-				OC_Util::addScript('search', 'searchprovider');
+			if (\OC::$server->getSystemConfig()->getValue('installed', false) && !\OCP\Util::needUpgrade()) {
 				OC_Util::addScript('merged-template-prepend', null, true);
-				OC_Util::addScript('files/fileinfo');
-				OC_Util::addScript('files/client');
+				OC_Util::addScript('dist/files_client', null, true);
+				OC_Util::addScript('dist/files_fileinfo', null, true);
 			}
 			OC_Util::addScript('core', 'dist/main', true);
 
 			if (\OC::$server->getRequest()->isUserAgent([\OC\AppFramework\Http\Request::USER_AGENT_IE])) {
 				// shim for the davclient.js library
-				\OCP\Util::addScript('files/iedavclient');
+				\OCP\Util::addScript('dist/files_iedavclient');
 			}
 
 			self::$initTemplateEngineFirstRun = false;
@@ -173,7 +171,7 @@ class OC_Template extends \OC\Template\Base {
 
 	/**
 	 * Process the template
-	 * @return boolean|string
+	 * @return string
 	 *
 	 * This function process the template. If $this->renderAs is set, it
 	 * will produce a full page.

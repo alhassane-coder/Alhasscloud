@@ -5,6 +5,7 @@ declare(strict_types=1);
 /**
  * @copyright 2018, Maxence Lange <maxence@artificial-owl.com>
  *
+ * @author Julius Härtl <jus@bitgrid.net>
  * @author Maxence Lange <maxence@artificial-owl.com>
  *
  * @license GNU AGPL version 3 or any later version
@@ -37,6 +38,7 @@ use JsonSerializable;
  * @see IDashboardWidget::getWidgetTemplate
  *
  * @since 15.0.0
+ * @deprecated 20.0.0
  *
  */
 final class WidgetTemplate implements JsonSerializable {
@@ -65,6 +67,7 @@ final class WidgetTemplate implements JsonSerializable {
 	 * Get the icon class of the widget.
 	 *
 	 * @since 15.0.0
+	 * @deprecated 20.0.0
 	 *
 	 * @return string
 	 */
@@ -79,6 +82,7 @@ final class WidgetTemplate implements JsonSerializable {
 	 * @see addCss
 	 *
 	 * @since 15.0.0
+	 * @deprecated 20.0.0
 	 *
 	 * @param string $icon
 	 *
@@ -94,6 +98,7 @@ final class WidgetTemplate implements JsonSerializable {
 	 * Get CSS files to be included when displaying a widget
 	 *
 	 * @since 15.0.0
+	 * @deprecated 20.0.0
 	 *
 	 * @return array
 	 */
@@ -105,6 +110,7 @@ final class WidgetTemplate implements JsonSerializable {
 	 * path and name of CSS files
 	 *
 	 * @since 15.0.0
+	 * @deprecated 20.0.0
 	 *
 	 * @param array $css
 	 *
@@ -120,6 +126,7 @@ final class WidgetTemplate implements JsonSerializable {
 	 * Add a CSS file to be included when displaying a widget.
 	 *
 	 * @since 15.0.0
+	 * @deprecated 20.0.0
 	 *
 	 * @param string $css
 	 *
@@ -135,6 +142,7 @@ final class WidgetTemplate implements JsonSerializable {
 	 * Get JS files to be included when loading a widget
 	 *
 	 * @since 15.0.0
+	 * @deprecated 20.0.0
 	 *
 	 * @return array
 	 */
@@ -146,6 +154,7 @@ final class WidgetTemplate implements JsonSerializable {
 	 * Set an array of JS files to be included when loading a widget.
 	 *
 	 * @since 15.0.0
+	 * @deprecated 20.0.0
 	 *
 	 * @param array $js
 	 *
@@ -161,6 +170,7 @@ final class WidgetTemplate implements JsonSerializable {
 	 * Add a JS file to be included when loading a widget.
 	 *
 	 * @since 15.0.0
+	 * @deprecated 20.0.0
 	 *
 	 * @param string $js
 	 *
@@ -176,6 +186,7 @@ final class WidgetTemplate implements JsonSerializable {
 	 * Get the HTML file that contains the content of the widget.
 	 *
 	 * @since 15.0.0
+	 * @deprecated 20.0.0
 	 *
 	 * @return string
 	 */
@@ -187,6 +198,7 @@ final class WidgetTemplate implements JsonSerializable {
 	 * Set the HTML file that contains the content of the widget.
 	 *
 	 * @since 15.0.0
+	 * @deprecated 20.0.0
 	 *
 	 * @param string $content
 	 *
@@ -202,6 +214,7 @@ final class WidgetTemplate implements JsonSerializable {
 	 * Get the JS function to be called when loading the widget.
 	 *
 	 * @since 15.0.0
+	 * @deprecated 20.0.0
 	 *
 	 * @return string
 	 */
@@ -214,6 +227,7 @@ final class WidgetTemplate implements JsonSerializable {
 	 * dashboard
 	 *
 	 * @since 15.0.0
+	 * @deprecated 20.0.0
 	 *
 	 * @param string $function
 	 *
@@ -231,6 +245,7 @@ final class WidgetTemplate implements JsonSerializable {
 	 * @see WidgetSetting
 	 *
 	 * @since 15.0.0
+	 * @deprecated 20.0.0
 	 *
 	 * @return WidgetSetting[]
 	 */
@@ -242,6 +257,7 @@ final class WidgetTemplate implements JsonSerializable {
 	 * Define all WidgetSetting for the widget.
 	 *
 	 * @since 15.0.0
+	 * @deprecated 20.0.0
 	 *
 	 * @see WidgetSetting
 	 *
@@ -261,6 +277,7 @@ final class WidgetTemplate implements JsonSerializable {
 	 * @see WidgetSetting
 	 *
 	 * @since 15.0.0
+	 * @deprecated 20.0.0
 	 *
 	 * @param WidgetSetting $setting
 	 *
@@ -278,6 +295,7 @@ final class WidgetTemplate implements JsonSerializable {
 	 * @see WidgetSetting::setName
 	 *
 	 * @since 15.0.0
+	 * @deprecated 20.0.0
 	 *
 	 * @param string $key
 	 *
@@ -294,6 +312,7 @@ final class WidgetTemplate implements JsonSerializable {
 
 	/**
 	 * @since 15.0.0
+	 * @deprecated 20.0.0
 	 *
 	 * @return array
 	 */

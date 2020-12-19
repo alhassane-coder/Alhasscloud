@@ -4,6 +4,7 @@
  *
  * @author Arthur Schiwon <blizzz@arthur-schiwon.de>
  * @author Christoph Wurst <christoph@winzerhof-wurst.at>
+ * @author Joas Schilling <coding@schilljs.com>
  * @author Julius Härtl <jus@bitgrid.net>
  * @author Morris Jobke <hey@morrisjobke.de>
  * @author Robin Appelman <robin@icewind.nl>
@@ -34,7 +35,7 @@ use OCP\IConfig;
 use OCP\IGroup;
 use OCP\IGroupManager;
 use OCP\IUserSession;
-use OCP\Share;
+use OCP\Share\IShare;
 
 class GroupPlugin implements ISearchPlugin {
 	protected $shareeEnumeration;
@@ -95,7 +96,7 @@ class GroupPlugin implements ISearchPlugin {
 				$result['exact'][] = [
 					'label' => $group->getDisplayName(),
 					'value' => [
-						'shareType' => Share::SHARE_TYPE_GROUP,
+						'shareType' => IShare::TYPE_GROUP,
 						'shareWith' => $gid,
 					],
 				];
@@ -106,7 +107,7 @@ class GroupPlugin implements ISearchPlugin {
 				$result['wide'][] = [
 					'label' => $group->getDisplayName(),
 					'value' => [
-						'shareType' => Share::SHARE_TYPE_GROUP,
+						'shareType' => IShare::TYPE_GROUP,
 						'shareWith' => $gid,
 					],
 				];
@@ -121,7 +122,7 @@ class GroupPlugin implements ISearchPlugin {
 				$result['exact'][] = [
 					'label' => $group->getDisplayName(),
 					'value' => [
-						'shareType' => Share::SHARE_TYPE_GROUP,
+						'shareType' => IShare::TYPE_GROUP,
 						'shareWith' => $group->getGID(),
 					],
 				];

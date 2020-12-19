@@ -6,6 +6,7 @@
  * @author Björn Schießle <bjoern@schiessle.org>
  * @author Christoph Wurst <christoph@winzerhof-wurst.at>
  * @author Lukas Reschke <lukas@statuscode.ch>
+ * @author Morris Jobke <hey@morrisjobke.de>
  *
  * @license AGPL-3.0
  *
@@ -25,8 +26,10 @@
 
 namespace OCA\FederatedFileSharing;
 
+use OCA\FederatedFileSharing\Events\FederatedShareAddedEvent;
 use OCP\AppFramework\Http;
 use OCP\BackgroundJob\IJobList;
+use OCP\EventDispatcher\IEventDispatcher;
 use OCP\Federation\ICloudFederationFactory;
 use OCP\Federation\ICloudFederationProviderManager;
 use OCP\Http\Client\IClientService;
@@ -53,21 +56,17 @@ class Notifications {
 	/** @var ICloudFederationFactory */
 	private $cloudFederationFactory;
 
-	/**
-	 * @param AddressHandler $addressHandler
-	 * @param IClientService $httpClientService
-	 * @param IDiscoveryService $discoveryService
-	 * @param IJobList $jobList
-	 * @param ICloudFederationProviderManager $federationProviderManager
-	 * @param ICloudFederationFactory $cloudFederationFactory
-	 */
+	/** @var IEventDispatcher */
+	private $eventDispatcher;
+
 	public function __construct(
 		AddressHandler $addressHandler,
 		IClientService $httpClientService,
 		IDiscoveryService $discoveryService,
 		IJobList $jobList,
 		ICloudFederationProviderManager $federationProviderManager,
-		ICloudFederationFactory $cloudFederationFactory
+		ICloudFederationFactory $cloudFederationFactory,
+		IEventDispatcher $eventDispatcher
 	) {
 		$this->addressHandler = $addressHandler;
 		$this->httpClientService = $httpClientService;
@@ -75,6 +74,7 @@ class Notifications {
 		$this->jobList = $jobList;
 		$this->federationProviderManager = $federationProviderManager;
 		$this->cloudFederationFactory = $cloudFederationFactory;
+		$this->eventDispatcher = $eventDispatcher;
 	}
 
 	/**
@@ -83,7 +83,7 @@ class Notifications {
 	 * @param string $token
 	 * @param string $shareWith
 	 * @param string $name
-	 * @param int $remote_id
+	 * @param string $remoteId
 	 * @param string $owner
 	 * @param string $ownerFederatedId
 	 * @param string $sharedBy
@@ -93,7 +93,7 @@ class Notifications {
 	 * @throws \OC\HintException
 	 * @throws \OC\ServerNotAvailableException
 	 */
-	public function sendRemoteShare($token, $shareWith, $name, $remote_id, $owner, $ownerFederatedId, $sharedBy, $sharedByFederatedId, $shareType) {
+	public function sendRemoteShare($token, $shareWith, $name, $remoteId, $owner, $ownerFederatedId, $sharedBy, $sharedByFederatedId, $shareType) {
 		list($user, $remote) = $this->addressHandler->splitUserRemote($shareWith);
 
 		if ($user && $remote) {
@@ -103,7 +103,7 @@ class Notifications {
 				'shareWith' => $user,
 				'token' => $token,
 				'name' => $name,
-				'remoteId' => $remote_id,
+				'remoteId' => $remoteId,
 				'owner' => $owner,
 				'ownerFederatedId' => $ownerFederatedId,
 				'sharedBy' => $sharedBy,
@@ -119,7 +119,8 @@ class Notifications {
 			$ocsSuccess = $ocsStatus && ($status['ocs']['meta']['statuscode'] === 100 || $status['ocs']['meta']['statuscode'] === 200);
 
 			if ($result['success'] && (!$ocsStatus ||$ocsSuccess)) {
-				\OC_Hook::emit('OCP\Share', 'federated_share_added', ['server' => $remote]);
+				$event = new FederatedShareAddedEvent($remote);
+				$this->eventDispatcher->dispatchTyped($event);
 				return true;
 			}
 		}
@@ -131,13 +132,13 @@ class Notifications {
 	 * ask owner to re-share the file with the given user
 	 *
 	 * @param string $token
-	 * @param int $id remote Id
-	 * @param int $shareId internal share Id
+	 * @param string $id remote Id
+	 * @param string $shareId internal share Id
 	 * @param string $remote remote address of the owner
 	 * @param string $shareWith
 	 * @param int $permission
 	 * @param string $filename
-	 * @return bool
+	 * @return array|false
 	 * @throws \OC\HintException
 	 * @throws \OC\ServerNotAvailableException
 	 */
@@ -150,7 +151,7 @@ class Notifications {
 		];
 
 		$ocmFields = $fields;
-		$ocmFields['remoteId'] = $id;
+		$ocmFields['remoteId'] = (string)$id;
 		$ocmFields['localId'] = $shareId;
 		$ocmFields['name'] = $filename;
 
@@ -170,7 +171,7 @@ class Notifications {
 		if ($httpRequestSuccessful && $ocsCallSuccessful && $validToken && $validRemoteId) {
 			return [
 				$status['ocs']['data']['token'],
-				(int)$status['ocs']['data']['remoteId']
+				$status['ocs']['data']['remoteId']
 			];
 		}
 
@@ -181,7 +182,7 @@ class Notifications {
 	 * send server-to-server unshare to remote server
 	 *
 	 * @param string $remote url
-	 * @param int $id share id
+	 * @param string $id share id
 	 * @param string $token
 	 * @return bool
 	 */
@@ -193,7 +194,7 @@ class Notifications {
 	 * send server-to-server unshare to remote server
 	 *
 	 * @param string $remote url
-	 * @param int $id share id
+	 * @param string $id share id
 	 * @param string $token
 	 * @return bool
 	 */
@@ -205,7 +206,7 @@ class Notifications {
 	 * send notification to remote server if the permissions was changed
 	 *
 	 * @param string $remote
-	 * @param int $remoteId
+	 * @param string $remoteId
 	 * @param string $token
 	 * @param int $permissions
 	 * @return bool
@@ -218,7 +219,7 @@ class Notifications {
 	 * forward accept reShare to remote server
 	 *
 	 * @param string $remote
-	 * @param int $remoteId
+	 * @param string $remoteId
 	 * @param string $token
 	 */
 	public function sendAcceptShare($remote, $remoteId, $token) {
@@ -229,7 +230,7 @@ class Notifications {
 	 * forward decline reShare to remote server
 	 *
 	 * @param string $remote
-	 * @param int $remoteId
+	 * @param string $remoteId
 	 * @param string $token
 	 */
 	public function sendDeclineShare($remote, $remoteId, $token) {
@@ -241,7 +242,7 @@ class Notifications {
 	 *
 	 * @param string $remote
 	 * @param string $token
-	 * @param int $remoteId Share id on the remote host
+	 * @param string $remoteId Share id on the remote host
 	 * @param string $action possible actions: accept, decline, unshare, revoke, permissions
 	 * @param array $data
 	 * @param int $try

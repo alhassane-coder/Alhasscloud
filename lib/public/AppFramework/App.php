@@ -7,6 +7,7 @@ declare(strict_types=1);
  *
  * @author Bernhard Posselt <dev@bernhard-posselt.com>
  * @author Christoph Wurst <christoph@winzerhof-wurst.at>
+ * @author Daniel Kesselberg <mail@danielkesselberg.de>
  * @author Joas Schilling <coding@schilljs.com>
  * @author Julius Härtl <jus@bitgrid.net>
  * @author Lukas Reschke <lukas@statuscode.ch>
@@ -142,6 +143,7 @@ class App {
 	 * @param array $routes
 	 * @since 6.0.0
 	 * @suppress PhanAccessMethodInternal
+	 * @deprecated 20.0.0 Just return an array from your routes.php
 	 */
 	public function registerRoutes(IRouter $router, array $routes) {
 		$routeConfig = new RouteConfig($this->container, $router, $routes);

@@ -24,6 +24,11 @@ class WorkspaceService {
 		$this->l10n = $l10n;
 	}
 
+	/**
+	 * @param Folder $folder
+	 * @throws StorageNotAvailableException
+	 * @return \OCP\Files\File
+	 */
 	public function getFile(Folder $folder) {
 		foreach ($this->getSupportedFilenames() as $filename) {
 			if ($folder->nodeExists($filename)) {

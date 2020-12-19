@@ -2,6 +2,7 @@
 /**
  * @copyright Copyright (c) 2016, ownCloud, Inc.
  *
+ * @author Joas Schilling <coding@schilljs.com>
  * @author Robin McCorkell <robin@mccorkell.me.uk>
  * @author Roeland Jago Douma <roeland@famdouma.nl>
  * @author Xheni Myrtaj <myrtajxheni@gmail.com>
@@ -48,7 +49,7 @@ class UpdateJS extends Command {
 			->setDescription('Update mimetypelist.js');
 	}
 
-	protected function execute(InputInterface $input, OutputInterface $output) {
+	protected function execute(InputInterface $input, OutputInterface $output): int {
 		// Fetch all the aliases
 		$aliases = $this->mimetypeDetector->getAllAliases();
 
@@ -57,5 +58,6 @@ class UpdateJS extends Command {
 		file_put_contents(\OC::$SERVERROOT.'/core/js/mimetypelist.js', $generatedMimetypeFile->generateFile($aliases));
 
 		$output->writeln('<info>mimetypelist.js is updated');
+		return 0;
 	}
 }

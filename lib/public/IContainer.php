@@ -3,6 +3,7 @@
  * @copyright Copyright (c) 2016, ownCloud, Inc.
  *
  * @author Bernhard Posselt <dev@bernhard-posselt.com>
+ * @author Christoph Wurst <christoph@winzerhof-wurst.at>
  * @author Joas Schilling <coding@schilljs.com>
  * @author Morris Jobke <hey@morrisjobke.de>
  * @author Roeland Jago Douma <roeland@famdouma.nl>
@@ -37,6 +38,8 @@ namespace OCP;
 
 use Closure;
 use OCP\AppFramework\QueryException;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\ContainerInterface;
 
 /**
  * Class IContainer
@@ -44,15 +47,22 @@ use OCP\AppFramework\QueryException;
  * IContainer is the basic interface to be used for any internal dependency injection mechanism
  *
  * @since 6.0.0
+ * @deprecated 20.0.0 use \Psr\Container\ContainerInterface
  */
-interface IContainer {
+interface IContainer extends ContainerInterface {
 
 	/**
+	 * @template T
+	 *
 	 * If a parameter is not registered in the container try to instantiate it
 	 * by using reflection to find out how to build the class
 	 * @param string $name the class name to resolve
+	 * @psalm-param string|class-string<T> $name
 	 * @return \stdClass
+	 * @psalm-return ($name is class-string ? T : mixed)
 	 * @since 8.2.0
+	 * @deprecated 20.0.0 use \Psr\Container\ContainerInterface::get
+	 * @throws ContainerExceptionInterface if the class could not be found or instantiated
 	 * @throws QueryException if the class could not be found or instantiated
 	 */
 	public function resolve($name);
@@ -60,11 +70,17 @@ interface IContainer {
 	/**
 	 * Look up a service for a given name in the container.
 	 *
+	 * @template T
+	 *
 	 * @param string $name
+	 * @psalm-param string|class-string<T> $name
 	 * @param bool $autoload Should we try to autoload the service. If we are trying to resolve built in types this makes no sense for example
 	 * @return mixed
+	 * @psalm-return ($name is class-string ? T : mixed)
+	 * @throws ContainerExceptionInterface if the query could not be resolved
 	 * @throws QueryException if the query could not be resolved
 	 * @since 6.0.0
+	 * @deprecated 20.0.0 use \Psr\Container\ContainerInterface::get
 	 */
 	public function query(string $name, bool $autoload = true);
 
@@ -75,6 +91,7 @@ interface IContainer {
 	 * @param mixed $value
 	 * @return void
 	 * @since 6.0.0
+	 * @deprecated 20.0.0 use \OCP\AppFramework\Bootstrap\IRegistrationContext::registerParameter
 	 */
 	public function registerParameter($name, $value);
 
@@ -90,6 +107,7 @@ interface IContainer {
 	 * @param bool $shared
 	 * @return void
 	 * @since 6.0.0
+	 * @deprecated 20.0.0 use \OCP\AppFramework\Bootstrap\IRegistrationContext::registerService
 	 */
 	public function registerService($name, Closure $closure, $shared = true);
 
@@ -100,6 +118,7 @@ interface IContainer {
 	 * @param string $alias the alias that should be registered
 	 * @param string $target the target that should be resolved instead
 	 * @since 8.2.0
+	 * @deprecated 20.0.0 use \OCP\AppFramework\Bootstrap\IRegistrationContext::registerServiceAlias
 	 */
 	public function registerAlias($alias, $target);
 }

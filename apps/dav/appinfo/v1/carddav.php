@@ -57,7 +57,7 @@ $principalBackend = new Principal(
 	'principals/'
 );
 $db = \OC::$server->getDatabaseConnection();
-$cardDavBackend = new CardDavBackend($db, $principalBackend, \OC::$server->getUserManager(), \OC::$server->getGroupManager(), \OC::$server->getEventDispatcher());
+$cardDavBackend = new CardDavBackend($db, $principalBackend, \OC::$server->getUserManager(), \OC::$server->getGroupManager(), \OC::$server->get(\OCP\EventDispatcher\IEventDispatcher::class), \OC::$server->getEventDispatcher());
 
 $debugging = \OC::$server->getConfig()->getSystemValue('debug', false);
 
@@ -80,7 +80,7 @@ $server::$exposeVersion = false;
 $server->httpRequest->setUrl(\OC::$server->getRequest()->getRequestUri());
 $server->setBaseUri($baseuri);
 // Add plugins
-$server->addPlugin(new MaintenancePlugin());
+$server->addPlugin(new MaintenancePlugin(\OC::$server->getConfig(), \OC::$server->getL10N('dav')));
 $server->addPlugin(new \Sabre\DAV\Auth\Plugin($authBackend, 'ownCloud'));
 $server->addPlugin(new Plugin());
 

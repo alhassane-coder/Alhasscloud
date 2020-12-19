@@ -2,9 +2,11 @@
 /**
  *
  *
+ * @author Arthur Schiwon <blizzz@arthur-schiwon.de>
  * @author Christoph Wurst <christoph@winzerhof-wurst.at>
  * @author Daniel Calviño Sánchez <danxuliu@gmail.com>
  * @author Joas Schilling <coding@schilljs.com>
+ * @author Julius Härtl <jus@bitgrid.net>
  * @author Lukas Reschke <lukas@statuscode.ch>
  * @author Matthew Setter <matthew@matthewsetter.com>
  * @author Morris Jobke <hey@morrisjobke.de>
@@ -33,6 +35,7 @@
 
 namespace OCA\Settings\Controller;
 
+use OC\Group\Manager as GroupManager;
 use OC\HintException;
 use OC\User\Session;
 use OCP\App\IAppManager;
@@ -56,7 +59,7 @@ class ChangePasswordController extends Controller {
 	/** @var IL10N */
 	private $l;
 
-	/** @var IGroupManager */
+	/** @var GroupManager */
 	private $groupManager;
 
 	/** @var Session */
@@ -85,7 +88,7 @@ class ChangePasswordController extends Controller {
 
 	/**
 	 * @NoAdminRequired
-	 * @NoSubadminRequired
+	 * @NoSubAdminRequired
 	 * @BruteForceProtection(action=changePersonalPassword)
 	 */
 	public function changePersonalPassword(string $oldpassword = '', string $newpassword = null): JSONResponse {

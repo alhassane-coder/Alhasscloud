@@ -3,7 +3,6 @@
  * @copyright Copyright (c) 2016, ownCloud, Inc.
  *
  * @author Bernhard Posselt <dev@bernhard-posselt.com>
- * @author Christian Kampka <christian@kampka.net>
  * @author Christoph Wurst <christoph@winzerhof-wurst.at>
  * @author Daniel Hansson <daniel@techandme.se>
  * @author Daniel Kesselberg <mail@danielkesselberg.de>
@@ -32,6 +31,7 @@
 
 namespace OC\Core\Command\Maintenance;
 
+use bantu\IniGetWrapper\IniGetWrapper;
 use InvalidArgumentException;
 use OC\Installer;
 use OC\Setup;
@@ -46,14 +46,15 @@ use Symfony\Component\Console\Question\Question;
 
 class Install extends Command {
 
-	/**
-	 * @var SystemConfig
-	 */
+	/** @var SystemConfig */
 	private $config;
+	/** @var IniGetWrapper  */
+	private $iniGetWrapper;
 
-	public function __construct(SystemConfig $config) {
+	public function __construct(SystemConfig $config, IniGetWrapper $iniGetWrapper) {
 		parent::__construct();
 		$this->config = $config;
+		$this->iniGetWrapper = $iniGetWrapper;
 	}
 
 	protected function configure() {
@@ -66,7 +67,6 @@ class Install extends Command {
 			->addOption('database-port', null, InputOption::VALUE_REQUIRED, 'Port the database is listening on')
 			->addOption('database-user', null, InputOption::VALUE_REQUIRED, 'User name to connect to the database')
 			->addOption('database-pass', null, InputOption::VALUE_OPTIONAL, 'Password of the database user', null)
-			->addOption('database-table-prefix', null, InputOption::VALUE_OPTIONAL, 'Prefix for all tables (default: oc_)', null)
 			->addOption('database-table-space', null, InputOption::VALUE_OPTIONAL, 'Table space of the database (oci only)', null)
 			->addOption('admin-user', null, InputOption::VALUE_REQUIRED, 'User name of the admin account', 'admin')
 			->addOption('admin-pass', null, InputOption::VALUE_REQUIRED, 'Password of the admin account')
@@ -74,13 +74,13 @@ class Install extends Command {
 			->addOption('data-dir', null, InputOption::VALUE_REQUIRED, 'Path to data directory', \OC::$SERVERROOT."/data");
 	}
 
-	protected function execute(InputInterface $input, OutputInterface $output) {
+	protected function execute(InputInterface $input, OutputInterface $output): int {
 
 		// validate the environment
 		$server = \OC::$server;
 		$setupHelper = new Setup(
 			$this->config,
-			$server->getIniWrapper(),
+			$this->iniGetWrapper,
 			$server->getL10N('lib'),
 			$server->query(Defaults::class),
 			$server->getLogger(),
@@ -139,11 +139,6 @@ class Install extends Command {
 			// Append the port to the host so it is the same as in the config (there is no dbport config)
 			$dbHost .= ':' . $dbPort;
 		}
-		$dbTablePrefix = 'oc_';
-		if ($input->hasParameterOption('--database-table-prefix')) {
-			$dbTablePrefix = (string) $input->getOption('database-table-prefix');
-			$dbTablePrefix = trim($dbTablePrefix);
-		}
 		if ($input->hasParameterOption('--database-pass')) {
 			$dbPass = (string) $input->getOption('database-pass');
 		}
@@ -188,7 +183,6 @@ class Install extends Command {
 			'dbpass' => $dbPass,
 			'dbname' => $dbName,
 			'dbhost' => $dbHost,
-			'dbtableprefix' => $dbTablePrefix,
 			'adminlogin' => $adminLogin,
 			'adminpass' => $adminPassword,
 			'adminemail' => $adminEmail,

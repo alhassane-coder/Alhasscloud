@@ -3,6 +3,7 @@
  * @copyright Copyright (c) 2016, ownCloud, Inc.
  *
  * @author Christoph Wurst <christoph@winzerhof-wurst.at>
+ * @author Daniel Kesselberg <mail@danielkesselberg.de>
  * @author Joas Schilling <coding@schilljs.com>
  * @author Robin Appelman <robin@icewind.nl>
  * @author Roeland Jago Douma <roeland@famdouma.nl>
@@ -96,24 +97,23 @@ class ListCommand extends Base {
 		parent::configure();
 	}
 
-	protected function execute(InputInterface $input, OutputInterface $output) {
+	protected function execute(InputInterface $input, OutputInterface $output): int {
+		/** @var StorageConfig[] $mounts */
 		if ($input->getOption('all')) {
-			/** @var  $mounts StorageConfig[] */
 			$mounts = $this->globalService->getStorageForAllUsers();
 			$userId = self::ALL;
 		} else {
 			$userId = $input->getArgument('user_id');
 			$storageService = $this->getStorageService($userId);
-
-			/** @var  $mounts StorageConfig[] */
 			$mounts = $storageService->getAllStorages();
 		}
 
 		$this->listMounts($userId, $mounts, $input, $output);
+		return 0;
 	}
 
 	/**
-	 * @param $userId $userId
+	 * @param string $userId
 	 * @param StorageConfig[] $mounts
 	 * @param InputInterface $input
 	 * @param OutputInterface $output

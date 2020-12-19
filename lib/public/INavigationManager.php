@@ -5,6 +5,7 @@
  * @author Bart Visscher <bartv@thisnet.nl>
  * @author Christoph Wurst <christoph@winzerhof-wurst.at>
  * @author Joas Schilling <coding@schilljs.com>
+ * @author John Molakvoæ (skjnldsv) <skjnldsv@protonmail.com>
  * @author Jörn Friedrich Dreyer <jfd@butonic.de>
  * @author Julius Härtl <jus@bitgrid.net>
  * @author Morris Jobke <hey@morrisjobke.de>
@@ -80,6 +81,13 @@ interface INavigationManager {
 	 * @since 6.0.0
 	 */
 	public function setActiveEntry($appId);
+
+	/**
+	 * Get the current navigation entry of the currently running app
+	 * @return string
+	 * @since 20.0.0
+	 */
+	public function getActiveEntry();
 
 	/**
 	 * Get a list of navigation entries

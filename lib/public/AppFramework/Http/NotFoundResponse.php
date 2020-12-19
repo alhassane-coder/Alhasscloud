@@ -2,6 +2,7 @@
 /**
  * @copyright Copyright (c) 2016, ownCloud, Inc.
  *
+ * @author Julius Härtl <jus@bitgrid.net>
  * @author Lukas Reschke <lukas@statuscode.ch>
  * @author Morris Jobke <hey@morrisjobke.de>
  * @author Roeland Jago Douma <roeland@famdouma.nl>
@@ -24,30 +25,19 @@
 
 namespace OCP\AppFramework\Http;
 
-use OCP\Template;
-
 /**
  * A generic 404 response showing an 404 error page as well to the end-user
  * @since 8.1.0
  */
-class NotFoundResponse extends Response {
+class NotFoundResponse extends TemplateResponse {
 
 	/**
 	 * @since 8.1.0
 	 */
 	public function __construct() {
-		parent::__construct();
+		parent::__construct('core', '404', [], 'guest');
 
 		$this->setContentSecurityPolicy(new ContentSecurityPolicy());
 		$this->setStatus(404);
-	}
-
-	/**
-	 * @return string
-	 * @since 8.1.0
-	 */
-	public function render() {
-		$template = new Template('core', '404', 'guest');
-		return $template->fetchPage();
 	}
 }

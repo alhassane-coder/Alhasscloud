@@ -61,7 +61,7 @@ class ListApps extends Base {
 		;
 	}
 
-	protected function execute(InputInterface $input, OutputInterface $output) {
+	protected function execute(InputInterface $input, OutputInterface $output): int {
 		if ($input->getOption('shipped') === 'true' || $input->getOption('shipped') === 'false') {
 			$shippedFilter = $input->getOption('shipped') === 'true';
 		} else {
@@ -97,6 +97,7 @@ class ListApps extends Base {
 		}
 
 		$this->writeAppList($input, $output, $apps);
+		return 0;
 	}
 
 	/**
@@ -122,10 +123,10 @@ class ListApps extends Base {
 
 	/**
 	 * @param string $optionName
-	 * @param CompletionContext $completionContext
+	 * @param CompletionContext $context
 	 * @return array
 	 */
-	public function completeOptionValues($optionName, CompletionContext $completionContext) {
+	public function completeOptionValues($optionName, CompletionContext $context) {
 		if ($optionName === 'shipped') {
 			return ['true', 'false'];
 		}

@@ -9,6 +9,7 @@
  * @author Joas Schilling <coding@schilljs.com>
  * @author Lukas Reschke <lukas@statuscode.ch>
  * @author Morris Jobke <hey@morrisjobke.de>
+ * @author Roeland Jago Douma <roeland@famdouma.nl>
  * @author Stefan Weiberg <sweiberg@suse.com>
  * @author Thomas Müller <thomas.mueller@tmit.eu>
  *
@@ -106,7 +107,7 @@ class Crypt {
 		$this->l = $l;
 		$this->supportedKeyFormats = ['hash', 'password'];
 
-		$this->supportLegacy = $this->config->getSystemValueBool('encryption.legacy_format_support', true);
+		$this->supportLegacy = $this->config->getSystemValueBool('encryption.legacy_format_support', false);
 	}
 
 	/**

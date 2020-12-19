@@ -17,6 +17,7 @@
  * @author Joas Schilling <coding@schilljs.com>
  * @author Julius Härtl <jus@bitgrid.net>
  * @author KB7777 <k.burkowski@gmail.com>
+ * @author Kevin Lanni <therealklanni@gmail.com>
  * @author Lukas Reschke <lukas@statuscode.ch>
  * @author MichaIng <28480705+MichaIng@users.noreply.github.com>
  * @author MichaIng <micha@dietpi.com>
@@ -503,7 +504,7 @@ class Setup {
 
 		$setupHelper = new \OC\Setup(
 			$config,
-			\OC::$server->getIniWrapper(),
+			\OC::$server->get(IniGetWrapper::class),
 			\OC::$server->getL10N('lib'),
 			\OC::$server->query(Defaults::class),
 			\OC::$server->getLogger(),
@@ -528,7 +529,7 @@ class Setup {
 			$content .= "\n  Options -MultiViews";
 			$content .= "\n  RewriteRule ^core/js/oc.js$ index.php [PT,E=PATH_INFO:$1]";
 			$content .= "\n  RewriteRule ^core/preview.png$ index.php [PT,E=PATH_INFO:$1]";
-			$content .= "\n  RewriteCond %{REQUEST_FILENAME} !\\.(css|js|svg|gif|png|html|ttf|woff2?|ico|jpg|jpeg|map|webm|mp4)$";
+			$content .= "\n  RewriteCond %{REQUEST_FILENAME} !\\.(css|js|svg|gif|png|html|ttf|woff2?|ico|jpg|jpeg|map|webm|mp4|mp3|ogg|wav)$";
 			$content .= "\n  RewriteCond %{REQUEST_FILENAME} !core/img/favicon.ico$";
 			$content .= "\n  RewriteCond %{REQUEST_FILENAME} !core/img/manifest.json$";
 			$content .= "\n  RewriteCond %{REQUEST_FILENAME} !/remote.php";
@@ -543,7 +544,7 @@ class Setup {
 			$content .= "\n  RewriteCond %{REQUEST_FILENAME} !/ocs-provider/";
 			$content .= "\n  RewriteCond %{REQUEST_FILENAME} !/ocm-provider/";
 			$content .= "\n  RewriteCond %{REQUEST_URI} !^/\\.well-known/(acme-challenge|pki-validation)/.*";
-			$content .= "\n  RewriteCond %{REQUEST_FILENAME} !/richdocumentscode/proxy.php$";
+			$content .= "\n  RewriteCond %{REQUEST_FILENAME} !/richdocumentscode(_arm64)?/proxy.php$";
 			$content .= "\n  RewriteRule . index.php [PT,E=PATH_INFO:$1]";
 			$content .= "\n  RewriteBase " . $rewriteBase;
 			$content .= "\n  <IfModule mod_env.c>";

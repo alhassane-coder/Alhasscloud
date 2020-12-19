@@ -20,53 +20,25 @@
 
 namespace OCA\ServerInfo;
 
-use bantu\IniGetWrapper\IniGetWrapper;
 use OCA\ServerInfo\OperatingSystems\DefaultOs;
-use OCP\Http\Client\IClientService;
-use OCP\IConfig;
-use OCP\IDBConnection;
-use OCP\IL10N;
+use OCA\ServerInfo\OperatingSystems\FreeBSD;
+use OCA\ServerInfo\OperatingSystems\IOperatingSystem;
+use OCA\ServerInfo\Resources\Memory;
 
-class Os {
-
-	/** @var IClientService */
-	protected $clientService;
-
-	/** @var IConfig */
-	protected $config;
-
-	/** @var IDBConnection */
-	protected $connection;
-
-	/** @var IniGetWrapper */
-	protected $phpIni;
-
-	/** @var \OCP\IL10N */
-	protected $l;
+class Os implements IOperatingSystem {
 
 	/** @var */
 	protected $backend;
 
 	/**
 	 * Os constructor.
-	 *
-	 * @param IClientService $clientService
-	 * @param IConfig $config
-	 * @param IDBConnection $connection
-	 * @param IniGetWrapper $phpIni
-	 * @param IL10N $l
 	 */
-	public function __construct(IClientService $clientService,
-								IConfig $config,
-								IDBConnection $connection,
-								IniGetWrapper $phpIni,
-								IL10N $l) {
-		$this->clientService = $clientService;
-		$this->config        = $config;
-		$this->connection    = $connection;
-		$this->phpIni        = $phpIni;
-		$this->l             = $l;
-		$this->backend = new DefaultOs();
+	public function __construct() {
+		if (PHP_OS === 'FreeBSD') {
+			$this->backend = new FreeBSD();
+		} else {
+			$this->backend = new DefaultOs();
+		}
 	}
 
 	/**
@@ -91,23 +63,12 @@ class Os {
 		return PHP_OS . ' ' . php_uname('r') . ' ' . php_uname('m');
 	}
 
-	/**
-	 * Get memory will return a list key => value where all values are in bytes.
-	 * [MemTotal => 0, MemFree => 0, MemAvailable => 0, SwapTotal => 0, SwapFree => 0].
-	 *
-	 * @return array
-	 */
-	public function getMemory(): array {
+	public function getMemory(): Memory {
 		return $this->backend->getMemory();
 	}
 
-	/**
-	 * Get name of the processor
-	 *
-	 * @return string
-	 */
-	public function getCPUName(): string {
-		return $this->backend->getCPUName();
+	public function getCpuName(): string {
+		return $this->backend->getCpuName();
 	}
 
 	/**
@@ -118,11 +79,6 @@ class Os {
 		return $data;
 	}
 
-	/**
-	 * Get the total number of seconds the system has been up
-	 *
-	 * @return int
-	 */
 	public function getUptime(): int {
 		return $this->backend->getUptime();
 	}
@@ -135,15 +91,6 @@ class Os {
 		return explode("\n", $data);
 	}
 
-	/**
-	 * Get diskInfo will return a list of disks. Used and Available in bytes.
-	 *
-	 * [
-	 * 	[device => /dev/mapper/homestead--vg-root, fs => ext4, used => 6205468, available => 47321220, percent => 12%, mount => /]
-	 * ]
-	 *
-	 * @return array
-	 */
 	public function getDiskInfo(): array {
 		return $this->backend->getDiskInfo();
 	}
@@ -159,12 +106,11 @@ class Os {
 	 */
 	public function getDiskData(): array {
 		$data = [];
-		$disks = $this->backend->getDiskInfo();
 
-		foreach ($disks as $disk) {
+		foreach ($this->backend->getDiskInfo() as $disk) {
 			$data[] = [
-				round($disk['used'] / 1024 / 1024 / 1024, 1),
-				round($disk['available'] / 1024 / 1024 / 1024, 1)
+				round($disk->getUsed() / 1024 , 1),
+				round($disk->getAvailable() / 1024, 1)
 			];
 		}
 

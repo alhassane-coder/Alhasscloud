@@ -180,7 +180,7 @@ class DBLockingProvider extends AbstractLockingProvider {
 	 * @param int $type self::LOCK_SHARED or self::LOCK_EXCLUSIVE
 	 * @throws \OCP\Lock\LockedException
 	 */
-	public function acquireLock(string $path, int $type) {
+	public function acquireLock(string $path, int $type, string $readablePath = null) {
 		$expire = $this->getExpireTime();
 		if ($type === self::LOCK_SHARED) {
 			if (!$this->isLocallyLocked($path)) {
@@ -208,7 +208,7 @@ class DBLockingProvider extends AbstractLockingProvider {
 			}
 		}
 		if ($result !== 1) {
-			throw new LockedException($path);
+			throw new LockedException($path, null, null, $readablePath);
 		}
 		$this->markAcquire($path, $type);
 	}
@@ -216,8 +216,6 @@ class DBLockingProvider extends AbstractLockingProvider {
 	/**
 	 * @param string $path
 	 * @param int $type self::LOCK_SHARED or self::LOCK_EXCLUSIVE
-	 *
-	 * @suppress SqlInjectionChecker
 	 */
 	public function releaseLock(string $path, int $type) {
 		$this->markRelease($path, $type);
@@ -288,8 +286,6 @@ class DBLockingProvider extends AbstractLockingProvider {
 
 	/**
 	 * release all lock acquired by this instance which were marked using the mark* methods
-	 *
-	 * @suppress SqlInjectionChecker
 	 */
 	public function releaseAll() {
 		parent::releaseAll();

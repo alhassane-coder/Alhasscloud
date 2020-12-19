@@ -11,6 +11,7 @@
  * @author Greta Doci <gretadoci@gmail.com>
  * @author Joas Schilling <coding@schilljs.com>
  * @author Jörn Friedrich Dreyer <jfd@butonic.de>
+ * @author Lionel Elie Mamane <lionel@mamane.lu>
  * @author Lukas Reschke <lukas@statuscode.ch>
  * @author Morris Jobke <hey@morrisjobke.de>
  * @author Robin Appelman <robin@icewind.nl>
@@ -80,7 +81,7 @@ use Symfony\Component\EventDispatcher\GenericEvent;
  * - preUnassignedUserId(string $uid)
  * - postUnassignedUserId(string $uid)
  * - preLogin(string $user, string $password)
- * - postLogin(\OC\User\User $user, string $password)
+ * - postLogin(\OC\User\User $user, string $loginName, string $password, boolean $isTokenLogin)
  * - preRememberedLogin(string $uid)
  * - postRememberedLogin(\OC\User\User $user)
  * - logout()
@@ -400,11 +401,13 @@ class Session implements IUserSession, Emitter {
 
 		$this->dispatcher->dispatchTyped(new PostLoginEvent(
 			$user,
+			$loginDetails['loginName'],
 			$loginDetails['password'],
 			$isToken
 		));
 		$this->manager->emit('\OC\User', 'postLogin', [
 			$user,
+			$loginDetails['loginName'],
 			$loginDetails['password'],
 			$isToken,
 		]);
@@ -531,6 +534,10 @@ class Session implements IUserSession, Emitter {
 		} catch (ExpiredTokenException $e) {
 			throw $e;
 		} catch (InvalidTokenException $ex) {
+			$this->logger->logException($ex, [
+				'level' => ILogger::DEBUG,
+				'message' => 'Token is not valid: ' . $ex->getMessage(),
+			]);
 			return false;
 		}
 	}

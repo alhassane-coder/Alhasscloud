@@ -4,6 +4,7 @@
  *
  * @author Bjoern Schiessle <bjoern@schiessle.org>
  * @author Christoph Wurst <christoph@winzerhof-wurst.at>
+ * @author Joas Schilling <coding@schilljs.com>
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -73,25 +74,25 @@ class RecoverUser extends Command {
 		);
 	}
 
-	protected function execute(InputInterface $input, OutputInterface $output) {
+	protected function execute(InputInterface $input, OutputInterface $output): int {
 		$isMasterKeyEnabled = $this->util->isMasterKeyEnabled();
 
 		if ($isMasterKeyEnabled) {
 			$output->writeln('You use the master key, no individual user recovery needed.');
-			return;
+			return 0;
 		}
 
 		$uid = $input->getArgument('user');
 		$userExists = $this->userManager->userExists($uid);
 		if ($userExists === false) {
 			$output->writeln('User "' . $uid . '" unknown.');
-			return;
+			return 1;
 		}
 
 		$recoveryKeyEnabled = $this->util->isRecoveryEnabledForUser($uid);
 		if ($recoveryKeyEnabled === false) {
 			$output->writeln('Recovery key is not enabled for: ' . $uid);
-			return;
+			return 1;
 		}
 
 		$question = new Question('Please enter the recovery key password: ');
@@ -107,5 +108,6 @@ class RecoverUser extends Command {
 		$output->write('Start to recover users files... This can take some time...');
 		$this->userManager->get($uid)->setPassword($newLoginPassword, $recoveryPassword);
 		$output->writeln('Done.');
+		return 0;
 	}
 }

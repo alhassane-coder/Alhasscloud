@@ -55,7 +55,7 @@ class Report extends Command {
 			->setDescription('shows how many users have access');
 	}
 
-	protected function execute(InputInterface $input, OutputInterface $output) {
+	protected function execute(InputInterface $input, OutputInterface $output): int {
 		$table = new Table($output);
 		$table->setHeaders(['User Report', '']);
 		$userCountArray = $this->countUsers();
@@ -83,6 +83,7 @@ class Report extends Command {
 
 		$table->setRows($rows);
 		$table->render();
+		return 0;
 	}
 
 	private function countUsers() {

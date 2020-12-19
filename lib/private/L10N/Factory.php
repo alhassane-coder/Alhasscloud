@@ -9,6 +9,7 @@
  * @author Bjoern Schiessle <bjoern@schiessle.org>
  * @author Christoph Wurst <christoph@winzerhof-wurst.at>
  * @author Georg Ehrke <oc.list@georgehrke.com>
+ * @author GretaD <gretadoci@gmail.com>
  * @author Joas Schilling <coding@schilljs.com>
  * @author John Molakvoæ (skjnldsv) <skjnldsv@protonmail.com>
  * @author Lukas Reschke <lukas@statuscode.ch>
@@ -356,6 +357,29 @@ class Factory implements IFactory {
 			throw new \RuntimeException('Failed to get an IUser instance');
 		}
 		return new LanguageIterator($user, $this->config);
+	}
+
+	/**
+	 * Return the language to use when sending something to a user
+	 *
+	 * @param IUser|null $user
+	 * @return string
+	 * @since 20.0.0
+	 */
+	public function getUserLanguage(IUser $user = null): string {
+		$language = $this->config->getSystemValue('force_language', false);
+		if ($language !== false) {
+			return $language;
+		}
+
+		if ($user instanceof IUser) {
+			$language = $this->config->getUserValue($user->getUID(), 'core', 'lang', null);
+			if ($language !== null) {
+				return $language;
+			}
+		}
+
+		return $this->config->getSystemValue('default_language', 'en');
 	}
 
 	/**

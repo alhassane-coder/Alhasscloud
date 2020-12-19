@@ -5,6 +5,7 @@ declare(strict_types=1);
 /**
  * @copyright 2018, Roeland Jago Douma <roeland@famdouma.nl>
  *
+ * @author Morris Jobke <hey@morrisjobke.de>
  * @author Roeland Jago Douma <roeland@famdouma.nl>
  *
  * @license GNU AGPL version 3 or any later version
@@ -35,7 +36,7 @@ ignore_user_abort(true);
 
 $requestUri = \OC::$server->getRequest()->getRequestUri();
 
-$serverFactory = new \OCA\DAV\Direct\ServerFactory(\OC::$server->getConfig());
+$serverFactory = new \OCA\DAV\Direct\ServerFactory(\OC::$server->getConfig(), \OC::$server->getL10N('dav'));
 $server = $serverFactory->createServer(
 	$baseuri,
 	$requestUri,

@@ -4,6 +4,7 @@
  *
  * @author Bernhard Posselt <dev@bernhard-posselt.com>
  * @author Christoph Wurst <christoph@winzerhof-wurst.at>
+ * @author Joas Schilling <coding@schilljs.com>
  * @author Julius Härtl <jus@bitgrid.net>
  * @author Morris Jobke <hey@morrisjobke.de>
  * @author Roeland Jago Douma <roeland@famdouma.nl>
@@ -38,7 +39,38 @@ namespace OCP\AppFramework\Http;
  * @since 6.0.0
  */
 class TemplateResponse extends Response {
+	/**
+	 * @since 20.0.0
+	 */
+	public const RENDER_AS_GUEST = 'guest';
+	/**
+	 * @since 20.0.0
+	 */
+	public const RENDER_AS_BLANK = '';
+	/**
+	 * @since 20.0.0
+	 */
+	public const RENDER_AS_BASE = 'base';
+	/**
+	 * @since 20.0.0
+	 */
+	public const RENDER_AS_USER = 'user';
+	/**
+	 * @since 20.0.0
+	 */
+	public const RENDER_AS_ERROR = 'error';
+	/**
+	 * @since 20.0.0
+	 */
+	public const RENDER_AS_PUBLIC = 'public';
+
+	/**
+	 * @deprecated 20.0.0 use OCP\AppFramework\Http\Events\BeforeTemplateRenderedEvent
+	 */
 	public const EVENT_LOAD_ADDITIONAL_SCRIPTS = self::class . '::loadAdditionalScripts';
+	/**
+	 * @deprecated 20.0.0 use OCP\AppFramework\Http\Events\BeforeTemplateRenderedEvent
+	 */
 	public const EVENT_LOAD_ADDITIONAL_SCRIPTS_LOGGEDIN = self::class . '::loadAdditionalScriptsLoggedIn';
 
 	/**
@@ -75,7 +107,7 @@ class TemplateResponse extends Response {
 	 * @since 6.0.0 - parameters $params and $renderAs were added in 7.0.0
 	 */
 	public function __construct($appName, $templateName, array $params=[],
-								$renderAs='user') {
+								$renderAs = self::RENDER_AS_USER) {
 		parent::__construct();
 
 		$this->templateName = $templateName;
@@ -154,9 +186,21 @@ class TemplateResponse extends Response {
 	 * @since 6.0.0
 	 */
 	public function render() {
-		// \OCP\Template needs an empty string instead of 'blank' for an unwrapped response
-		$renderAs = $this->renderAs === 'blank' ? '' : $this->renderAs;
+		$renderAs = self::RENDER_AS_USER;
+		if ($this->renderAs === 'blank') {
+			// Legacy fallback as \OCP\Template needs an empty string instead of 'blank' for an unwrapped response
+			$renderAs = self::RENDER_AS_BLANK;
+		} elseif (in_array($this->renderAs, [
+			self::RENDER_AS_GUEST,
+			self::RENDER_AS_BLANK,
+			self::RENDER_AS_BASE,
+			self::RENDER_AS_ERROR,
+			self::RENDER_AS_PUBLIC,
+			self::RENDER_AS_USER], true)) {
+			$renderAs = $this->renderAs;
+		}
 
+		\OCP\Util::addHeader('meta', ['name' => 'robots', 'content' => 'noindex, nofollow']);
 		$template = new \OCP\Template($this->appName, $this->templateName, $renderAs);
 
 		foreach ($this->params as $key => $value) {
