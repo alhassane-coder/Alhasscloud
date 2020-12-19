@@ -101,7 +101,6 @@
     "Set an admin username." : "Stel de gebruikersnaam van de beheerder in.",
     "Set an admin password." : "Stel een beheerders wachtwoord in.",
     "Can't create or write into the data directory %s" : "Kan niets creëren of wegschrijven in de datadirectory %s",
-    "Invalid Federated Cloud ID" : "Ongeldige gefedereerde Cloud ID",
     "Sharing backend %s must implement the interface OCP\\Share_Backend" : "De gedeelde achtergrond %s moet de OCP\\Share_Backend interface implementeren",
     "Sharing backend %s not found" : "De gedeelde backend %s is niet gevonden",
     "Sharing backend for %s not found" : "De gedeelde backend voor %s is niet gevonden",
@@ -166,6 +165,7 @@
     "Oct." : "Okt.",
     "Nov." : "Nov.",
     "Dec." : "Dec.",
+    "The user limit has been reached and the user was not created." : "Het maximum aantal gebruikers is bereikt en de gebruiker is niet aangemaakt.",
     "Only the following characters are allowed in a username: \"a-z\", \"A-Z\", \"0-9\", and \"_.@-'\"" : "Alleen de volgende tekens zijn toegestaan in een gebruikersnaam: \"a-z\", \"A-Z\", \"0-9\", en \"_.@-\"",
     "A valid username must be provided" : "Er moet een geldige gebruikersnaam worden opgegeven",
     "Username contains whitespace at the beginning or at the end" : "De gebruikersnaam bevat spaties aan het begin of aan het eind",
@@ -233,6 +233,7 @@
     "Groupware" : "Groupware",
     "Personal info" : "Persoonlijke informatie",
     "Mobile & desktop" : "Mobiel & desktop",
+    "Invalid Federated Cloud ID" : "Ongeldige gefedereerde Cloud ID",
     "This can usually be fixed by giving the webserver write access to the apps directory or disabling the appstore in the config file. See %s" : "Dit kan hersteld worden door de app map schrijf rechten te geven iin de webserver of schakel de appstore uit bij het config bestand. Zie %s"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

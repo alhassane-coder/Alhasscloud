@@ -34,7 +34,6 @@ namespace daita\MySmallPhpTools\Traits\Nextcloud;
 use daita\MySmallPhpTools\Exceptions\RequestContentException;
 use daita\MySmallPhpTools\Exceptions\RequestNetworkException;
 use daita\MySmallPhpTools\Exceptions\RequestResultNotJsonException;
-use daita\MySmallPhpTools\Exceptions\RequestResultSizeException;
 use daita\MySmallPhpTools\Exceptions\RequestServerException;
 use daita\MySmallPhpTools\Model\Nextcloud\NC19Request;
 use daita\MySmallPhpTools\Model\Request;
@@ -109,19 +108,23 @@ trait TNC19Request {
 
 			try {
 				$result = $this->useClient($request);
+				$request->setResultCode($result->getStatusCode());
 				break;
 			} catch (Exception $e) {
+				\OC::$server->getLogger()
+							->log(
+								3,
+								'issue while useClient(): ' . get_class($e) . '; ' . $e->getMessage() . '; '
+								. $request->getResultCode()
+							);
 			}
 		}
-
-		\OC::$server->getLogger()
-					->log(3, '>>> RESULT: ' . json_encode($result));
 
 		if ($result === null) {
 			throw new RequestNetworkException();
 		}
 
-		return $result;
+		return $result->getBody();
 	}
 
 
@@ -130,12 +133,18 @@ trait TNC19Request {
 	 */
 	private function generationClientOptions(NC19Request $request) {
 		$options = [
-			'body'    => $request->getData(),
 			'headers' => $request->getHeaders(),
-			'cookies' => [],
-			'verify'  => $request->isVerifyPeer(),
-			'debug'   => true
+			'cookies' => $request->getCookies(),
+			'verify'  => $request->isVerifyPeer()
 		];
+
+		if (!empty($request->getData())) {
+			$options['body'] = $request->getDataBody();
+		}
+
+		if (!empty($request->getParams())) {
+			$options['form_params'] = $request->getParams();
+		}
 
 		if ($request->isLocalAddressAllowed()) {
 			$options['nextcloud']['allow_local_address'] = true;
@@ -147,6 +156,8 @@ trait TNC19Request {
 				'strict'  => true,
 				'referer' => true,
 			];
+		} else {
+			$options['allow_redirects'] = false;
 		}
 
 		$request->setClientOptions($options);
@@ -161,17 +172,20 @@ trait TNC19Request {
 	 */
 	private function useClient(NC19Request $request): IResponse {
 		$client = $request->getClient();
-		$url = $request->getUsedProtocol() . '://' . $request->getAddress() . $request->getParsedUrl();
 
 		switch ($request->getType()) {
 			case Request::TYPE_POST:
-				return $client->post($url, $request->getClientOptions());
+				return $client->post($request->getCompleteUrl(), $request->getClientOptions());
 			case Request::TYPE_PUT:
-				return $client->put($url, $request->getClientOptions());
+				return $client->put($request->getCompleteUrl(), $request->getClientOptions());
 			case Request::TYPE_DELETE:
-				return $client->delete($url, $request->getClientOptions());
+				return $client->delete($request->getCompleteUrl(), $request->getClientOptions());
+			case Request::TYPE_GET:
+				return $client->get(
+					$request->getCompleteUrl() . '?' . $request->getUrlParams(), $request->getClientOptions()
+				);
 			default:
-				return $client->get($url, $request->getClientOptions());
+				throw new Exception('unknown request type ' . json_encode($request));
 		}
 	}
 
@@ -227,7 +241,7 @@ trait TNC19Request {
 	 * @return resource
 	 */
 	private function generateCurlRequest(Request $request) {
-		$url = $request->getUsedProtocol() . '://' . $request->getAddress() . $request->getParsedUrl();
+		$url = $request->getUsedProtocol() . '://' . $request->getHost() . $request->getParsedUrl();
 		if ($request->getType() !== Request::TYPE_GET) {
 			$curl = curl_init($url);
 		} else {
@@ -235,58 +249,6 @@ trait TNC19Request {
 		}
 
 		return $curl;
-	}
-
-
-	/**
-	 * @param Request $request
-	 */
-	private function initRequestGet(Request $request) {
-		if ($request->getType() !== Request::TYPE_GET) {
-			return;
-		}
-	}
-
-
-	/**
-	 * @param resource $curl
-	 * @param Request $request
-	 */
-	private function initRequestPost($curl, Request $request) {
-		if ($request->getType() !== Request::TYPE_POST) {
-			return;
-		}
-
-		curl_setopt($curl, CURLOPT_POST, true);
-		curl_setopt($curl, CURLOPT_POSTFIELDS, $request->getDataBody());
-	}
-
-
-	/**
-	 * @param resource $curl
-	 * @param Request $request
-	 */
-	private function initRequestPut($curl, Request $request) {
-		if ($request->getType() !== Request::TYPE_PUT) {
-			return;
-		}
-
-		curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "PUT");
-		curl_setopt($curl, CURLOPT_POSTFIELDS, $request->getDataBody());
-	}
-
-
-	/**
-	 * @param resource $curl
-	 * @param Request $request
-	 */
-	private function initRequestDelete($curl, Request $request) {
-		if ($request->getType() !== Request::TYPE_DELETE) {
-			return;
-		}
-
-		curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "DELETE");
-		curl_setopt($curl, CURLOPT_POSTFIELDS, $request->getDataBody());
 	}
 
 

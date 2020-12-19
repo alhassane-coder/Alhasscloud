@@ -91,6 +91,20 @@ class MountManager {
 	}
 
 
+	// TODO: implement !
+	public function getMountManager() {
+		return $this;
+	}
+
+	// TODO: implement !
+	public function removeShare($mountPoint) {
+	}
+
+	// TODO: implement !
+	public function removeMount($mountPoint) {
+	}
+
+
 	/**
 	 * @param int $gsShareId
 	 *

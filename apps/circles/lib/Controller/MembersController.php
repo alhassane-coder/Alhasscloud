@@ -56,7 +56,7 @@ class MembersController extends BaseController {
 					'circle_id' => $uniqueId,
 					'user_id'   => $ident,
 					'user_type' => (int)$type,
-					'display'   => MiscService::getDisplay($ident, (int)$type),
+					'display'   => $ident,
 					'error'     => $e->getMessage()
 				]
 			);
@@ -67,7 +67,7 @@ class MembersController extends BaseController {
 				'circle_id' => $uniqueId,
 				'user_id'   => $ident,
 				'user_type' => (int)$type,
-				'display'   => MiscService::getDisplay($ident, (int)$type),
+				'display'   => $ident,
 				'members'   => $data
 			]
 		);
@@ -134,7 +134,7 @@ class MembersController extends BaseController {
 						'user_id'   => $member,
 						'instance'  => $instance,
 						'user_type' => (int)$type,
-						'display'   => MiscService::getDisplay($member, (int)$type),
+						'display'   => $member,
 						'level'     => $level,
 						'error'     => $e->getMessage()
 					]
@@ -146,7 +146,7 @@ class MembersController extends BaseController {
 				'circle_id' => $uniqueId,
 				'user_id'   => $member,
 				'user_type' => (int)$type,
-				'display'   => MiscService::getDisplay($member, (int)$type),
+				'display'   => $member,
 				'level'     => $level,
 				'members'   => $data,
 			]
@@ -178,7 +178,7 @@ class MembersController extends BaseController {
 						'circle_id' => $uniqueId,
 						'user_id'   => $member,
 						'user_type' => (int)$type,
-						'display'   => MiscService::getDisplay($member, (int)$type),
+						'display'   => $member,
 						'error'     => $e->getMessage()
 					]
 				);
@@ -189,7 +189,7 @@ class MembersController extends BaseController {
 				'circle_id' => $uniqueId,
 				'user_id'   => $member,
 				'user_type' => (int)$type,
-				'display'   => MiscService::getDisplay($member, (int)$type),
+				'display'   => $member,
 				'members'   => $data,
 			]
 		);
@@ -235,11 +235,11 @@ class MembersController extends BaseController {
 	 * @NoAdminRequired
 	 *
 	 * @param string $search
+	 * @param int $order
 	 *
 	 * @return DataResponse
 	 */
-	public function searchGlobal($search) {
-
+	public function searchGlobal(string $search, int $order) {
 		try {
 			$this->mustHaveFrontEndEnabled();
 
@@ -264,7 +264,7 @@ class MembersController extends BaseController {
 			);
 		}
 
-		return $this->success(['search' => $search, 'result' => $result]);
+		return $this->success(['search' => $search, 'result' => $result, 'order' => $order]);
 	}
 
 }

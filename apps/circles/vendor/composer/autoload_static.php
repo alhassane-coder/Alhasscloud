@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit42d579c38462159ae56c62afc40e3406
+class ComposerStaticInitb6667f14a82d7662668135901bcdb862
 {
     public static $prefixLengthsPsr4 = array (
         'd' => 
@@ -56,11 +56,16 @@ class ComposerStaticInit42d579c38462159ae56c62afc40e3406
         'daita\\MySmallPhpTools\\Model\\Cache' => __DIR__ . '/..' . '/daita/my-small-php-tools/lib/Model/Cache.php',
         'daita\\MySmallPhpTools\\Model\\CacheItem' => __DIR__ . '/..' . '/daita/my-small-php-tools/lib/Model/CacheItem.php',
         'daita\\MySmallPhpTools\\Model\\Nextcloud\\NC19Request' => __DIR__ . '/..' . '/daita/my-small-php-tools/lib/Model/Nextcloud/NC19Request.php',
+        'daita\\MySmallPhpTools\\Model\\Nextcloud\\nc20\\NC20Request' => __DIR__ . '/..' . '/daita/my-small-php-tools/lib/Model/Nextcloud/nc20/NC20Request.php',
+        'daita\\MySmallPhpTools\\Model\\Nextcloud\\nc20\\NC20RequestResult' => __DIR__ . '/..' . '/daita/my-small-php-tools/lib/Model/Nextcloud/nc20/NC20RequestResult.php',
         'daita\\MySmallPhpTools\\Model\\Request' => __DIR__ . '/..' . '/daita/my-small-php-tools/lib/Model/Request.php',
         'daita\\MySmallPhpTools\\Model\\SimpleDataStore' => __DIR__ . '/..' . '/daita/my-small-php-tools/lib/Model/SimpleDataStore.php',
         'daita\\MySmallPhpTools\\Traits\\Nextcloud\\TNC19Request' => __DIR__ . '/..' . '/daita/my-small-php-tools/lib/Traits/Nextcloud/TNC19Request.php',
         'daita\\MySmallPhpTools\\Traits\\Nextcloud\\TNCDataResponse' => __DIR__ . '/..' . '/daita/my-small-php-tools/lib/Traits/Nextcloud/TNCDataResponse.php',
         'daita\\MySmallPhpTools\\Traits\\Nextcloud\\TNCRequest' => __DIR__ . '/..' . '/daita/my-small-php-tools/lib/Traits/Nextcloud/TNCRequest.php',
+        'daita\\MySmallPhpTools\\Traits\\Nextcloud\\nc20\\TNC20Logger' => __DIR__ . '/..' . '/daita/my-small-php-tools/lib/Traits/Nextcloud/nc20/TNC20Logger.php',
+        'daita\\MySmallPhpTools\\Traits\\Nextcloud\\nc20\\TNC20Request' => __DIR__ . '/..' . '/daita/my-small-php-tools/lib/Traits/Nextcloud/nc20/TNC20Request.php',
+        'daita\\MySmallPhpTools\\Traits\\Nextcloud\\nc20\\TNC20Setup' => __DIR__ . '/..' . '/daita/my-small-php-tools/lib/Traits/Nextcloud/nc20/TNC20Setup.php',
         'daita\\MySmallPhpTools\\Traits\\TArrayTools' => __DIR__ . '/..' . '/daita/my-small-php-tools/lib/Traits/TArrayTools.php',
         'daita\\MySmallPhpTools\\Traits\\TAsync' => __DIR__ . '/..' . '/daita/my-small-php-tools/lib/Traits/TAsync.php',
         'daita\\MySmallPhpTools\\Traits\\TFileTools' => __DIR__ . '/..' . '/daita/my-small-php-tools/lib/Traits/TFileTools.php',
@@ -72,9 +77,9 @@ class ComposerStaticInit42d579c38462159ae56c62afc40e3406
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit42d579c38462159ae56c62afc40e3406::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit42d579c38462159ae56c62afc40e3406::$prefixDirsPsr4;
-            $loader->classMap = ComposerStaticInit42d579c38462159ae56c62afc40e3406::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInitb6667f14a82d7662668135901bcdb862::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInitb6667f14a82d7662668135901bcdb862::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInitb6667f14a82d7662668135901bcdb862::$classMap;
 
         }, null, ClassLoader::class);
     }

@@ -483,6 +483,15 @@ even if requests to the server might extend the session lifetime.</p>
 password for enhanced security. Users need to generate tokens in personal settings
 which can be used as passwords on their clients.</p>
 <p>Defaults to <code class="docutils literal notranslate"><span class="pre">false</span></code></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s1">&#39;token_auth_activity_update&#39;</span> <span class="o">=&gt;</span> <span class="mi">60</span><span class="p">,</span>
+</pre></div>
+</div>
+<p>The interval at which token activity should be updated.</p>
+<p>Increasing this value means that the last activty on the security page gets
+more outdated.</p>
+<p>Tokens are still checked every 5 minutes for validity
+max value: 300</p>
+<p>Defaults to <code class="docutils literal notranslate"><span class="pre">300</span></code></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s1">&#39;auth.bruteforce.protection.enabled&#39;</span> <span class="o">=&gt;</span> <span class="n">true</span><span class="p">,</span>
 </pre></div>
 </div>

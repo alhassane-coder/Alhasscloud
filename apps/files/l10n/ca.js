@@ -195,11 +195,7 @@ OC.L10N.register(
     "A file or folder has been <strong>deleted</strong>" : "S'ha <strong>suprimit</strong> un fitxer o una carpeta",
     "Limit notifications about creation and changes to your <strong>favorite files</strong> <em>(Stream only)</em>" : "Limita les notificacions sobre la creació i canvis dels vostres <strong>fitxers favorits</strong><em>(només Stream)</em>",
     "A file or folder has been <strong>restored</strong>" : "S'ha <strong>restaurat</strong> un fitxer o una carpeta",
-    "Use this address to <a href=\"%s\" target=\"_blank\" rel=\"noreferrer noopener\">access your Files via WebDAV</a>" : "Utilitzeu aquesta adreça per <a href=\"%s\" target=\"_blank\" rel=\"noreferrer noopener\">accedir als vostres fitxers mitjançant WebDAV</a>",
-    "This group folder is full, files can not be updated or synced anymore!" : "Aquesta carpeta de grup és plena, els arxius no es poden actualitzar o sincronitzar ja!",
-    "This external storage is full, files can not be updated or synced anymore!" : "Aquest emmagatzematge extern és ple, els arxius no es poden actualitzar o sincronitzar ja!",
-    "This group folder is almost full ({usedSpacePercent}%)" : "Aquesta carpeta de grup és gairebé plena ({usedSpacePercent}%)",
-    "This external storage is almost full ({usedSpacePercent}%)" : "Aquest emmagatzematge extern és gairebé ple ({usedSpacePercent}%)",
-    "Cannot transfter ownership of a file or folder you don't own" : "No es pot transferir la propietat d'un fitxer o carpeta que no és vostre"
+    "Cannot transfter ownership of a file or folder you don't own" : "No es pot transferir la propietat d'un fitxer o carpeta que no és vostre",
+    "Use this address to <a href=\"%s\" target=\"_blank\" rel=\"noreferrer noopener\">access your Files via WebDAV</a>" : "Utilitzeu aquesta adreça per <a href=\"%s\" target=\"_blank\" rel=\"noreferrer noopener\">accedir als vostres fitxers mitjançant WebDAV</a>"
 },
 "nplurals=2; plural=(n != 1);");

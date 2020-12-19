@@ -103,6 +103,7 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#parameters">Parameters</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#configuring-a-mysql-or-mariadb-database">Configuring a MySQL or MariaDB database</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ssl-for-mysql-database">SSL for MySQL Database</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#postgresql-database">PostgreSQL database</a></li>
 </ul>
 </li>
@@ -241,7 +242,7 @@ for detailed information.</p>
 </div>
 <p>Your <code class="file docutils literal notranslate"><span class="pre">/etc/mysql/my.cnf</span></code> could look like this:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>[server]
-skip-name-resolve
+skip_name_resolve = 1
 innodb_buffer_pool_size = 128M
 innodb_buffer_pool_instances = 1
 innodb_flush_log_at_trx_commit = 2
@@ -253,8 +254,8 @@ query_cache_min_res_unit = 2k
 query_cache_size = 64M
 tmp_table_size= 64M
 max_heap_table_size= 64M
-slow-query-log = 1
-slow-query-log-file = /var/log/mysql/slow.log
+slow_query_log = 1
+slow_query_log_file = /var/log/mysql/slow.log
 long_query_time = 1
 
 [client-server]
@@ -265,8 +266,8 @@ long_query_time = 1
 default-character-set = utf8mb4
 
 [mysqld]
-character-set-server = utf8mb4
-collation-server = utf8mb4_general_ci
+character_set_server = utf8mb4
+collation_server = utf8mb4_general_ci
 transaction_isolation = READ-COMMITTED
 binlog_format = ROW
 innodb_large_prefix=on
@@ -339,6 +340,19 @@ this:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;mysql.utf8mb4&quot;</span> <span class="o">=&gt;</span> <span class="n">true</span><span class="p">,</span>
 </pre></div>
 </div>
+</div>
+<div class="section" id="ssl-for-mysql-database">
+<h3>SSL for MySQL Database<a class="headerlink" href="#ssl-for-mysql-database" title="Permalink to this headline">¶</a></h3>
+<p>This just covers the SSL database configuration on the Nextcloud server. First you need to configure your database server accordingly.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s1">&#39;dbdriveroptions&#39;</span> <span class="o">=&gt;</span> <span class="p">[</span>
+  \<span class="n">PDO</span><span class="p">::</span><span class="n">MYSQL_ATTR_SSL_KEY</span> <span class="o">=&gt;</span> <span class="s1">&#39;/../ssl-key.pem&#39;</span><span class="p">,</span>
+  \<span class="n">PDO</span><span class="p">::</span><span class="n">MYSQL_ATTR_SSL_CERT</span> <span class="o">=&gt;</span> <span class="s1">&#39;/../ssl-cert.pem&#39;</span><span class="p">,</span>
+  \<span class="n">PDO</span><span class="p">::</span><span class="n">MYSQL_ATTR_SSL_CA</span> <span class="o">=&gt;</span> <span class="s1">&#39;/../ca-cert.pem&#39;</span><span class="p">,</span>
+  \<span class="n">PDO</span><span class="p">::</span><span class="n">MYSQL_ATTR_SSL_VERIFY_SERVER_CERT</span> <span class="o">=&gt;</span> <span class="n">true</span><span class="p">,</span>
+<span class="p">],</span>
+</pre></div>
+</div>
+<p>Adjust the paths to the pem files for your environment.</p>
 </div>
 <div class="section" id="postgresql-database">
 <h3>PostgreSQL database<a class="headerlink" href="#postgresql-database" title="Permalink to this headline">¶</a></h3>

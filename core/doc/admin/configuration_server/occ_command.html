@@ -115,6 +115,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#transfer">Transfer</a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="#files-sharing">Files Sharing</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#files-external">Files external</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#integrity-check">Integrity check</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#l10n-create-javascript-translation-files-for-apps">l10n, create JavaScript translation files for apps</a></li>
@@ -419,6 +420,14 @@ shell’s profile (eg. <code class="docutils literal notranslate"><span class="p
  <span class="n">app</span><span class="p">:</span><span class="n">getpath</span>      <span class="n">get</span> <span class="n">an</span> <span class="n">absolute</span> <span class="n">path</span> <span class="n">to</span> <span class="n">the</span> <span class="n">app</span> <span class="n">directory</span>
  <span class="n">app</span><span class="p">:</span><span class="nb">list</span>         <span class="nb">list</span> <span class="nb">all</span> <span class="n">available</span> <span class="n">apps</span>
  <span class="n">app</span><span class="p">:</span><span class="n">update</span>       <span class="n">update</span> <span class="n">an</span> <span class="n">app</span> <span class="ow">or</span> <span class="nb">all</span> <span class="n">apps</span>
+</pre></div>
+</div>
+<p>Download and install an app:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="o">-</span><span class="n">u</span> <span class="n">www</span><span class="o">-</span><span class="n">data</span> <span class="n">php</span> <span class="n">occ</span> <span class="n">app</span><span class="p">:</span><span class="n">install</span> <span class="n">twofactor_totp</span>
+</pre></div>
+</div>
+<p>Install but don’t enable:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="o">-</span><span class="n">u</span> <span class="n">www</span><span class="o">-</span><span class="n">data</span> <span class="n">php</span> <span class="n">occ</span> <span class="n">app</span><span class="p">:</span><span class="n">install</span> <span class="o">--</span><span class="n">keep</span><span class="o">-</span><span class="n">disabled</span> <span class="n">twofactor_totp</span>
 </pre></div>
 </div>
 <p>List all of your installed apps, and show whether they are
@@ -841,8 +850,11 @@ to synchronize federated servers:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">files</span>
  <span class="n">files</span><span class="p">:</span><span class="n">cleanup</span>              <span class="n">cleanup</span> <span class="n">filecache</span>
  <span class="n">files</span><span class="p">:</span><span class="n">scan</span>                 <span class="n">rescan</span> <span class="n">filesystem</span>
- <span class="n">files</span><span class="p">:</span><span class="n">transfer</span><span class="o">-</span><span class="n">ownership</span>   <span class="n">All</span> <span class="n">files</span> <span class="ow">and</span> <span class="n">folders</span> <span class="n">are</span> <span class="n">moved</span> <span class="n">to</span> <span class="n">another</span>
-                            <span class="n">user</span> <span class="o">-</span> <span class="n">shares</span> <span class="n">are</span> <span class="n">moved</span> <span class="k">as</span> <span class="n">well</span><span class="o">.</span>
+ <span class="n">files</span><span class="p">:</span><span class="n">transfer</span><span class="o">-</span><span class="n">ownership</span>   <span class="n">All</span> <span class="n">files</span><span class="s1">&#39; and folders&#39;</span> <span class="n">ownerships</span> <span class="n">are</span> <span class="n">moved</span> <span class="n">to</span> <span class="n">another</span>
+                            <span class="n">user</span><span class="o">.</span> <span class="n">Outgoing</span> <span class="n">shares</span> <span class="n">are</span> <span class="n">moved</span> <span class="k">as</span> <span class="n">well</span><span class="o">.</span>
+                            <span class="n">Incoming</span> <span class="n">shares</span> <span class="n">are</span> <span class="ow">not</span> <span class="n">moved</span> <span class="n">because</span> <span class="n">the</span> <span class="n">sharing</span> <span class="n">user</span>
+                            <span class="n">holds</span> <span class="n">the</span> <span class="n">ownership</span> <span class="n">of</span> <span class="n">the</span> <span class="n">respective</span> <span class="n">files</span> <span class="ow">and</span> <span class="n">therefore</span>
+                            <span class="n">owns</span> <span class="n">the</span> <span class="n">decision</span> <span class="n">which</span> <span class="n">actual</span> <span class="n">users</span><span class="o">/</span><span class="n">groups</span> <span class="n">to</span> <span class="n">be</span> <span class="n">shared</span> <span class="k">with</span><span class="o">.</span>
 </pre></div>
 </div>
 <div class="section" id="scan">
@@ -909,6 +921,15 @@ before removing a user:</p>
 </div>
 <p>Users may also transfer files or folders selectively by themselves.
 See <a class="reference external" href="https://docs.nextcloud.com/server/latest/user_manual/files/transfer_ownership.html">user documentation</a> for details.</p>
+</div>
+</div>
+<div class="section" id="files-sharing">
+<span id="occ-sharing-label"></span><h2>Files Sharing<a class="headerlink" href="#files-sharing" title="Permalink to this headline">¶</a></h2>
+<p>Commands for handling shares:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sharing</span>
+ <span class="n">sharing</span><span class="p">:</span><span class="n">cleanup</span><span class="o">-</span><span class="n">remote</span><span class="o">-</span><span class="n">storages</span>  <span class="n">Cleanup</span> <span class="n">shared</span> <span class="n">storage</span> <span class="n">entries</span> <span class="n">that</span> <span class="n">have</span> <span class="n">no</span> <span class="n">matching</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">the</span> <span class="n">shares_external</span> <span class="n">table</span>
+ <span class="n">sharing</span><span class="p">:</span><span class="n">expiration</span><span class="o">-</span><span class="n">notification</span>  <span class="n">Notify</span> <span class="n">share</span> <span class="n">initiators</span> <span class="n">when</span> <span class="n">a</span> <span class="n">share</span> <span class="n">will</span> <span class="n">expire</span> <span class="n">the</span> <span class="nb">next</span> <span class="n">day</span>
+</pre></div>
 </div>
 </div>
 <div class="section" id="files-external">
@@ -1380,7 +1401,7 @@ when none are specified:</p>
 </pre></div>
 </div>
 <p>You can delete versions for specific users in a space-delimited list:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="o">-</span><span class="n">u</span> <span class="n">www</span><span class="o">-</span><span class="n">data</span> <span class="n">php</span> <span class="n">occ</span> <span class="n">versions</span><span class="p">:</span><span class="n">cleanup</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="o">-</span><span class="n">u</span> <span class="n">www</span><span class="o">-</span><span class="n">data</span> <span class="n">php</span> <span class="n">occ</span> <span class="n">versions</span><span class="p">:</span><span class="n">cleanup</span> <span class="n">freda</span> <span class="n">molly</span>
 <span class="n">Delete</span> <span class="n">versions</span> <span class="n">of</span>   <span class="n">freda</span>
 <span class="n">Delete</span> <span class="n">versions</span> <span class="n">of</span>   <span class="n">molly</span>
 </pre></div>

@@ -9,9 +9,10 @@ OC.L10N.register(
     "** 📝 Collaborative document editing!**\n\n- **📝 Focused writing:** No distractions, only the formatting you need.\n- **🙋 Work together:** Share and collaborate with friends and colleagues, no matter if they use Nextcloud or not!\n- **💾 Open format:** Files are saved as [Markdown](https://en.wikipedia.org/wiki/Markdown), so you can edit them from any other text app too.\n- **✊ Strong foundation:** We use [🐈 tiptap](https://tiptap.scrumpy.io) which is based on [🦉 ProseMirror](https://prosemirror.net) – huge thanks to them!" : "** 📝 Édition de documents collaborative !**\n\n- **📝 Restez concentré :** Aucune distraction, seulement la mise en forme dont vous avez besoin.\n- **🙋 Travaillez ensemble :** Partagez et collaborez avec vos amis et vos collègues, qu'ils utilisent Nextcloud ou non !\n- **💾 Format ouvert :** Les fichiers sont enregistrés en [Markdown](https://fr.wikipedia.org/wiki/Markdown), ce qui vous permet de les éditer depuis d'autres applications de texte.\n- **✊ Base solide :** Nous utilisons [🐈 tiptap](https://tiptap.scrumpy.io) qui est basé sur [🦉 ProseMirror](https://prosemirror.net) – un grand merci à eux !",
     "Use current version" : "Utiliser la version actuelle",
     "Use the saved version" : "Utiliser la version enregistrée",
+    "Document idle for {timeout} minutes, click to continue editing" : "Document sans activité depuis {timeout} minutes, cliquez pour continuer les modifications",
+    "Reconnect" : "Se reconnecter",
     "The document has been changed outside of the editor. The changes cannot be applied." : "Le document a été modifié par un autre programme que l'éditeur. Les changements ne peuvent être appliqués.",
     "File could not be loaded. Please check your internet connection." : "Le fichier n'a pu être chargé. Vérifiez votre connexion Internet.",
-    "Retry" : "Réessayer",
     "Last saved {lastSaved}" : "Dernier enregistrement {lastSave}",
     "Unpushed changes" : "Modifications non poussées",
     "Unsaved changes" : "Modifications non enregistrées",
@@ -44,12 +45,12 @@ OC.L10N.register(
     "ToDo list" : "Liste des tâches",
     "Blockquote" : "Citation",
     "Code block" : "Bloc de code",
-    "Network connection error: Could not connect to the document" : "Erreur de connexion réseau : Impossible de se connecter au document",
+    "Retry" : "Réessayer",
     "Last save {lastSave}" : "Enregistré pour la dernière fois le {lastSave}",
+    "Update link" : "Mettre à jour le lien",
     "Add link" : "Ajouter un lien",
     "Show image" : "Afficher l'image",
     "Show file" : "Afficher le fichier",
-    "Paragraph" : "Paragraphe",
-    "Update link" : "Mettre à jour le lien"
+    "Paragraph" : "Paragraphe"
 },
 "nplurals=2; plural=(n > 1);");

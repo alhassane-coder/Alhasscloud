@@ -104,6 +104,7 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#configuring-php">Configuring PHP</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#configuring-nextcloud">Configuring Nextcloud</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#adjust-chunk-size-on-nextcloud-side">Adjust chunk size on Nextcloud side</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="default_files_configuration.html">Providing default files</a></li>
@@ -208,7 +209,8 @@ filesystem.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>The Nextcloud sync client is not affected by these upload limits
-as it is uploading files in smaller chunks.</p>
+as it is uploading files in smaller chunks. See <a class="reference external" href="https://docs.nextcloud.com/desktop/3.0/advancedusage.html">Client documentation</a>
+for more information on configuration options.</p>
 </div>
 <div class="section" id="system-configuration">
 <h2>System configuration<a class="headerlink" href="#system-configuration" title="Permalink to this headline">¶</a></h2>
@@ -333,6 +335,15 @@ make sure it is not too
 low. This setting needs to be configured to at least the time (in seconds) that
 the longest upload will take. If unsure remove this completely from your
 configuration to reset it to the default shown in the <code class="docutils literal notranslate"><span class="pre">config.sample.php</span></code>.</p>
+</div>
+<div class="section" id="adjust-chunk-size-on-nextcloud-side">
+<h2>Adjust chunk size on Nextcloud side<a class="headerlink" href="#adjust-chunk-size-on-nextcloud-side" title="Permalink to this headline">¶</a></h2>
+<p>For upload performance improvements in environments with high upload bandwidth, the server’s upload chunk size may be adjusted:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="o">-</span><span class="n">u</span> <span class="n">www</span><span class="o">-</span><span class="n">data</span> <span class="n">php</span> <span class="n">occ</span> <span class="n">config</span><span class="p">:</span><span class="n">app</span><span class="p">:</span><span class="nb">set</span> <span class="n">files</span> <span class="n">max_chunk_size</span>
+</pre></div>
+</div>
+<p>Put in a value in bytes or set <code class="docutils literal notranslate"><span class="pre">--value</span> <span class="pre">0</span></code> for no chunking at all.</p>
+<p>Default is 10485760 (10 MB).</p>
 </div>
 </div>
 

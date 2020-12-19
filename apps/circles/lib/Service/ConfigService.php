@@ -31,6 +31,7 @@ use OCA\Circles\Exceptions\GSStatusException;
 use OCA\Circles\Model\Circle;
 use OCP\IConfig;
 use OCP\IRequest;
+use OCP\IURLGenerator;
 use OCP\PreConditionNotMetException;
 use OCP\Util;
 
@@ -49,6 +50,7 @@ class ConfigService {
 	const CIRCLES_NON_SSL_LOCAL = 'local_is_non_ssl';
 	const CIRCLES_SELF_SIGNED = 'self_signed_cert';
 	const LOCAL_CLOUD_ID = 'local_cloud_id';
+	const CIRCLES_LOCAL_GSKEY = 'local_gskey';
 	const CIRCLES_ACTIVITY_ON_CREATION = 'creation_activity';
 	const CIRCLES_SKIP_INVITATION_STEP = 'skip_invitation_to_closed_circles';
 	const CIRCLES_SEARCH_FROM_COLLABORATOR = 'search_from_collaborator';
@@ -56,6 +58,8 @@ class ConfigService {
 	const CIRCLES_TEST_ASYNC_INIT = 'test_async_init';
 	const CIRCLES_TEST_ASYNC_HAND = 'test_async_hand';
 	const CIRCLES_TEST_ASYNC_COUNT = 'test_async_count';
+	const FORCE_NC_BASE = 'force_nc_base';
+	const TEST_NC_BASE = 'test_nc_base';
 
 	const GS_ENABLED = 'enabled';
 	const GS_MODE = 'mode';
@@ -63,6 +67,7 @@ class ConfigService {
 	const GS_LOOKUP = 'lookup';
 
 	const GS_LOOKUP_INSTANCES = '/instances';
+	const GS_LOOKUP_USERS = '/users';
 
 
 	private $defaults = [
@@ -76,10 +81,13 @@ class ConfigService {
 		self::CIRCLES_ALLOW_LINKED_GROUPS      => '0',
 		self::CIRCLES_ALLOW_FEDERATED_CIRCLES  => '0',
 		self::CIRCLES_GS_ENABLED               => '0',
+		self::CIRCLES_LOCAL_GSKEY              => '',
 		self::CIRCLES_ALLOW_NON_SSL_LINKS      => '0',
 		self::CIRCLES_NON_SSL_LOCAL            => '0',
 		self::CIRCLES_SELF_SIGNED              => '0',
 		self::LOCAL_CLOUD_ID                   => '',
+		self::FORCE_NC_BASE                    => '',
+		self::TEST_NC_BASE                     => '',
 		self::CIRCLES_ACTIVITY_ON_CREATION     => '1',
 		self::CIRCLES_SKIP_INVITATION_STEP     => '0',
 		self::CIRCLES_SEARCH_FROM_COLLABORATOR => '0'
@@ -96,6 +104,9 @@ class ConfigService {
 
 	/** @var IRequest */
 	private $request;
+
+	/** @var IURLGenerator */
+	private $urlGenerator;
 
 	/** @var MiscService */
 	private $miscService;
@@ -122,19 +133,26 @@ class ConfigService {
 	 * @param IConfig $config
 	 * @param IRequest $request
 	 * @param string $userId
+	 * @param IURLGenerator $urlGenerator
 	 * @param MiscService $miscService
 	 */
 	public function __construct(
-		$appName, IConfig $config, IRequest $request, $userId, MiscService $miscService
+		$appName, IConfig $config, IRequest $request, $userId, IURLGenerator $urlGenerator,
+		MiscService $miscService
 	) {
 		$this->appName = $appName;
 		$this->config = $config;
 		$this->request = $request;
 		$this->userId = $userId;
+		$this->urlGenerator = $urlGenerator;
 		$this->miscService = $miscService;
 	}
 
 
+	/**
+	 * @return string
+	 * @deprecated
+	 */
 	public function getLocalAddress() {
 		return (($this->isLocalNonSSL()) ? 'http://' : '')
 			   . $this->request->getServerHost();
@@ -517,47 +535,137 @@ class ConfigService {
 	 * @return array
 	 */
 	public function getTrustedDomains(): array {
-		$domains = [];
-		foreach ($this->config->getSystemValue('trusted_domains', []) as $v) {
-			$domains[] = $v;
-		}
-
-		return $domains;
+		return array_values($this->config->getSystemValue('trusted_domains', []));
 	}
 
 
 	/**
+	 * - returns host+port, does not specify any protocol
+	 * - can be forced using LOCAL_CLOUD_ID
+	 * - use 'overwrite.cli.url'
+	 * - can use the first entry from trusted_domains is LOCAL_CLOUD_ID = 'use-trusted-domain'
+	 * - used mainly to assign instance and source to a request
+	 * - important only in remote environment; can be totally random in a jailed environment
+	 *
 	 * @return string
 	 */
-	public function getLocalCloudId(): string {
+	public function getLocalInstance(): string {
 		$localCloudId = $this->getAppValue(self::LOCAL_CLOUD_ID);
 		if ($localCloudId === '') {
+			$cliUrl = $this->config->getSystemValue('overwrite.cli.url', '');
+			$local = parse_url($cliUrl);
+			if (array_key_exists('port', $local)) {
+				return $local['host'] . ':' . $local['port'];
+			} else {
+				return $local['host'];
+			}
+		} else if ($localCloudId === 'use-trusted-domain') {
 			return $this->getTrustedDomains()[0];
+		} else {
+			return $localCloudId;
 		}
-
-		return $localCloudId;
 	}
 
 
 	/**
-	 * @return mixed
+	 * @param string $instance
+	 *
+	 * @return bool
 	 */
-	public function getInstanceId() {
-		return $this->config->getSystemValue('instanceid');
+	public function isLocalInstance(string $instance): bool {
+		if ($instance === $this->getLocalInstance()) {
+			return true;
+		}
+
+		if ($this->getAppValue(self::LOCAL_CLOUD_ID) === 'use-trusted-domain') {
+			return (in_array($instance, $this->getTrustedDomains()));
+		}
+
+		return false;
 	}
 
 
 	/**
 	 * @param NC19Request $request
+	 * @param string $routeName
+	 * @param array $args
 	 */
-	public function configureRequest(NC19Request $request) {
-		if ($this->getAppValue(ConfigService::CIRCLES_SELF_SIGNED) === '1') {
-			$request->setVerifyPeer(false);
+	public function configureRequest(NC19Request $request, string $routeName = '', array $args = []) {
+		$this->configureRequestAddress($request, $routeName, $args);
+
+		if ($this->getForcedNcBase() === '') {
+			$request->setProtocols(['https', 'http']);
 		}
 
-//		if ($this->getAppValue(ConfigService::CIRCLES_NON_SSL_LOCAL) === '1') {
+		$request->setVerifyPeer($this->getAppValue(ConfigService::CIRCLES_SELF_SIGNED) !== '1');
 		$request->setLocalAddressAllowed(true);
-//		}
+	}
+
+	/**
+	 * - Create route using overwrite.cli.url.
+	 * - can be forced using FORCE_NC_BASE or TEST_BC_BASE (temporary)
+	 * - can also be overwritten in config/config.php: 'circles.force_nc_base'
+	 * - perfect for loopback request.
+	 *
+	 * @param NC19Request $request
+	 * @param string $routeName
+	 * @param array $args
+	 *
+	 * @return string
+	 */
+	private function configureRequestAddress(NC19Request $request, string $routeName, array $args = []) {
+		if ($routeName === '') {
+			return;
+		}
+
+		$ncBase = $this->getForcedNcBase();
+		if ($ncBase !== '') {
+			$absolute = $this->cleanLinkToRoute($ncBase, $routeName, $args);
+		} else {
+			$absolute = $this->urlGenerator->linkToRouteAbsolute($routeName, $args);
+		}
+
+		$request->basedOnUrl($absolute);
+	}
+
+
+	/**
+	 * - return force_nc_base from config/config.php, then from FORCE_NC_BASE.
+	 *
+	 * @return string
+	 */
+	private function getForcedNcBase(): string {
+		if ($this->getAppValue(self::TEST_NC_BASE) !== '') {
+			return $this->getAppValue(self::TEST_NC_BASE);
+		}
+
+		$fromConfig = $this->config->getSystemValue('circles.force_nc_base', '');
+		if ($fromConfig !== '') {
+			return $fromConfig;
+		}
+
+		return $this->getAppValue(self::FORCE_NC_BASE);
+	}
+
+
+	/**
+	 * sometimes, linkToRoute will include the base path to the nextcloud which will be duplicate with ncBase
+	 *
+	 * @param string $ncBase
+	 * @param string $routeName
+	 * @param array $args
+	 *
+	 * @return string
+	 */
+	private function cleanLinkToRoute(string $ncBase, string $routeName, array $args): string {
+		$link = $this->urlGenerator->linkToRoute($routeName, $args);
+		$forcedPath = rtrim(parse_url($ncBase, PHP_URL_PATH), '/');
+
+		if ($forcedPath !== '' && strpos($link, $forcedPath) === 0) {
+			$ncBase = substr($ncBase, 0, -strlen($forcedPath));
+		}
+
+		return rtrim($ncBase, '/') . $link;
 	}
 
 }

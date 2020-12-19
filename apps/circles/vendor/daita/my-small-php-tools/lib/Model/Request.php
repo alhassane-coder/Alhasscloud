@@ -31,6 +31,7 @@ declare(strict_types=1);
 namespace daita\MySmallPhpTools\Model;
 
 
+use daita\MySmallPhpTools\Traits\TArrayTools;
 use JsonSerializable;
 
 
@@ -40,6 +41,9 @@ use JsonSerializable;
  * @package daita\MySmallPhpTools\Model
  */
 class Request implements JsonSerializable {
+
+
+	use TArrayTools;
 
 
 	const TYPE_GET = 0;
@@ -55,7 +59,10 @@ class Request implements JsonSerializable {
 	private $protocols = ['https'];
 
 	/** @var string */
-	private $address = '';
+	private $host = '';
+
+	/** @var int */
+	private $port = 0;
 
 	/** @var string */
 	private $url = '';
@@ -77,6 +84,12 @@ class Request implements JsonSerializable {
 
 	/** @var array */
 	private $headers = [];
+
+	/** @var array */
+	private $cookies = [];
+
+	/** @var array */
+	private $params = [];
 
 	/** @var array */
 	private $data = [];
@@ -158,39 +171,131 @@ class Request implements JsonSerializable {
 
 	/**
 	 * @return string
+	 * @deprecated - 19 - use getHost();
 	 */
 	public function getAddress(): string {
-		return $this->address;
+		return $this->getHost();
 	}
 
 	/**
 	 * @param string $address
 	 *
 	 * @return Request
+	 * @deprecated - 19 - use setHost();
 	 */
 	public function setAddress(string $address): Request {
-		$this->address = $address;
+		$this->setHost($address);
 
 		return $this;
 	}
 
 	/**
+	 * @return string
+	 */
+	public function getHost(): string {
+		return $this->host;
+	}
+
+	/**
+	 * @param string $host
+	 *
+	 * @return Request
+	 */
+	public function setHost(string $host): Request {
+		$this->host = $host;
+
+		return $this;
+	}
+
+
+	/**
+	 * @return int
+	 */
+	public function getPort(): int {
+		return $this->port;
+	}
+
+	/**
+	 * @param int $port
+	 *
+	 * @return Request
+	 */
+	public function setPort(int $port): Request {
+		$this->port = $port;
+
+		return $this;
+	}
+
+
+	/**
+	 * @param string $instance
+	 *
+	 * @return Request
+	 */
+	public function setInstance(string $instance): Request {
+		if (strpos($instance, ':') === false) {
+			$this->setHost($instance);
+
+			return $this;
+		}
+
+		list($host, $port) = explode(':', $instance, 2);
+		$this->setHost($host);
+		if ($port !== '') {
+			$this->setPort((int)$port);
+		}
+
+		return $this;
+	}
+
+
+	/**
+	 * @return string
+	 */
+	public function getInstance(): string {
+		$instance = $this->getHost();
+		if ($this->getPort() > 0) {
+			$instance .= ':' . $this->getPort();
+		}
+
+		return $instance;
+	}
+
+
+	/**
 	 * @param string $url
+	 *
+	 * @deprecated - 19 - use basedOnUrl();
 	 */
 	public function setAddressFromUrl(string $url) {
+		$this->basedOnUrl($url);
+	}
+
+	/**
+	 * @param string $url
+	 */
+	public function basedOnUrl(string $url) {
 		$protocol = parse_url($url, PHP_URL_SCHEME);
 		if ($protocol === null) {
 			if (strpos($url, '/') > -1) {
 				list($address, $baseUrl) = explode('/', $url, 2);
-				$this->setAddress($address);
-				$this->setBaseUrl($baseUrl);
+				$this->setBaseUrl('/' . $baseUrl);
 			} else {
-				$this->setAddress($url);
+				$address = $url;
 			}
+			if (strpos($address, ':') > -1) {
+				list($address, $port) = explode(':', $address, 2);
+				$this->setPort((int)$port);
+			}
+			$this->setHost($address);
 		} else {
 			$this->setProtocols([$protocol]);
-			$this->setAddress(parse_url($url, PHP_URL_HOST));
+			$this->setUsedProtocol($protocol);
+			$this->setHost(parse_url($url, PHP_URL_HOST));
 			$this->setBaseUrl(parse_url($url, PHP_URL_PATH));
+			if (is_numeric($port = parse_url($url, PHP_URL_PORT))) {
+				$this->setPort($port);
+			}
 		}
 	}
 
@@ -255,9 +360,10 @@ class Request implements JsonSerializable {
 
 	/**
 	 * @return string
+	 * @deprecated - 19 - use getParametersUrl() + addParam()
 	 */
 	public function getParsedUrl(): string {
-		$url = $this->getUrl();
+		$url = $this->getPath();
 		$ak = array_keys($this->getData());
 		foreach ($ak as $k) {
 			if (!is_string($this->data[$k])) {
@@ -270,12 +376,48 @@ class Request implements JsonSerializable {
 		return $url;
 	}
 
+	/**
+	 * @return string
+	 */
+	public function getParametersUrl(): string {
+		$url = $this->getPath();
+		$ak = array_keys($this->getParams());
+		foreach ($ak as $k) {
+			if (!is_string($this->params[$k])) {
+				continue;
+			}
+
+			$url = str_replace(':' . $k, $this->params[$k], $url);
+		}
+
+		return $url;
+	}
+
 
 	/**
 	 * @return string
 	 */
-	public function getUrl(): string {
+	public function getPath(): string {
 		return $this->baseUrl . $this->url;
+	}
+
+
+	/**
+	 * @return string
+	 * @deprecated - 19 - use getPath()
+	 */
+	public function getUrl(): string {
+		return $this->getPath();
+	}
+
+
+	/**
+	 * @return string
+	 */
+	public function getCompleteUrl(): string {
+		$port = ($this->getPort() > 0) ? ':' . $this->getPort() : '';
+
+		return $this->getUsedProtocol() . '://' . $this->getHost() . $port . $this->getParametersUrl();
 	}
 
 
@@ -287,18 +429,24 @@ class Request implements JsonSerializable {
 	}
 
 
-	public function addHeader($header): Request {
-		$this->headers[] = $header;
+	public function addHeader($key, $value): Request {
+		$header = $this->get($key, $this->headers);
+		if ($header !== '') {
+			$header .= ', ' . $value;
+		} else {
+			$header = $value;
+		}
+
+		$this->headers[$key] = $header;
 
 		return $this;
 	}
-
 
 	/**
 	 * @return array
 	 */
 	public function getHeaders(): array {
-		return $this->headers;
+		return array_merge(['User-Agent' => $this->getUserAgent()], $this->headers);
 	}
 
 	/**
@@ -308,6 +456,25 @@ class Request implements JsonSerializable {
 	 */
 	public function setHeaders(array $headers): Request {
 		$this->headers = $headers;
+
+		return $this;
+	}
+
+
+	/**
+	 * @return array
+	 */
+	public function getCookies(): array {
+		return $this->cookies;
+	}
+
+	/**
+	 * @param array $cookies
+	 *
+	 * @return Request
+	 */
+	public function setCookies(array $cookies): Request {
+		$this->cookies = $cookies;
 
 		return $this;
 	}
@@ -358,6 +525,51 @@ class Request implements JsonSerializable {
 
 
 	/**
+	 * @return array
+	 */
+	public function getParams(): array {
+		return $this->params;
+	}
+
+	/**
+	 * @param array $params
+	 *
+	 * @return Request
+	 */
+	public function setParams(array $params): Request {
+		$this->params = $params;
+
+		return $this;
+	}
+
+
+	/**
+	 * @param string $k
+	 * @param string $v
+	 *
+	 * @return Request
+	 */
+	public function addParam(string $k, string $v): Request {
+		$this->params[$k] = $v;
+
+		return $this;
+	}
+
+
+	/**
+	 * @param string $k
+	 * @param int $v
+	 *
+	 * @return Request
+	 */
+	public function addParamInt(string $k, int $v): Request {
+		$this->params[$k] = $v;
+
+		return $this;
+	}
+
+
+	/**
 	 * @param string $k
 	 * @param string $v
 	 *
@@ -388,26 +600,32 @@ class Request implements JsonSerializable {
 	 */
 	public function getDataBody(): string {
 		return json_encode($this->getData());
-//		if ($this->getData() === []) {
-//			return '';
-//		}
-//
-//		return preg_replace(
-//			'/([(%5B)]{1})[0-9]+([(%5D)]{1})/', '$1$2', http_build_query($this->getData())
-//		);
 	}
 
 	/**
 	 * @return string
+	 * @deprecated - 19 - use getUrlParams();
 	 */
 	public function getUrlData(): string {
-//		return json_encode($this->getData());
 		if ($this->getData() === []) {
 			return '';
 		}
 
 		return preg_replace(
 			'/([(%5B)]{1})[0-9]+([(%5D)]{1})/', '$1$2', http_build_query($this->getData())
+		);
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getUrlParams(): string {
+		if ($this->getParams() === []) {
+			return '';
+		}
+
+		return preg_replace(
+			'/([(%5B)]{1})[0-9]+([(%5D)]{1})/', '$1$2', http_build_query($this->getParams())
 		);
 	}
 
@@ -495,11 +713,37 @@ class Request implements JsonSerializable {
 		return [
 			'protocols'     => $this->getProtocols(),
 			'used_protocol' => $this->getUsedProtocol(),
-			'host'          => $this->getAddress(),
-			'url'           => $this->getUrl(),
+			'port'          => $this->getPort(),
+			'host'          => $this->getHost(),
+			'url'           => $this->getPath(),
 			'timeout'       => $this->getTimeout(),
 			'type'          => $this->getType(),
+			'cookies'       => $this->getCookies(),
+			'params'        => $this->getParams(),
 			'data'          => $this->getData()
 		];
 	}
+
+
+	/**
+	 * @param string $type
+	 *
+	 * @return int
+	 */
+	public static function type(string $type): int {
+		switch (strtoupper($type)) {
+			case 'GET':
+				return self::TYPE_GET;
+			case 'POST':
+				return self::TYPE_POST;
+			case 'PUT':
+				return self::TYPE_PUT;
+			case 'DELETE':
+				return self::TYPE_DELETE;
+		}
+
+		return 0;
+	}
+
 }
+

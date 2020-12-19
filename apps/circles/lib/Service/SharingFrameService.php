@@ -304,13 +304,10 @@ class SharingFrameService {
 	 * @throws Exception
 	 */
 	public function initiateShare(string $circleUniqueId, string $frameUniqueId) {
-		$route = $this->urlGenerator->linkToRouteAbsolute('circles.Shares.initShareDelivery');
 		$request = new NC19Request('', Request::TYPE_POST);
-		$this->configService->configureRequest($request);
-		$request->setProtocols(['https', 'http']);
-		$request->addData('circleId', $circleUniqueId);
-		$request->addData('frameId', $frameUniqueId);
-		$request->setAddressFromUrl($route);
+		$this->configService->configureRequest($request, 'circles.Shares.initShareDelivery');
+		$request->addParam('circleId', $circleUniqueId);
+		$request->addParam('frameId', $frameUniqueId);
 
 		try {
 			$this->doRequest($request);

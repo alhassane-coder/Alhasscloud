@@ -186,10 +186,6 @@ OC.L10N.register(
     "Error, please enter proper password and/or expiration date" : "Σφάλμα, παρακαλώ εισάγετε τον σωστό κωδικό πρόσβασης και/ή ημερομηνία λήξης",
     "No recommendations. Start typing." : "Δεν υπάρχουν συστάσεις. Αρχίστε να πληκτρολογείτε.",
     "Resharing is not allowed" : "Δεν επιτρέπεται ο επαναμοιρασμός",
-    "Name or email address …" : "Όνομα ή διεύθυνση ηλεκτρονικού ταχυδρομείου...",
-    "Name or federated cloud ID …" : "Όνομα ταυτότητας ή ομοσπονδιακού σύννεφου ...",
-    "Name, federated cloud ID or email address …" : "Όνομα ταυτότητας, ομοσπονδιακού σύννεφου ή διεύθυνση ηλεκτρονικού ταχυδρομείου…",
-    "Name …" : "Όνομα ...",
     "Searching …" : "Αναζήτηση ...",
     "No elements found." : "Δεν βρέθηκαν στοιχεία.",
     "Search globally" : "Γενική αναζήτηση",
@@ -232,7 +228,6 @@ OC.L10N.register(
     "Uploading files" : "Μεταφόρτωση αρχείων",
     "Uploaded files:" : "Αποστολή αρχείων:",
     "By uploading files, you agree to the %1$sterms of service%2$s." : "Με την μεταφόρτωση αρχείων, συμφωνείτε με %1$sόρους χρήσεως %2$s.",
-    "could not delete share" : "αδυναμία διαγραφής κοινόχρηστου φακέλου",
     "Uploading files…" : "Αποστολή αρχείων ..."
 },
 "nplurals=2; plural=(n != 1);");

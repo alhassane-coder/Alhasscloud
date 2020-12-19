@@ -35,5 +35,5 @@ class Horde_ListHeaders_Translation extends Horde_Translation_Autodetect
      *
      * @var string
      */
-    protected static $_pearDirectory = '/tmp/krankerl.kZGDuUNLZIad/mail/vendor/pear-pear.horde.org/Horde_ListHeaders/data';
+    protected static $_pearDirectory = '/tmp/krankerl.qKs5JNFaCWgy/mail/vendor/pear-pear.horde.org/Horde_ListHeaders/data';
 }

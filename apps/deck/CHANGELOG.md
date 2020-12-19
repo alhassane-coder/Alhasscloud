@@ -1,6 +1,24 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## 1.2.2 - 2020-11-24
+
+### Fixed
+
+* [#2584](https://github.com/nextcloud/deck/pull/2584) Fix updating checkbox state and avoid issues due to duplicate sidebar element
+* [#2586](https://github.com/nextcloud/deck/pull/2586) Fix card details button
+* [#2587](https://github.com/nextcloud/deck/pull/2587) Move modal top spacing to the header to avoid side-effect when scrolling
+* [#2588](https://github.com/nextcloud/deck/pull/2588) Do not render images in editor
+* [#2609](https://github.com/nextcloud/deck/pull/2609) Fix issue with depenendency causing newline comments to not show
+* [#2611](https://github.com/nextcloud/deck/pull/2611) Fix paragraph styling in comments
+
+## 1.2.1 - 2020-11-18
+
+### Fixed
+
+* [#2570](https://github.com/nextcloud/deck/pull/2570) [#2571](https://github.com/nextcloud/deck/pull/2571) Fix error when deleting users @ksteinb
+* [#2573](https://github.com/nextcloud/deck/pull/2573) Fix issue where card description was changed on the wrong card when switching cards
+
 ## 1.2.0 - 2020-11-16
 
 ### Added

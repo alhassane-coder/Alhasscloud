@@ -82,11 +82,10 @@ class GlobalScaleUsers implements ISearch {
 			return [];
 		}
 
-		$request = new NC19Request('/users', Request::TYPE_GET);
+		$request = new NC19Request(ConfigService::GS_LOOKUP_USERS, Request::TYPE_GET);
 		$this->configService->configureRequest($request);
-		$request->setProtocols(['https', 'http']);
-		$request->addData('search', $search);
-		$request->setAddressFromUrl($lookup);
+		$request->basedOnUrl($lookup);
+		$request->addParam('search', $search);
 
 		try {
 			$users = $this->retrieveJson($request);
@@ -95,7 +94,7 @@ class GlobalScaleUsers implements ISearch {
 		RequestResultNotJsonException $e
 		) {
 			$this->miscService->log(
-				'Issue while retrieving instances from lookup: ' . get_class($e) . ' ' . $e->getMessage()
+				'Issue while search users from lookup: ' . get_class($e) . ' ' . $e->getMessage()
 			);
 
 			return [];
@@ -104,7 +103,7 @@ class GlobalScaleUsers implements ISearch {
 		$result = [];
 		foreach ($users as $user) {
 			list(, $instance) = explode('@', $this->get('federationId', $user), 2);
-			if ($instance === $this->configService->getLocalCloudId()) {
+			if ($this->configService->isLocalInstance($instance)) {
 				continue;
 			}
 

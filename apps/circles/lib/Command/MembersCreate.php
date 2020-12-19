@@ -36,7 +36,7 @@ use daita\MySmallPhpTools\Exceptions\RequestResultSizeException;
 use daita\MySmallPhpTools\Exceptions\RequestServerException;
 use daita\MySmallPhpTools\Model\Nextcloud\NC19Request;
 use daita\MySmallPhpTools\Model\Request;
-use daita\MySmallPhpTools\Traits\TRequest;
+use daita\MySmallPhpTools\Traits\Nextcloud\TNC19Request;
 use Exception;
 use OC\Core\Command\Base;
 use OC\User\NoUserException;
@@ -60,7 +60,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 class MembersCreate extends Base {
 
 
-	use TRequest;
+	use TNC19Request;
 
 
 	/** @var IL10N */
@@ -175,11 +175,10 @@ class MembersCreate extends Base {
 			return '';
 		}
 
-		$request = new NC19Request('/users', Request::TYPE_GET);
+		$request = new NC19Request(ConfigService::GS_LOOKUP_USERS, Request::TYPE_GET);
 		$this->configService->configureRequest($request);
-		$request->setProtocols(['https', 'http']);
-		$request->addData('search', $search);
-		$request->setAddressFromUrl($lookup);
+		$request->basedOnUrl($lookup);
+		$request->addParam('search', $search);
 
 		try {
 			$users = $this->retrieveJson($request);

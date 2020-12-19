@@ -104,6 +104,7 @@ class MemberAdd extends AGlobalScaleEvent {
 			$circle->getUniqueId(), $ident, $eventMember->getType(), $eventMember->getInstance()
 		);
 		$member->hasToBeInviteAble();
+		$member->setCachedName($eventMember->getCachedName());
 
 		$this->circlesService->checkThatCircleIsNotFull($circle);
 		$this->membersService->addMemberBasedOnItsType($circle, $member);
@@ -145,9 +146,11 @@ class MemberAdd extends AGlobalScaleEvent {
 			$this->membersRequest->updateMemberLevel($member);
 		}
 
-		$this->miscService->updateCachedName($member);
-		$cachedName = $member->getCachedName();
 
+		//
+		// TODO: verifiez comment se passe le cached name sur un member_add
+		//
+		$cachedName = $member->getCachedName();
 		$password = $event->getData()
 						  ->g('password');
 
@@ -158,7 +161,7 @@ class MemberAdd extends AGlobalScaleEvent {
 		];
 
 		if ($member->getType() === Member::TYPE_CONTACT
-			&& $member->getInstance() === $this->configService->getLocalCloudId()) {
+			&& $this->configService->isLocalInstance($member->getInstance())) {
 			$result['contact'] = $this->miscService->getInfosFromContact($member);
 		}
 

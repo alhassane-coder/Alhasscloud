@@ -64,7 +64,6 @@
     "Group '{name}' successfully removed from the circle" : "群組 '{name}' 已成功自小圈圈移除",
     "Group '{name}' could not be removed from the circle" : "群組 '{name}' 無法從小圈圈移除",
     "Local User" : "本地用戶",
-    "The member '{name}' was invited to the circle" : "成員 {name} 已被邀請加入小圈圈",
     "Settings saved." : "設定已儲存",
     "You deleted {circle}" : "您刪除了 {circle}",
     "{author} deleted {circle}" : "{author} 刪除了 {circle}",
@@ -83,7 +82,10 @@
     "Accept" : "接受",
     "Refuse" : "拒絕",
     "Leave the circle" : "離開小圈圈",
+    "This link exists already" : "此連結已存在",
     "now" : "現在",
+    "This user does not exist" : "此使用者不存在",
+    "Email format is not valid" : "電子郵件格式無效",
     "Could not find share" : "找不到分享",
     "No files in here" : "沒有檔案在這裡。",
     "No entries found in this folder" : "在此資料夾中沒有任何項目",
@@ -128,6 +130,7 @@
     "Name of the Circle" : "小圈圈名稱",
     "Description" : "描述",
     "Change password" : "變更密碼",
-    "Save settings" : "儲存設定"
+    "Save settings" : "儲存設定",
+    "The member '{name}' was invited to the circle" : "成員 {name} 已被邀請加入小圈圈"
 },"pluralForm" :"nplurals=1; plural=0;"
 }

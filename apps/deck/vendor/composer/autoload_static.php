@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInitaded3d3dbd33286c73700bd166f06676
+class ComposerStaticInit45634ef9840d68c1607c1abea5bd923a
 {
     public static $prefixesPsr0 = array (
         'c' => 
@@ -17,7 +17,6 @@ class ComposerStaticInitaded3d3dbd33286c73700bd166f06676
     );
 
     public static $classMap = array (
-        'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
         'cogpowered\\FineDiff\\Delimiters' => __DIR__ . '/..' . '/cogpowered/finediff/src/cogpowered/FineDiff/Delimiters.php',
         'cogpowered\\FineDiff\\Diff' => __DIR__ . '/..' . '/cogpowered/finediff/src/cogpowered/FineDiff/Diff.php',
         'cogpowered\\FineDiff\\Exceptions\\GranularityCountException' => __DIR__ . '/..' . '/cogpowered/finediff/src/cogpowered/FineDiff/Exceptions/GranularityCountException.php',
@@ -46,8 +45,8 @@ class ComposerStaticInitaded3d3dbd33286c73700bd166f06676
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixesPsr0 = ComposerStaticInitaded3d3dbd33286c73700bd166f06676::$prefixesPsr0;
-            $loader->classMap = ComposerStaticInitaded3d3dbd33286c73700bd166f06676::$classMap;
+            $loader->prefixesPsr0 = ComposerStaticInit45634ef9840d68c1607c1abea5bd923a::$prefixesPsr0;
+            $loader->classMap = ComposerStaticInit45634ef9840d68c1607c1abea5bd923a::$classMap;
 
         }, null, ClassLoader::class);
     }

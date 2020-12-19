@@ -24,7 +24,6 @@ if ($_['audioplayer_sonos'] !== 'checked') {
 
 ?>
 <input type="hidden" name="id" value="">
-<input type="hidden" id="audioplayer_notification" value="<?php p($_['audioplayer_notification']); ?>">
 <input type="hidden" id="audioplayer_volume" value="<?php p($_['audioplayer_volume']); ?>">
 <input type="hidden" id="audioplayer_sonos" value="<?php p($_['audioplayer_sonos']); ?>">
 
@@ -50,6 +49,6 @@ if ($_['audioplayer_sonos'] !== 'checked') {
 
 </div>
 
-<div id="app-sidebar" class="details-view scroll-container disappear" data-trackid="">
+<div id="app-sidebar" class="app-sidebar details-view scroll-container disappear" data-trackid="">
     <?php print_unescaped($this->inc('part.sidebar')); ?>
 </div>

@@ -167,6 +167,7 @@
     "Password protection" : "Protezione con password",
     "Enter a password" : "Digita una password",
     "Expiration date (enforced)" : "Data di scadenza (applicata)",
+    "Create share" : "Crea condivisione",
     "Cancel" : "Annulla",
     "Share label" : "Condividi etichetta",
     "Read only" : "Sola lettura",
@@ -184,10 +185,8 @@
     "Error, please enter proper password and/or expiration date" : "Errore, digita la password corretta e/o la data di scadenza",
     "No recommendations. Start typing." : "Nessun consiglio. Inizia a digitare.",
     "Resharing is not allowed" : "La ri-condivisione non è consentita",
-    "Name or email address …" : "Nome o indirizzo email...",
-    "Name or federated cloud ID …" : "Nome o ID di cloud federata...",
-    "Name, federated cloud ID or email address …" : "Nome, ID di cloud federata o indirizzo email…",
-    "Name …" : "Nome…",
+    "Name or email …" : "Nome o email...",
+    "Name, email, or Federated Cloud ID …" : "Nome, email o ID di cloud federata...",
     "Searching …" : "Ricerca in corso...",
     "No elements found." : "Nessun elemento trovato.",
     "Search globally" : "Cerca globalmente",
@@ -230,7 +229,7 @@
     "Uploading files" : "Caricamento file",
     "Uploaded files:" : "File caricati:",
     "By uploading files, you agree to the %1$sterms of service%2$s." : "Caricando i file, accetti i %1$stermini del servizio%2$s.",
-    "could not delete share" : "impossibile eliminare la condivisione",
+    "Name, email, or federated cloud ID …" : "Nome, email o ID di cloud federata...",
     "Uploading files…" : "Caricamento file in corso..."
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

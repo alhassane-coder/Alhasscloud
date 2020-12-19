@@ -74,7 +74,7 @@ OC.L10N.register(
     "Attendees:" : "Uczestnicy:",
     "Accept" : "Akceptuj",
     "Decline" : "Odrzuć",
-    "More options …" : "Więcej opcji...",
+    "More options …" : "Więcej opcji…",
     "More options at %s" : "Więcej opcji na %s",
     "Contacts" : "Kontakty",
     "System in maintenance mode." : "System w trybie konserwacji.",
@@ -110,10 +110,6 @@ OC.L10N.register(
     "The meeting »%1$s« with %2$s was canceled." : "Spotkanie »%1$s« z %2$s zostało anulowane.",
     "The meeting »%1$s« with %2$s was updated." : "Spotkanie »%1$s« z %2$s zostało zaktualizowane.",
     "%1$s invited you to »%2$s«" : "%1$s zaprosił cię do »%2$s«",
-    "When:" : "Kiedy:",
-    "Technical details" : "Szczegóły techniczne",
-    "Remote Address: %s" : "Adres zdalny: %s",
-    "Request ID: %s" : "ID żądania: %s",
-    "Notifications will be send through background jobs, so these need to happen often enough." : "Powiadomienia będą wysyłane za pośrednictwem zadań w tle, więc mogą pojawiać się one dosyć często."
+    "When:" : "Kiedy:"
 },
 "nplurals=4; plural=(n==1 ? 0 : (n%10>=2 && n%10<=4) && (n%100<12 || n%100>14) ? 1 : n!=1 && (n%10>=0 && n%10<=1) || (n%10>=5 && n%10<=9) || (n%100>=12 && n%100<=14) ? 2 : 3);");

@@ -281,13 +281,14 @@ class ThemingDefaults extends \OC_Defaults {
 	 * @return array scss variables to overwrite
 	 */
 	public function getScssVariables() {
-		$cache = $this->cacheFactory->createDistributed('theming-' . $this->urlGenerator->getBaseUrl());
+		$cacheBuster = $this->config->getAppValue('theming', 'cachebuster', '0');
+		$cache = $this->cacheFactory->createDistributed('theming-' . $cacheBuster . '-' . $this->urlGenerator->getBaseUrl());
 		if ($value = $cache->get('getScssVariables')) {
 			return $value;
 		}
 
 		$variables = [
-			'theming-cachebuster' => "'" . $this->config->getAppValue('theming', 'cachebuster', '0') . "'",
+			'theming-cachebuster' => "'" . $cacheBuster . "'",
 			'theming-logo-mime' => "'" . $this->config->getAppValue('theming', 'logoMime') . "'",
 			'theming-background-mime' => "'" . $this->config->getAppValue('theming', 'backgroundMime') . "'",
 			'theming-logoheader-mime' => "'" . $this->config->getAppValue('theming', 'logoheaderMime') . "'",
@@ -398,6 +399,7 @@ class ThemingDefaults extends \OC_Defaults {
 		$this->config->deleteAppValue('theming', $setting);
 		$this->increaseCacheBuster();
 
+		$returnValue = '';
 		switch ($setting) {
 			case 'name':
 				$returnValue = $this->getEntity();
@@ -411,8 +413,11 @@ class ThemingDefaults extends \OC_Defaults {
 			case 'color':
 				$returnValue = $this->getColorPrimary();
 				break;
-			default:
-				$returnValue = '';
+			case 'logo':
+			case 'logoheader':
+			case 'background':
+			case 'favicon':
+				$this->imageManager->delete($setting);
 				break;
 		}
 

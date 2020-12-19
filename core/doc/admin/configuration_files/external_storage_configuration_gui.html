@@ -100,6 +100,7 @@
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Configuring External Storage (GUI)</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#enabling-external-storage-support">Enabling External Storage Support</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#storage-configuration">Storage configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#usage-of-variables-for-mount-paths">Usage of variables for mount paths</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#user-and-group-permissions">User and group permissions</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#mount-options">Mount options</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#using-self-signed-certificates">Using self-signed certificates</a></li>
@@ -242,6 +243,18 @@ that Nextcloud could not connect to the external storage, so you need to
 re-check your configuration and network availability.</p>
 <p>If there is an error on the storage, it will be marked as unavailable for ten
 minutes. To re-check it, click the colored icon or reload your Admin page.</p>
+</div>
+<div class="section" id="usage-of-variables-for-mount-paths">
+<h2>Usage of variables for mount paths<a class="headerlink" href="#usage-of-variables-for-mount-paths" title="Permalink to this headline">¶</a></h2>
+<p>The external storage mounting mechanism accepts variables in the mount path.</p>
+<p>Use <code class="docutils literal notranslate"><span class="pre">$user</span></code> for automatic substitution with the logged in user’s username.</p>
+<p>Use <code class="docutils literal notranslate"><span class="pre">$home</span></code> for automatic substitution with a configurable home directory variable
+(requires LDAP, see <a class="reference internal" href="../configuration_user/user_auth_ldap.html#ldap-special-attributes"><span class="std std-ref">Special attributes</span></a> in the LDAP configuration documentation for details)</p>
+<p>In the following example, the mount point for a logged in user “alice” would substitute
+to <code class="docutils literal notranslate"><span class="pre">/opt/userDirectories/alice/myPictures</span></code>.</p>
+<div class="figure align-default">
+<img alt="External storage user variable substitution" src="../_images/externalStorages_variables.png" />
+</div>
 </div>
 <div class="section" id="user-and-group-permissions">
 <h2>User and group permissions<a class="headerlink" href="#user-and-group-permissions" title="Permalink to this headline">¶</a></h2>

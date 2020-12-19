@@ -30,10 +30,7 @@
 namespace OCA\Circles\GlobalScale;
 
 
-use OCA\Circles\Exceptions\CircleAlreadyExistsException;
-use OCA\Circles\Exceptions\MemberAlreadyExistsException;
 use OCA\Circles\Model\GlobalScale\GSEvent;
-use OCA\Circles\Model\Member;
 
 
 /**
@@ -67,6 +64,7 @@ class CircleDestroy extends AGlobalScaleEvent {
 		$circle = $event->getCircle();
 		$this->eventsService->onCircleDestruction($circle);
 
+		$this->sharesRequest->removeSharesToCircleId($circle->getUniqueId());
 		$this->membersRequest->removeAllFromCircle($circle->getUniqueId());
 		$this->circlesRequest->destroyCircle($circle->getUniqueId());
 	}

@@ -224,7 +224,6 @@ use OCP\User\Events\BeforeUserLoggedOutEvent;
 use OCP\User\Events\PasswordUpdatedEvent;
 use OCP\User\Events\PostLoginEvent;
 use OCP\User\Events\UserChangedEvent;
-use OCP\User\Events\UserCreatedEvent;
 use OCP\User\Events\UserDeletedEvent;
 use OCP\User\Events\UserLoggedInEvent;
 use OCP\User\Events\UserLoggedInWithCookieEvent;
@@ -508,10 +507,6 @@ class Server extends ServerContainer implements IServerContainer {
 			$userSession->listen('\OC\User', 'postCreateUser', function ($user, $password) {
 				/** @var $user \OC\User\User */
 				\OC_Hook::emit('OC_User', 'post_createUser', ['uid' => $user->getUID(), 'password' => $password]);
-
-				/** @var IEventDispatcher $dispatcher */
-				$dispatcher = $this->query(IEventDispatcher::class);
-				$dispatcher->dispatchTyped(new UserCreatedEvent($user, $password));
 			});
 			$userSession->listen('\OC\User', 'preDelete', function ($user) use ($legacyDispatcher) {
 				/** @var $user \OC\User\User */
@@ -1126,7 +1121,7 @@ class Server extends ServerContainer implements IServerContainer {
 					$c->getURLGenerator(),
 					$c->getMemCacheFactory(),
 					new Util($c->getConfig(), $this->getAppManager(), $c->getAppDataDir('theming')),
-					new ImageManager($c->getConfig(), $c->getAppDataDir('theming'), $c->getURLGenerator(), $this->getMemCacheFactory(), $this->getLogger()),
+					new ImageManager($c->getConfig(), $c->getAppDataDir('theming'), $c->getURLGenerator(), $this->getMemCacheFactory(), $this->getLogger(), $this->getTempManager()),
 					$c->getAppManager(),
 					$c->getNavigationManager()
 				);
@@ -1143,7 +1138,8 @@ class Server extends ServerContainer implements IServerContainer {
 				\OC::$SERVERROOT,
 				$this->getMemCacheFactory(),
 				$c->query(IconsCacher::class),
-				new TimeFactory()
+				new TimeFactory(),
+				$c->query(AppConfig::class)
 			);
 		});
 		$this->registerService(JSCombiner::class, function (Server $c) {
@@ -1282,7 +1278,7 @@ class Server extends ServerContainer implements IServerContainer {
 		});
 
 		$this->registerService(ICloudIdManager::class, function (Server $c) {
-			return new CloudIdManager();
+			return new CloudIdManager($c->getContactsManager());
 		});
 
 		$this->registerService(IConfig::class, function (Server $c) {

@@ -29,14 +29,11 @@
 
 namespace OCA\Circles\Command;
 
-use daita\MySmallPhpTools\Exceptions\RequestContentException;
 use daita\MySmallPhpTools\Exceptions\RequestNetworkException;
-use daita\MySmallPhpTools\Exceptions\RequestResultSizeException;
-use daita\MySmallPhpTools\Exceptions\RequestServerException;
 use daita\MySmallPhpTools\Model\Nextcloud\NC19Request;
 use daita\MySmallPhpTools\Model\Request;
+use daita\MySmallPhpTools\Traits\Nextcloud\TNC19Request;
 use daita\MySmallPhpTools\Traits\TArrayTools;
-use daita\MySmallPhpTools\Traits\TRequest;
 use Exception;
 use OC\Core\Command\Base;
 use OCA\Circles\Model\GlobalScale\GSEvent;
@@ -59,7 +56,7 @@ class CirclesTest extends Base {
 
 
 	use TArrayTools;
-	use TRequest;
+	use TNC19Request;
 
 
 	/** @var IL10N */
@@ -109,7 +106,8 @@ class CirclesTest extends Base {
 		parent::configure();
 		$this->setName('circles:test')
 			 ->setDescription('testing some features')
-			 ->addOption('delay', 'd', InputOption::VALUE_REQUIRED, 'delay before checking result');
+			 ->addOption('delay', 'd', InputOption::VALUE_REQUIRED, 'delay before checking result')
+			 ->addOption('url', '', InputOption::VALUE_REQUIRED, 'specify a source url', '');
 	}
 
 
@@ -125,11 +123,23 @@ class CirclesTest extends Base {
 			$this->delay = (int)$input->getOption('delay');
 		}
 
-		if (!$this->testLocalAddress($output)) {
+		$this->configService->setAppValue(ConfigService::TEST_NC_BASE, '');
+		$this->configService->setAppValue(ConfigService::TEST_NC_BASE, $input->getOption('url'));
+
+		if (!$this->testRequest($output, 'GET', 'core.CSRFToken.index')) {
+			$this->configService->setAppValue(ConfigService::TEST_NC_BASE, '');
+
 			return 0;
 		}
 
-		$instances = array_merge($this->globalScaleService->getInstances(true));
+		if (!$this->testRequest(
+			$output, 'POST', 'circles.GlobalScale.asyncBroadcast',
+			['token' => 'test-dummy-token']
+		)) {
+			$this->configService->setAppValue(ConfigService::TEST_NC_BASE, '');
+
+			return 0;
+		}
 
 		$test = new GSEvent(GSEvent::TEST, true, true);
 		$test->setAsync(true);
@@ -142,6 +152,7 @@ class CirclesTest extends Base {
 		$wrappers = $this->gsUpstreamService->getEventsByToken($token);
 
 		$result = [];
+		$instances = array_merge($this->globalScaleService->getInstances(true));
 		foreach ($wrappers as $wrapper) {
 			$result[$wrapper->getInstance()] = $wrapper->getEvent();
 		}
@@ -157,33 +168,34 @@ class CirclesTest extends Base {
 			}
 		}
 
+		$this->configService->setAppValue(ConfigService::TEST_NC_BASE, '');
+
 		return 0;
 	}
 
 
 	/**
-	 * @param OutputInterface $output
+	 * @param OutputInterface $o
+	 * @param string $type
+	 * @param string $route
+	 * @param array $args
 	 *
 	 * @return bool
-	 * @throws RequestContentException
 	 * @throws RequestNetworkException
-	 * @throws RequestResultSizeException
-	 * @throws RequestServerException
 	 */
-	private function testLocalAddress(OutputInterface $output): bool {
-		$absolute = $this->urlGenerator->linkToRouteAbsolute('core.CSRFToken.index');
-		$output->write('- Simple request on ' . $absolute . ': ');
+	private function testRequest(OutputInterface $o, string $type, string $route, array $args = []): bool {
+		$request = new NC19Request('', Request::type($type));
+		$this->configService->configureRequest($request, $route, $args);
+		$request->setFollowLocation(false);
 
-		$request = new NC19Request('', Request::TYPE_GET);
-		$this->configService->configureRequest($request);
-		$request->setAddressFromUrl($absolute);
-
+		$o->write('- ' . $type . ' request on ' . $request->getCompleteUrl() . ': ');
 		$this->doRequest($request);
+
 		$color = 'error';
 		if ($request->getResultCode() === 200) {
 			$color = 'info';
 		}
-		$output->writeln('<' . $color . '>' . $request->getResultCode() . '</' . $color . '>');
+		$o->writeln('<' . $color . '>' . $request->getResultCode() . '</' . $color . '>');
 
 		if ($request->getResultCode() === 200) {
 			return true;

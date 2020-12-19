@@ -96,7 +96,6 @@ OC.L10N.register(
     "Add another link" : "Добави още една връзка",
     "Share link" : "Връзка за споделяне",
     "Resharing is not allowed" : "Повторното споделяне е забранено",
-    "Name …" : "Име ...",
     "Searching …" : "Търсене ...",
     "on {server}" : "на {server}",
     "Link to a file" : "Линк към файл",

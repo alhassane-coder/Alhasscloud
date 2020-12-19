@@ -38,8 +38,8 @@ use daita\MySmallPhpTools\Exceptions\RequestServerException;
 use daita\MySmallPhpTools\Model\Nextcloud\NC19Request;
 use daita\MySmallPhpTools\Model\Request;
 use daita\MySmallPhpTools\Model\SimpleDataStore;
+use daita\MySmallPhpTools\Traits\Nextcloud\TNC19Request;
 use daita\MySmallPhpTools\Traits\TArrayTools;
-use daita\MySmallPhpTools\Traits\TRequest;
 use Exception;
 use OCA\Circles\Db\CirclesRequest;
 use OCA\Circles\Db\GSEventsRequest;
@@ -63,7 +63,7 @@ use OCP\IURLGenerator;
 class GSUpstreamService {
 
 
-	use TRequest;
+	use TNC19Request;
 	use TArrayTools;
 
 
@@ -132,11 +132,10 @@ class GSUpstreamService {
 	 * @throws Exception
 	 */
 	public function newEvent(GSEvent $event): string {
-		$event->setSource($this->configService->getLocalCloudId());
+		$event->setSource($this->configService->getLocalInstance());
 
 		try {
 			$gs = $this->globalScaleService->getGlobalScaleEvent($event);
-
 			if ($this->isLocalEvent($event)) {
 				$gs->verify($event, true);
 				if (!$event->isAsync()) {
@@ -163,11 +162,11 @@ class GSUpstreamService {
 	 * @param GSWrapper $wrapper
 	 * @param string $protocol
 	 */
-	public function broadcastWrapper(GSWrapper $wrapper, string $protocol): void {
+	public function broadcastWrapper(GSWrapper $wrapper): void {
 		$status = GSWrapper::STATUS_FAILED;
 
 		try {
-			$this->broadcastEvent($wrapper->getEvent(), $wrapper->getInstance(), $protocol);
+			$this->broadcastEvent($wrapper->getEvent(), $wrapper->getInstance());
 			$status = GSWrapper::STATUS_DONE;
 		} catch (RequestContentException | RequestNetworkException | RequestResultSizeException | RequestServerException | RequestResultNotJsonException $e) {
 		}
@@ -193,21 +192,20 @@ class GSUpstreamService {
 	 * @throws RequestResultSizeException
 	 * @throws RequestServerException
 	 */
-	public function broadcastEvent(GSEvent $event, string $instance, string $protocol = ''): void {
+	public function broadcastEvent(GSEvent $event, string $instance): void {
 		$this->signEvent($event);
 
-		$path = $this->urlGenerator->linkToRoute('circles.GlobalScale.broadcast');
-		$request = new NC19Request($path, Request::TYPE_POST);
-		$this->configService->configureRequest($request);
-		$protocols = ['https', 'http'];
-		if ($protocol !== '') {
-			$protocols = [$protocol];
+		if ($this->configService->isLocalInstance($instance)) {
+			$request = new NC19Request('', Request::TYPE_POST);
+			$this->configService->configureRequest($request, 'circles.GlobalScale.broadcast');
+		} else {
+			$path = $this->urlGenerator->linkToRoute('circles.GlobalScale.broadcast');
+			$request = new NC19Request($path, Request::TYPE_POST);
+			$this->configService->configureRequest($request);
+			$request->setInstance($instance);
 		}
 
-		$request->setProtocols($protocols);
 		$request->setDataSerialize($event);
-
-		$request->setAddress($instance);
 
 		$data = $this->retrieveJson($request);
 		$event->setResult(new SimpleDataStore($this->getArray('result', $data, [])));
@@ -233,13 +231,8 @@ class GSUpstreamService {
 
 		$request = new NC19Request($path, Request::TYPE_POST);
 		$this->configService->configureRequest($request);
+		$request->basedOnUrl($owner->getInstance());
 
-		if ($this->get('REQUEST_SCHEME', $_SERVER) !== '') {
-			$request->setProtocols([$_SERVER['REQUEST_SCHEME']]);
-		} else {
-			$request->setProtocols(['https', 'http']);
-		}
-		$request->setAddressFromUrl($owner->getInstance());
 		$request->setDataSerialize($event);
 
 		$result = $this->retrieveJson($request);
@@ -274,7 +267,6 @@ class GSUpstreamService {
 	 * an other instance of Nextcloud
 	 *
 	 * @param GSEvent $event
-	 *asyncBroadcast
 	 *
 	 * @return bool
 	 */
@@ -341,15 +333,15 @@ class GSUpstreamService {
 
 
 	/**
+	 * @param array $sync
+	 *
 	 * @throws GSStatusException
 	 */
-	public function synchronize() {
+	public function synchronize(array $sync) {
 		$this->configService->getGSStatus();
 
-		$sync = $this->getCirclesToSync();
 		$this->synchronizeCircles($sync);
 		$this->removeDeprecatedCircles();
-
 		$this->removeDeprecatedEvents();
 	}
 
@@ -359,7 +351,7 @@ class GSUpstreamService {
 	 */
 	public function synchronizeCircles(array $circles): void {
 		$event = new GSEvent(GSEvent::GLOBAL_SYNC, true);
-		$event->setSource($this->configService->getLocalCloudId());
+		$event->setSource($this->configService->getLocalInstance());
 		$event->setData(new SimpleDataStore($circles));
 
 		foreach ($this->globalScaleService->getInstances() as $instance) {
@@ -368,30 +360,6 @@ class GSUpstreamService {
 			} catch (RequestContentException | RequestNetworkException | RequestResultSizeException | RequestServerException | RequestResultNotJsonException $e) {
 			}
 		}
-	}
-
-
-	/**
-	 * @return Circle[]
-	 */
-	private function getCirclesToSync(): array {
-		$circles = $this->circlesRequest->forceGetCircles();
-
-		$sync = [];
-		foreach ($circles as $circle) {
-			if ($circle->getOwner()
-					   ->getInstance() !== ''
-				|| $circle->getType() === Circle::CIRCLES_PERSONAL) {
-				continue;
-			}
-
-			$members = $this->membersRequest->forceGetMembers($circle->getUniqueId());
-			$circle->setMembers($members);
-
-			$sync[] = $circle;
-		}
-
-		return $sync;
 	}
 
 
@@ -437,7 +405,7 @@ class GSUpstreamService {
 	 */
 	public function confirmCircleStatus(Circle $circle): bool {
 		$event = new GSEvent(GSEvent::CIRCLE_STATUS, true);
-		$event->setSource($this->configService->getLocalCloudId());
+		$event->setSource($this->configService->getLocalInstance());
 		$event->setCircle($circle);
 
 		$this->signEvent($event);
@@ -445,14 +413,13 @@ class GSUpstreamService {
 		$path = $this->urlGenerator->linkToRoute('circles.GlobalScale.status');
 		$request = new NC19Request($path, Request::TYPE_POST);
 		$this->configService->configureRequest($request);
-		$request->setProtocols(['https', 'http']);
 		$request->setDataSerialize($event);
 
 		$requestIssue = false;
 		$notFound = false;
 		$foundWithNoOwner = false;
 		foreach ($this->globalScaleService->getInstances() as $instance) {
-			$request->setAddress($instance);
+			$request->setHost($instance);
 
 			try {
 				$result = $this->retrieveJson($request);

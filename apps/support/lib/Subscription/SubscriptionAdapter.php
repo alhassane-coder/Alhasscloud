@@ -101,6 +101,7 @@ class SubscriptionAdapter implements ISubscription, ISupportedApps {
 			'files_fulltextsearch_tesseract',
 			'files_pdfviewer',
 			'files_retention',
+			'files_rightclick',
 			'files_sharing',
 			'files_trashbin',
 			'files_versions',
@@ -108,12 +109,18 @@ class SubscriptionAdapter implements ISubscription, ISupportedApps {
 			'firstrunwizard',
 			'fulltextsearch',
 			'fulltextsearch_elasticsearch',
+			'groupfolders',
+			'guests',
 			'logreader',
 			'lookup_server_connector',
 			'nextcloud_announcements',
 			'notifications',
+			'oauth2',
 			'password_policy',
+			'photos',
+			'privacy',
 			'provisioning_api',
+			'recommendations',
 			'serverinfo',
 			'sharebymail',
 			'sharepoint',
@@ -122,40 +129,35 @@ class SubscriptionAdapter implements ISubscription, ISupportedApps {
 			'socialsharing_facebook',
 			'socialsharing_twitter',
 			'support',
+			'suspicious_login',
 			'systemtags',
+			'terms_of_service',
 			'text',
 			'theming',
+			'twofactor_backupcodes',
+			'twofactor_totp',
+			'twofactor_u2f',
 			'updatenotification',
 			'user_ldap',
+			'user_oidc',
 			'user_saml',
 			'viewer',
 			'workflowengine',
+			'workflow_script',
 		];
 
 		$nextcloudVersion = \OCP\Util::getVersion()[0];
 
-		if ($nextcloudVersion >= 16) {
-			$filesSubscription[] = 'files_rightclick';
-			$filesSubscription[] = 'groupfolders';
-			$filesSubscription[] = 'guests';
-			$filesSubscription[] = 'privacy';
-			$filesSubscription[] = 'recommendations';
-			$filesSubscription[] = 'terms_of_service';
-			$filesSubscription[] = 'text';
+		if ($nextcloudVersion >= 20) {
+			$filesSubscription[] = 'dashboard';
+			$filesSubscription[] = 'flow_notifications';
+			$filesSubscription[] = 'user_status';
+			$filesSubscription[] = 'weather_status';
 		}
-		if ($nextcloudVersion >= 17) {
-			$filesSubscription[] = 'twofactor_totp';
-			$filesSubscription[] = 'twofactor_u2f';
-		}
-		if ($nextcloudVersion  < 17) {
-			$filesSubscription[] = 'files_texteditor';
-		}
-		if ($nextcloudVersion  < 18) {
-			$filesSubscription[] = 'gallery';
+
+		if ($nextcloudVersion >= 19) {
+			$filesSubscription[] = 'contactsinteraction';
 		}		
-		if ($nextcloudVersion >= 18) {
-			$filesSubscription[] = 'photos';
-		}
 
 		$supportedApps = [];
 

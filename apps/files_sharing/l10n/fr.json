@@ -167,6 +167,7 @@
     "Password protection" : "Protection par mot de passe",
     "Enter a password" : "Saisissez un mot de passe",
     "Expiration date (enforced)" : "Date d’expiration (enforced)",
+    "Create share" : "Créer un partage",
     "Cancel" : "Annuler",
     "Share label" : "Partager étiquette",
     "Read only" : "Lecture seule",
@@ -184,10 +185,8 @@
     "Error, please enter proper password and/or expiration date" : "Erreur. Merci d'entrer un mot de passe valide et/ou une date d'expiration",
     "No recommendations. Start typing." : "Aucune recommandation. Commencez à écrire.",
     "Resharing is not allowed" : "Le repartage n'est pas autorisé",
-    "Name or email address …" : "Nom ou adresse courriel ...",
-    "Name or federated cloud ID …" : "Nom ou ID du cloud fédéré...",
-    "Name, federated cloud ID or email address …" : "Nom, ID du cloud fédéré ou adresse mail…",
-    "Name …" : "Nom …",
+    "Name or email …" : "Nom ou adresse courriel ...",
+    "Name, email, or Federated Cloud ID …" : "Nom, adresse e-mail ou identifiant Federated Cloud…",
     "Searching …" : "Recherche …",
     "No elements found." : "Aucun élément trouvé.",
     "Search globally" : "Rechercher partout",
@@ -230,7 +229,7 @@
     "Uploading files" : "Envoi des fichiers en cours ...",
     "Uploaded files:" : "Fichiers envoyés :",
     "By uploading files, you agree to the %1$sterms of service%2$s." : "En envoyant des fichiers, vous acceptez les %1$sconditions d'utilisation%2$s.",
-    "could not delete share" : "impossible de supprimer le partage",
+    "Name, email, or federated cloud ID …" : "Nom, adresse e-mail ou identifiant cloud fédéré…",
     "Uploading files…" : "Envoi des fichiers..."
 },"pluralForm" :"nplurals=2; plural=(n > 1);"
 }

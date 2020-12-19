@@ -59,6 +59,7 @@ use OCP\Files\NotFoundException;
 use OCP\IConfig;
 use OCP\IGroupManager;
 use OCP\IL10N;
+use OCP\IPreview;
 use OCP\IRequest;
 use OCP\IServerContainer;
 use OCP\IURLGenerator;
@@ -100,6 +101,8 @@ class ShareAPIController extends OCSController {
 	private $appManager;
 	/** @var IServerContainer */
 	private $serverContainer;
+	/** @var IPreview */
+	private $previewManager;
 
 	/**
 	 * Share20OCS constructor.
@@ -129,7 +132,8 @@ class ShareAPIController extends OCSController {
 		IL10N $l10n,
 		IConfig $config,
 		IAppManager $appManager,
-		IServerContainer $serverContainer
+		IServerContainer $serverContainer,
+		IPreview $previewManager
 	) {
 		parent::__construct($appName, $request);
 
@@ -144,6 +148,7 @@ class ShareAPIController extends OCSController {
 		$this->config = $config;
 		$this->appManager = $appManager;
 		$this->serverContainer = $serverContainer;
+		$this->previewManager = $previewManager;
 	}
 
 	/**
@@ -204,6 +209,7 @@ class ShareAPIController extends OCSController {
 		}
 
 		$result['mimetype'] = $node->getMimetype();
+		$result['has_preview'] = $this->previewManager->isAvailable($node);
 		$result['storage_id'] = $node->getStorage()->getId();
 		$result['storage'] = $node->getStorage()->getCache()->getNumericStorageId();
 		$result['item_source'] = $node->getId();
@@ -1616,10 +1622,11 @@ class ShareAPIController extends OCSController {
 			$hasCircleId = (substr($share->getSharedWith(), -1) === ']');
 			$shareWithStart = ($hasCircleId ? strrpos($share->getSharedWith(), '[') + 1 : 0);
 			$shareWithLength = ($hasCircleId ? -1 : strpos($share->getSharedWith(), ' '));
-			if (is_bool($shareWithLength)) {
-				$shareWithLength = -1;
+			if ($shareWithLength === false) {
+				$sharedWith = substr($share->getSharedWith(), $shareWithStart);
+			} else {
+				$sharedWith = substr($share->getSharedWith(), $shareWithStart, $shareWithLength);
 			}
-			$sharedWith = substr($share->getSharedWith(), $shareWithStart, $shareWithLength);
 			try {
 				$member = \OCA\Circles\Api\v1\Circles::getMember($sharedWith, $userId, 1);
 				if ($member->getLevel() >= 4) {

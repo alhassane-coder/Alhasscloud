@@ -34,5 +34,5 @@ class Horde_Date_Translation extends Horde_Translation_Autodetect
      *
      * @var string
      */
-    protected static $_pearDirectory = '/tmp/krankerl.kZGDuUNLZIad/mail/vendor/pear-pear.horde.org/Horde_Date/data';
+    protected static $_pearDirectory = '/tmp/krankerl.qKs5JNFaCWgy/mail/vendor/pear-pear.horde.org/Horde_Date/data';
 }

@@ -6,7 +6,6 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
-    'Composer\\InstalledVersions' => $vendorDir . '/composer/InstalledVersions.php',
     'cogpowered\\FineDiff\\Delimiters' => $vendorDir . '/cogpowered/finediff/src/cogpowered/FineDiff/Delimiters.php',
     'cogpowered\\FineDiff\\Diff' => $vendorDir . '/cogpowered/finediff/src/cogpowered/FineDiff/Diff.php',
     'cogpowered\\FineDiff\\Exceptions\\GranularityCountException' => $vendorDir . '/cogpowered/finediff/src/cogpowered/FineDiff/Exceptions/GranularityCountException.php',

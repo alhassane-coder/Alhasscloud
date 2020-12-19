@@ -203,7 +203,20 @@ this is not checked, no users can create file shares.</p></li>
 <li><p>Check <code class="docutils literal notranslate"><span class="pre">Set</span> <span class="pre">default</span> <span class="pre">expiration</span> <span class="pre">date</span> <span class="pre">for</span> <span class="pre">shares</span></code> to set a default expiration date
 on local user and group shares.</p></li>
 <li><p>Check <code class="docutils literal notranslate"><span class="pre">Enforce</span> <span class="pre">expiration</span> <span class="pre">date</span></code> to always enforce the configured expiration date
-on local user and group shares. Users will not be able to adjust or remove the expiration date.</p></li>
+on local user and group shares.</p>
+<blockquote>
+<div><div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Users will not be able to set the expiration date further
+in the future than the enforced expiration date, although they
+will be able to set a more recent date.
+Also note that users will be able to update the expiration date again at
+a later point. The expiration date is based on the current date and not on the share
+creation date. The user will be able to extend the expiration date again whenever a
+previous expiration date is close to be reached.</p>
+</div>
+</div></blockquote>
+</li>
 <li><p>Check <code class="docutils literal notranslate"><span class="pre">Allow</span> <span class="pre">users</span> <span class="pre">to</span> <span class="pre">share</span> <span class="pre">via</span> <span class="pre">link</span></code> to enable creating public shares for
 people who are not Nextcloud users via hyperlink.</p></li>
 <li><p>Check <code class="docutils literal notranslate"><span class="pre">Allow</span> <span class="pre">public</span> <span class="pre">uploads</span></code> to allow anyone to upload files to public shares.</p></li>
@@ -214,7 +227,20 @@ public share links. This does not apply to local user and group shares.</p></li>
 <li><p>Check <code class="docutils literal notranslate"><span class="pre">Set</span> <span class="pre">default</span> <span class="pre">expiration</span> <span class="pre">date</span> <span class="pre">for</span> <span class="pre">link</span> <span class="pre">shares</span></code> to set a default expiration date on
 public shares.</p></li>
 <li><p>Check <code class="docutils literal notranslate"><span class="pre">Enforce</span> <span class="pre">expiration</span> <span class="pre">date</span></code> to always enforce the configured expiration date
-on public shares. Users will not be able to adjust or remove the expiration date.</p></li>
+on public shares.</p>
+<blockquote>
+<div><div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Users will not be able to set the expiration date further
+in the future than the enforced expiration date, although they
+will be able to set a more recent date.
+Also note that users will be able to update the expiration date again at
+a later point. The expiration date is based on the current date and not on the share
+creation date. The user will be able to extend the expiration date again whenever a
+previous expiration date is close to be reached.</p>
+</div>
+</div></blockquote>
+</li>
 <li><p>Check <code class="docutils literal notranslate"><span class="pre">Allow</span> <span class="pre">resharing</span></code> to enable users to re-share files shared with them.</p></li>
 <li><p>Check <code class="docutils literal notranslate"><span class="pre">Allow</span> <span class="pre">sharing</span> <span class="pre">with</span> <span class="pre">groups</span></code> to enable users to share with groups.</p></li>
 <li><p>Check <code class="docutils literal notranslate"><span class="pre">Restrict</span> <span class="pre">users</span> <span class="pre">to</span> <span class="pre">only</span> <span class="pre">share</span> <span class="pre">with</span> <span class="pre">users</span> <span class="pre">in</span> <span class="pre">their</span> <span class="pre">groups</span></code> to confine

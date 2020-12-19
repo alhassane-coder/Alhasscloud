@@ -40,6 +40,7 @@ OC.L10N.register(
     "You solved todo {todo} in list {calendar}" : "Vyriešili ste úlohu {todo} v {calendar}",
     "{actor} reopened todo {todo} in list {calendar}" : "{actor} znovu otvoril úlohu {todo} v {calendar}",
     "You reopened todo {todo} in list {calendar}" : "Otvorili ste znovu úlohu {todo} v {calendar}",
+    "Calendar and tasks" : "Kalendár a úlohy",
     "A <strong>calendar</strong> was modified" : "<strong>kalendár</strong> bol upravený",
     "A calendar <strong>event</strong> was modified" : "<strong>Udalosť</strong> v kalendári bola upravená",
     "A calendar <strong>todo</strong> was modified" : "<strong>Pripomienka</strong> v kalendári bola upravená",
@@ -64,8 +65,13 @@ OC.L10N.register(
     "%1$s via %2$s" : "%1$s cez %2$s",
     "Invitation canceled" : "Pozvánka bola zrušená",
     "Invitation updated" : "Pozvánka bola aktualizovaná",
+    "Invitation" : "Pozvánka",
+    "Title:" : "Názov:",
+    "Time:" : "Čas:",
     "Location:" : "Miesto:",
     "Link:" : "Odkaz:",
+    "Organizer:" : "Organizátor:",
+    "Attendees:" : "Účastníci:",
     "Accept" : "Schváliť",
     "Decline" : "Odmietnuť",
     "More options …" : "Ďalšie nastavenia ...",
@@ -104,10 +110,6 @@ OC.L10N.register(
     "The meeting »%1$s« with %2$s was canceled." : "Stretnutie »%1$s« s %2$s bolo zrušené.",
     "The meeting »%1$s« with %2$s was updated." : "Stretnutie »%1$s« s %2$s bolo aktualizované.",
     "%1$s invited you to »%2$s«" : "%1$s vám poslal pozvánku na »%2$s«",
-    "When:" : "Kedy:",
-    "Technical details" : "Technické podrobnosti",
-    "Remote Address: %s" : "Vzdialená adresa: %s",
-    "Request ID: %s" : "ID požiadavky: %s",
-    "Notifications will be send through background jobs, so these need to happen often enough." : "Oznámenia sa budú odosielať prostredníctvom úloh na pozadí - preto je potrebné, aby tieto prebiehali dostatočne často."
+    "When:" : "Kedy:"
 },
 "nplurals=4; plural=(n % 1 == 0 && n == 1 ? 0 : n % 1 == 0 && n >= 2 && n <= 4 ? 1 : n % 1 != 0 ? 2: 3);");

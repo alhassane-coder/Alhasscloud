@@ -357,7 +357,7 @@ notication app is enabled in the apps management.</p></li>
 <li><p>Instead of clicking that button you can now invoke the command line based
 updater by going into the <cite>updater/</cite> directory in the Nextcloud directory
 and executing the <cite>updater.phar</cite> as the web server user. (i.e.
-<code class="docutils literal notranslate"><span class="pre">sudo</span> <span class="pre">-u</span> <span class="pre">www-data</span> <span class="pre">php</span> <span class="pre">updater.phar</span></code>)</p></li>
+<code class="docutils literal notranslate"><span class="pre">sudo</span> <span class="pre">-u</span> <span class="pre">www-data</span> <span class="pre">php</span> <span class="pre">/var/www/nextcloud/updater/updater.phar</span></code>)</p></li>
 </ol>
 <img alt="../_images/updater-cli-2-start-updater.png" class="terminal-image" src="../_images/updater-cli-2-start-updater.png" />
 <ol class="arabic simple" start="3">
@@ -395,7 +395,7 @@ is executed as well. After finishing the maintenance mode will be turned off
 except an error occured during the <code class="docutils literal notranslate"><span class="pre">occ</span> <span class="pre">upgrade</span></code> or the replacement of the
 code.</p>
 <p>To execute this, run the command with the <code class="docutils literal notranslate"><span class="pre">--no-interaction</span></code> option. (i.e.
-<code class="docutils literal notranslate"><span class="pre">sudo</span> <span class="pre">-u</span> <span class="pre">www-data</span> <span class="pre">php</span> <span class="pre">updater.phar</span> <span class="pre">--no-interaction</span></code>)</p>
+<code class="docutils literal notranslate"><span class="pre">sudo</span> <span class="pre">-u</span> <span class="pre">www-data</span> <span class="pre">php</span> <span class="pre">/var/www/nextcloud/updater/updater.phar</span> <span class="pre">--no-interaction</span></code>)</p>
 <img alt="../_images/updater-cli-8-no-interaction.png" class="terminal-image" src="../_images/updater-cli-8-no-interaction.png" />
 </div>
 </div>
